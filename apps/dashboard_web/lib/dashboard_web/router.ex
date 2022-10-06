@@ -20,6 +20,13 @@ defmodule DashboardWeb.Router do
     get "/", PageController, :index
   end
 
+  scope "/auth", DashboardWeb do
+    pipe_through :browser
+
+    get "/:provider/callback", AuthController, :callback
+    get "/:provider", AuthController, :index
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", DashboardWeb do
   #   pipe_through :api
