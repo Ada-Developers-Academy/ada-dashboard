@@ -23,7 +23,7 @@ defmodule Google do
   def authorize_url! do
     OAuth2.Client.authorize_url!(
       client(),
-      scope: "email profile https://www.googleapis.com/auth/calendar"
+      scope: "openid profile email https://www.googleapis.com/auth/calendar"
     )
   end
 

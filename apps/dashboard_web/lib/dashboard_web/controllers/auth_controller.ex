@@ -6,9 +6,8 @@ defmodule DashboardWeb.AuthController do
   end
 
   def callback(conn, %{"provider" => provider, "code" => code}) do
-    token = IO.inspect(get_token!(provider, code))
-    # IO.inspect(get_user!(provider, token))
-    user = %{"name" => "fake username"}
+    token = get_token!(provider, code)
+    %OAuth2.Response{body: user} = get_user!(provider, token)
 
     conn
     |> put_session(:current_user, user)
@@ -40,7 +39,8 @@ defmodule DashboardWeb.AuthController do
   end
 
   defp get_user!("google", token) do
-    user_url = "https://www.googleapis.com/plus/v1/people/me/openIdConnect"
+    # TODO: Fetch from https://accounts.google.com/.well-known/openid-configuration
+    user_url = "https://openidconnect.googleapis.com/v1/userinfo"
     OAuth2.Client.get!(token, user_url)
   end
 end
