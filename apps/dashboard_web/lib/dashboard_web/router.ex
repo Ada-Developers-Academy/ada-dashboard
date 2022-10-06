@@ -25,6 +25,7 @@ defmodule DashboardWeb.Router do
 
     get "/:provider/callback", AuthController, :callback
     get "/:provider", AuthController, :index
+    get "/:provider/logout", AuthController, :logout
   end
 
   # Other scopes may use custom stacks.
