@@ -18,7 +18,7 @@ defmodule DashboardWeb.AuthController do
   def logout(conn, _params) do
     conn
     |> put_flash(:info, "You have been logged out!")
-    |> configure_session(drop: true)
+    |> delete_session(:current_user)
     |> redirect(to: "/")
   end
 
