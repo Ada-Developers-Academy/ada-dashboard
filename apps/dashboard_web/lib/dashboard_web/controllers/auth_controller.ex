@@ -11,7 +11,7 @@ defmodule DashboardWeb.AuthController do
 
     conn
     |> put_session(:current_user, user)
-    # |> put_session(:access_token, token.access_token)
+    |> put_session(:access_token, token.token.access_token)
     |> redirect(to: "/")
   end
 
