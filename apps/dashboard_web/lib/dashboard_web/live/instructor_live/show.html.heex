@@ -1,0 +1,46 @@
+<h1>Show Instructor</h1>
+
+<%= if @live_action in [:edit] do %>
+  <.modal return_to={Routes.instructor_show_path(@socket, :show, @instructor)}>
+    <.live_component
+      module={DashboardWeb.InstructorLive.FormComponent}
+      id={@instructor.id}
+      title={@page_title}
+      action={@live_action}
+      instructor={@instructor}
+      return_to={Routes.instructor_show_path(@socket, :show, @instructor)}
+    />
+  </.modal>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @instructor.name %>
+  </li>
+
+  <li>
+    <strong>Email:</strong>
+    <%= @instructor.email %>
+  </li>
+
+  <li>
+    <strong>External:</strong>
+    <%= @instructor.external_id %>
+  </li>
+
+  <li>
+    <strong>External provider:</strong>
+    <%= @instructor.external_provider %>
+  </li>
+
+  <li>
+    <strong>Background color:</strong>
+    <%= @instructor.background_color %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.instructor_show_path(@socket, :edit, @instructor), class: "button" %></span> |
+<span><%= live_redirect "Back", to: Routes.instructor_index_path(@socket, :index) %></span>

@@ -1,6 +1,9 @@
 defmodule DashboardWeb.AuthController do
   use DashboardWeb, :controller
 
+  alias Dashboard.Accounts.Instructor
+  alias Dashboard.Accounts
+
   def index(conn, %{"provider" => provider}) do
     redirect(conn, external: authorize_url!(provider))
   end
@@ -8,6 +11,32 @@ defmodule DashboardWeb.AuthController do
   def callback(conn, %{"provider" => provider, "code" => code}) do
     token = get_token!(provider, code)
     %OAuth2.Response{body: user} = get_user!(provider, token)
+
+    email = user["email"]
+
+    if provider == "google" and
+         String.ends_with?(email, "@adadevelopersacademy.org") do
+      external_id = user["sub"]
+
+      instructor =
+        Accounts.get_instructor_by_external_id(
+          provider,
+          external_id
+        )
+
+      IO.inspect(instructor)
+
+      if is_nil(instructor) do
+        IO.puts("INSIDE IF!")
+
+        Accounts.create_instructor!(%{
+          name: user["name"],
+          email: email,
+          external_provider: provider,
+          external_id: external_id
+        })
+      end
+    end
 
     conn
     |> put_session(:current_user, user)
