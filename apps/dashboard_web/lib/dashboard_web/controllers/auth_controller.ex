@@ -10,7 +10,8 @@ defmodule DashboardWeb.AuthController do
 
   def callback(conn, %{"provider" => provider, "code" => code}) do
     token = get_token!(provider, code)
-    %OAuth2.Response{body: user} = get_user!(provider, token)
+    user = get_user!(provider, token).body
+    IO.inspect(conn |> get_calendars!(provider))
 
     email = user["email"]
 
@@ -24,11 +25,7 @@ defmodule DashboardWeb.AuthController do
           external_id
         )
 
-      IO.inspect(instructor)
-
       if is_nil(instructor) do
-        IO.puts("INSIDE IF!")
-
         Accounts.create_instructor!(%{
           name: user["name"],
           email: email,
@@ -40,7 +37,7 @@ defmodule DashboardWeb.AuthController do
 
     conn
     |> put_session(:current_user, user)
-    |> put_session(:access_token, token.token.access_token)
+    |> put_session(:token, token)
     |> redirect(to: "/")
   end
 
@@ -68,8 +65,21 @@ defmodule DashboardWeb.AuthController do
   end
 
   defp get_user!("google", token) do
-    # TODO: Fetch from https://accounts.google.com/.well-known/openid-configuration
-    user_url = "https://openidconnect.googleapis.com/v1/userinfo"
+    openid_url = "https://accounts.google.com/.well-known/openid-configuration"
+    user_url = OAuth2.Client.get!(token, openid_url).body["userinfo_endpoint"]
+
     OAuth2.Client.get!(token, user_url)
+  end
+
+  # TODO: Move to its own module
+  defp get_calendars!(conn, "google") do
+    token = get_session(conn, "token")
+
+    cal_url = "https://www.googleapis.com/calendar/v3/users/me/calendarList"
+    cals = OAuth2.Client.get!(token, cal_url).body["items"]
+
+    Enum.map(cals, fn cal ->
+      %{id: cal["id"], name: cal["summary"]}
+    end)
   end
 end

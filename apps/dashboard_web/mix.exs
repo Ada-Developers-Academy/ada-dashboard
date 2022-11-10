@@ -24,7 +24,7 @@ defmodule DashboardWeb.MixProject do
   def application do
     [
       mod: {DashboardWeb.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :os_mon]
     ]
   end
 
