@@ -1,7 +1,6 @@
 defmodule DashboardWeb.AuthController do
   use DashboardWeb, :controller
 
-  alias Dashboard.Accounts.Instructor
   alias Dashboard.Accounts
 
   def index(conn, %{"provider" => provider}) do
@@ -11,7 +10,7 @@ defmodule DashboardWeb.AuthController do
   def callback(conn, %{"provider" => provider, "code" => code}) do
     token = get_token!(provider, code)
     user = get_user!(provider, token).body
-    IO.inspect(conn |> get_calendars!(provider))
+    {:ok, updater_pid} = DashboardWeb.CalendarUpdater.start(%{token: token, provider: provider})
 
     email = user["email"]
 
@@ -38,13 +37,22 @@ defmodule DashboardWeb.AuthController do
     conn
     |> put_session(:current_user, user)
     |> put_session(:token, token)
+    |> put_session(:calendar_updater_pid, updater_pid)
     |> redirect(to: "/")
   end
 
   def logout(conn, _params) do
+    updater_pid = get_session(conn, :calendar_updater_pid)
+
+    unless is_nil(updater_pid) do
+      Process.exit(updater_pid, :logout)
+    end
+
     conn
     |> put_flash(:info, "You have been logged out!")
     |> delete_session(:current_user)
+    |> delete_session(:token)
+    |> delete_session(:calendar_updater_pid)
     |> redirect(to: "/")
   end
 
@@ -69,17 +77,5 @@ defmodule DashboardWeb.AuthController do
     user_url = OAuth2.Client.get!(token, openid_url).body["userinfo_endpoint"]
 
     OAuth2.Client.get!(token, user_url)
-  end
-
-  # TODO: Move to its own module
-  defp get_calendars!(conn, "google") do
-    token = get_session(conn, "token")
-
-    cal_url = "https://www.googleapis.com/calendar/v3/users/me/calendarList"
-    cals = OAuth2.Client.get!(token, cal_url).body["items"]
-
-    Enum.map(cals, fn cal ->
-      %{id: cal["id"], name: cal["summary"]}
-    end)
   end
 end
