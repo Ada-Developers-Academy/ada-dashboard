@@ -29,8 +29,6 @@ config :dashboard_web,
   ecto_repos: [Dashboard.Repo],
   generators: [context_app: :dashboard]
 
-config :dashboard_web, DashboardWeb.CalendarUpdater, interval_seconds: 300
-
 # Configures the endpoint
 config :dashboard_web, DashboardWeb.Endpoint,
   url: [host: "localhost"],
@@ -58,3 +56,6 @@ config :phoenix, :json_library, Jason
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
+
+# Calendar Config
+config :dashboard_web, DashboardWeb.CalendarUpdater, interval_seconds: 300

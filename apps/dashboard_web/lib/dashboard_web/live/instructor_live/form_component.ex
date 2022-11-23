@@ -41,7 +41,7 @@ defmodule DashboardWeb.InstructorLive.FormComponent do
   end
 
   defp save_instructor(socket, :new, instructor_params) do
-    case Accounts.create_instructor(instructor_params) do
+    case Accounts.create_instructor!(instructor_params) do
       {:ok, _instructor} ->
         {:noreply,
          socket
