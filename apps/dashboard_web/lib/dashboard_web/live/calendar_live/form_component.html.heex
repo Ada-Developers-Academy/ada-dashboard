@@ -1,0 +1,28 @@
+<div>
+  <h2><%= @title %></h2>
+
+  <.form
+    let={f}
+    for={@changeset}
+    id="calendar-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save">
+  
+    <%= label f, :name %>
+    <%= text_input f, :name %>
+    <%= error_tag f, :name %>
+  
+    <%= label f, :external_id %>
+    <%= text_input f, :external_id %>
+    <%= error_tag f, :external_id %>
+  
+    <%= label f, :external_provider %>
+    <%= text_input f, :external_provider %>
+    <%= error_tag f, :external_provider %>
+  
+    <div>
+      <%= submit "Save", phx_disable_with: "Saving..." %>
+    </div>
+  </.form>
+</div>
