@@ -16,6 +16,7 @@ defmodule Dashboard.Accounts.Instructor do
   def changeset(instructor, attrs) do
     instructor
     |> cast(attrs, [:name, :email, :external_id, :external_provider, :background_color])
+    |> unique_constraint([:external_id, :external_provider])
     |> validate_required([:name, :email, :external_id, :external_provider])
   end
 end

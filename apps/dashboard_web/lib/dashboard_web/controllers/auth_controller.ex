@@ -18,20 +18,13 @@ defmodule DashboardWeb.AuthController do
          String.ends_with?(email, "@adadevelopersacademy.org") do
       external_id = user["sub"]
 
-      instructor =
-        Accounts.get_instructor_by_external_id(
-          provider,
-          external_id
-        )
-
-      if is_nil(instructor) do
-        Accounts.create_instructor!(%{
+      {:ok, _instructor} =
+        Accounts.create_or_update_instructor(%{
           name: user["name"],
           email: email,
           external_provider: provider,
           external_id: external_id
         })
-      end
     end
 
     conn

@@ -56,6 +56,27 @@ defmodule Dashboard.Calendars do
   end
 
   @doc """
+  Creates a calendar; updates if already exists.
+
+  ## Examples
+
+      iex> create_or_update_calendar(%{field: value})
+      {:ok, %Calendar{}}
+
+      iex> create_or_update_calendar(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_or_update_calendar(attrs \\ %{}) do
+    %Calendar{}
+    |> Calendar.changeset(attrs)
+    |> Repo.insert(
+      on_conflict: :replace_all,
+      conflict_target: [:external_id, :external_provider]
+    )
+  end
+
+  @doc """
   Updates a calendar.
 
   ## Examples

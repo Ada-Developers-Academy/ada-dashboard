@@ -15,6 +15,7 @@ defmodule Dashboard.Calendars.Event do
   def changeset(event, attrs) do
     event
     |> cast(attrs, [:name, :description, :external_id, :external_provider])
+    |> unique_constraint([:external_id, :external_provider])
     |> validate_required([:name, :description, :external_id, :external_provider])
   end
 end

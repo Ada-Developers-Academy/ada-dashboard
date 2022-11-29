@@ -9,6 +9,9 @@
 # move said applications out of the umbrella.
 import Config
 
+# Configure tzdata
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 # Configure Mix tasks and generators
 config :dashboard,
   ecto_repos: [Dashboard.Repo]

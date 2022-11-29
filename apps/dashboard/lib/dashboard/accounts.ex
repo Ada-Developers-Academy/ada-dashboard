@@ -37,29 +37,49 @@ defmodule Dashboard.Accounts do
   """
   def get_instructor!(id), do: Repo.get!(Instructor, id)
 
-  def get_instructor_by_external_id(external_provider, external_id) do
-    Repo.get_by(
-      Instructor,
-      external_provider: external_provider,
-      external_id: external_id
-    )
-  end
+  # def get_instructor_by_external_id(external_provider, external_id) do
+  #   Repo.get_by(
+  #     Instructor,
+  #     external_provider: external_provider,
+  #     external_id: external_id
+  #   )
+  # end
 
   @doc """
   Creates a instructor.
 
   ## Examples
 
-      iex> create_instructor!(%{field: value})
-      %Instructor{}
+      iex> create_instructor(%{field: value})
+      {:ok, %Instructor{}}
 
-      iex> create_instructor!(%{field: bad_value})
-      ** (Ecto.ChangeError)
+      iex> create_instructor(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
   """
-  def create_instructor!(attrs \\ %{}) do
+  def create_instructor(attrs \\ %{}) do
     %Instructor{}
     |> Instructor.changeset(attrs)
-    |> Repo.insert!()
+    |> Repo.insert()
+  end
+
+  @doc """
+  Creates a instructor; updates if already exists.
+
+  ## Examples
+
+      iex> create_or_update_instructor(%{field: value})
+      {:ok, %Instructor{}}
+
+      iex> create_or_update_instructor(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+  """
+  def create_or_update_instructor(attrs \\ %{}) do
+    %Instructor{}
+    |> Instructor.changeset(attrs)
+    |> Repo.insert(
+      on_conflict: :replace_all,
+      conflict_target: [:external_id, :external_provider]
+    )
   end
 
   @doc """
