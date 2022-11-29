@@ -37,13 +37,13 @@ defmodule Dashboard.Accounts do
   """
   def get_instructor!(id), do: Repo.get!(Instructor, id)
 
-  # def get_instructor_by_external_id(external_provider, external_id) do
-  #   Repo.get_by(
-  #     Instructor,
-  #     external_provider: external_provider,
-  #     external_id: external_id
-  #   )
-  # end
+  def get_instructor_by_external_id(external_provider, external_id) do
+    Repo.get_by(
+      Instructor,
+      external_provider: external_provider,
+      external_id: external_id
+    )
+  end
 
   @doc """
   Creates a instructor.

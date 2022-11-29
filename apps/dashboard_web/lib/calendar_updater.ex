@@ -41,7 +41,7 @@ defmodule DashboardWeb.CalendarUpdater do
 
   defp update_calendars(provider, token) do
     calendars = get_calendars!(provider, token)
-    IO.inspect(get_events!(provider, token, calendars))
+    get_events!(provider, token, calendars)
   end
 
   defp schedule_update(%{interval_seconds: seconds}) do
@@ -81,7 +81,9 @@ defmodule DashboardWeb.CalendarUpdater do
       params =
         URI.encode_query(%{
           "timeMin" => monday |> DateTime.to_iso8601(),
-          "timeMax" => monday_after_next |> DateTime.to_iso8601()
+          "timeMax" => monday_after_next |> DateTime.to_iso8601(),
+          "orderBy" => "startTime",
+          "singleEvents" => "true"
         })
 
       url =
@@ -91,11 +93,25 @@ defmodule DashboardWeb.CalendarUpdater do
         |> URI.to_string()
 
       case OAuth2.Client.get(token, url) do
-        {:ok, events} ->
-          [events]
+        {:ok, response} ->
+          [
+            Enum.map(response.body["items"], fn event ->
+              Calendars.get_or_create_event!(%{
+                external_id: event["id"],
+                external_provider: provider,
+                calendar_id: cal.id,
+                location: event["location"],
+                start_time: event["start"]["dateTime"],
+                end_time: event["end"]["dateTime"],
+                title: event["summary"],
+                description: event["description"]
+              })
+            end)
+          ]
 
         {:error, %OAuth2.Response{} = error} ->
           error_code = error.body["error"]["code"]
+          Logger.debug(error)
           Logger.info("Failed to update #{cal.name}: #{error_code}")
 
           []
@@ -109,7 +125,7 @@ defmodule DashboardWeb.CalendarUpdater do
 
     Enum.map(cals, fn cal ->
       {:ok, cal} =
-        Calendars.create_or_update_calendar(%{
+        Calendars.get_or_create_calendar(%{
           name: cal["summary"],
           external_id: cal["id"],
           external_provider: provider,

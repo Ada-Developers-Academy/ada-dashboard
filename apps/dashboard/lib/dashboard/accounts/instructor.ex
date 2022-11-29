@@ -9,7 +9,7 @@ defmodule Dashboard.Accounts.Instructor do
     field :external_provider, :string
     field :name, :string
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc false

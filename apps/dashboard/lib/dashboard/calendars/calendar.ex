@@ -8,7 +8,7 @@ defmodule Dashboard.Calendars.Calendar do
     field :name, :string
     field :timezone, :string
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc false

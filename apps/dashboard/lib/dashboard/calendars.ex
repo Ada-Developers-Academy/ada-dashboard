@@ -77,6 +77,35 @@ defmodule Dashboard.Calendars do
   end
 
   @doc """
+  Returns the matching calendar; creates it if it doesn't exist.
+
+  ## Examples
+
+      iex> get_or_create_calendar(%{field: value})
+      %Calendar{}
+
+      iex> get_or_create_calendar(%{field: bad_value})
+      raises Ecto.ChangesetError
+
+  """
+  def get_or_create_calendar(attrs \\ %{}) do
+    calendar =
+      Repo.get_by(
+        Calendar,
+        external_provider: attrs.external_provider,
+        external_id: attrs.external_id
+      )
+
+    if is_nil(calendar) do
+      %Calendar{}
+      |> Calendar.changeset(attrs)
+      |> Repo.insert(on_conflict: :nothing)
+    else
+      {:ok, calendar}
+    end
+  end
+
+  @doc """
   Updates a calendar.
 
   ## Examples
@@ -170,6 +199,35 @@ defmodule Dashboard.Calendars do
     %Event{}
     |> Event.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Returns the matching calendar; creates it if it doesn't exist.
+
+  ## Examples
+
+      iex> get_or_create_event(%{field: value})
+      %Event{}
+
+      iex> get_or_create_event!(%{field: bad_value})
+      raises Ecto.ChangesetError
+
+  """
+  def get_or_create_event!(attrs \\ %{}) do
+    event =
+      Repo.get_by(
+        Event,
+        external_provider: attrs.external_provider,
+        external_id: attrs.external_id
+      )
+
+    if is_nil(event) do
+      %Event{}
+      |> Event.changeset(attrs)
+      |> Repo.insert!(on_conflict: :nothing)
+    else
+      event
+    end
   end
 
   @doc """

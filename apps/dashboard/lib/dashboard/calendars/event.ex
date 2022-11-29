@@ -3,19 +3,32 @@ defmodule Dashboard.Calendars.Event do
   import Ecto.Changeset
 
   schema "events" do
-    field :description, :string
     field :external_id, :string
     field :external_provider, :string
-    field :name, :string
+    field :calendar_id, :id
+    field :title, :string
+    field :description, :string
+    field :location, :string
+    field :start_time, :utc_datetime
+    field :end_time, :utc_datetime
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(event, attrs) do
     event
-    |> cast(attrs, [:name, :description, :external_id, :external_provider])
+    |> cast(attrs, [
+      :external_id,
+      :external_provider,
+      :calendar_id,
+      :title,
+      :description,
+      :location,
+      :start_time,
+      :end_time
+    ])
     |> unique_constraint([:external_id, :external_provider])
-    |> validate_required([:name, :description, :external_id, :external_provider])
+    |> validate_required([:external_id, :external_provider, :calendar_id, :title])
   end
 end
