@@ -7,6 +7,8 @@ defmodule Dashboard.Classes.Class do
     field :campus_id, :id
     field :cohort_id, :id
 
+    many_to_many :calendars, Dashboard.ClassCalendar, join_through: "class_calendars"
+
     timestamps()
   end
 
