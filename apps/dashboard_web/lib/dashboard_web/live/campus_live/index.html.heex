@@ -1,0 +1,39 @@
+<h1>Listing Campus</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <.modal return_to={Routes.campus_index_path(@socket, :index)}>
+    <.live_component
+      module={DashboardWeb.CampusLive.FormComponent}
+      id={@campus.id || :new}
+      title={@page_title}
+      action={@live_action}
+      campus={@campus}
+      return_to={Routes.campus_index_path(@socket, :index)}
+    />
+  </.modal>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="campus">
+    <%= for campus <- @campus_collection do %>
+      <tr id={"campus-#{campus.id}"}>
+        <td><%= campus.name %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.campus_show_path(@socket, :show, campus) %></span>
+          <span><%= live_patch "Edit", to: Routes.campus_index_path(@socket, :edit, campus) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: campus.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Campus", to: Routes.campus_index_path(@socket, :new) %></span>

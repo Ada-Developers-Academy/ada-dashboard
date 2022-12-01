@@ -1,0 +1,26 @@
+<h1>Show Campus</h1>
+
+<%= if @live_action in [:edit] do %>
+  <.modal return_to={Routes.campus_show_path(@socket, :show, @campus)}>
+    <.live_component
+      module={DashboardWeb.CampusLive.FormComponent}
+      id={@campus.id}
+      title={@page_title}
+      action={@live_action}
+      campus={@campus}
+      return_to={Routes.campus_show_path(@socket, :show, @campus)}
+    />
+  </.modal>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @campus.name %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.campus_show_path(@socket, :edit, @campus), class: "button" %></span> |
+<span><%= live_redirect "Back", to: Routes.campus_index_path(@socket, :index) %></span>

@@ -1,0 +1,39 @@
+<h1>Listing Cohort</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <.modal return_to={Routes.cohort_index_path(@socket, :index)}>
+    <.live_component
+      module={DashboardWeb.CohortLive.FormComponent}
+      id={@cohort.id || :new}
+      title={@page_title}
+      action={@live_action}
+      cohort={@cohort}
+      return_to={Routes.cohort_index_path(@socket, :index)}
+    />
+  </.modal>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="cohort">
+    <%= for cohort <- @cohort_collection do %>
+      <tr id={"cohort-#{cohort.id}"}>
+        <td><%= cohort.name %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.cohort_show_path(@socket, :show, cohort) %></span>
+          <span><%= live_patch "Edit", to: Routes.cohort_index_path(@socket, :edit, cohort) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: cohort.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Cohort", to: Routes.cohort_index_path(@socket, :new) %></span>
