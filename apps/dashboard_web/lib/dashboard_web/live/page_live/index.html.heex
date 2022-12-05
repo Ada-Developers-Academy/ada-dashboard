@@ -1,11 +1,13 @@
-<section class="phx-hero">
+<h1>Home</h1>
+
+<section>
   <%= if @current_user do %>
   <p>Welcome, <%= @current_user["name"] %>!</p>
-  <%= link to: Routes.auth_path(@conn, :logout, "google") do %>
+  <%= link to: Routes.auth_path(@socket, :logout, "google") do %>
   Log out
   <% end %>
   <% else %>
-  <%= link to: Routes.auth_path(@conn, :index, "google") do %>
+  <%= link to: Routes.auth_path(@socket, :index, "google") do %>
   Sign in with Google
   <% end %>
   <% end %>

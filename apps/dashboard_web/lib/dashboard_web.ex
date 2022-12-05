@@ -23,6 +23,8 @@ defmodule DashboardWeb do
 
       import Plug.Conn
       import DashboardWeb.Gettext
+      import Phoenix.LiveView.Controller
+
       alias DashboardWeb.Router.Helpers, as: Routes
     end
   end
