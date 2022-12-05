@@ -5,11 +5,7 @@ defmodule DashboardWeb.PageController do
     current_user = get_session(conn, :current_user)
 
     conn
-    |> assign(:current_user, current_user)
-    |> assign(:page_title, "Home")
-    |> live_render(
-      DashboardWeb.PageLive.Index,
-      session: %{"current_user" => current_user}
-    )
+    |> put_session("current_user", current_user)
+    |> live_render(DashboardWeb.PageLive.Index)
   end
 end
