@@ -20,7 +20,6 @@ defmodule DashboardWeb.Router do
     get "/", PageController, :index
     live "/instructors", InstructorLive.Index, :index
     live "/instructors/:id/edit", InstructorLive.Index, :edit
-
     live "/instructors/:id", InstructorLive.Show, :show
     live "/instructors/:id/show/edit", InstructorLive.Show, :edit
   end

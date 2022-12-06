@@ -1,10 +1,10 @@
 <h1>Listing Instructors</h1>
 
-<%= if @live_action in [:new, :edit] do %>
+<%= if @live_action == :edit do %>
   <.modal return_to={Routes.instructor_index_path(@socket, :index)}>
     <.live_component
       module={DashboardWeb.InstructorLive.FormComponent}
-      id={@instructor.id || :new}
+      id={@instructor.id}
       title={@page_title}
       action={@live_action}
       instructor={@instructor}
@@ -43,5 +43,3 @@
     <% end %>
   </tbody>
 </table>
-
-<span><%= live_patch "New Instructor", to: Routes.instructor_index_path(@socket, :new) %></span>

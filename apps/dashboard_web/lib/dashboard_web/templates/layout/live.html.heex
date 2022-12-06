@@ -1,11 +1,31 @@
-<main class="container">
+<main>
+  <header>
+    <nav>
+      <ul>
+        <li>
+          <%= link "Home", to: Routes.page_path(@socket, :index) %>
+        </li>
+        <li>
+          <%= link "Instructors",
+              to: Routes.instructor_index_path(@socket, :index)%>
+              </li>
+        <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+        <li>
+          <%= link "LiveDashboard", to:
+              Routes.live_dashboard_path(@socket, :home) %>
+        </li>
+        <% end %>
+      </ul>
+    </nav>
+  </header>
+
   <p class="alert alert-info" role="alert"
-    phx-click="lv:clear-flash"
-    phx-value-key="info"><%= live_flash(@flash, :info) %></p>
+     phx-click="lv:clear-flash"
+     phx-value-key="info"><%= live_flash(@flash, :info) %></p>
 
   <p class="alert alert-danger" role="alert"
-    phx-click="lv:clear-flash"
-    phx-value-key="error"><%= live_flash(@flash, :error) %></p>
+     phx-click="lv:clear-flash"
+     phx-value-key="error"><%= live_flash(@flash, :error) %></p>
 
   <%= @inner_content %>
 </main>

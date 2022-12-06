@@ -20,12 +20,6 @@ defmodule DashboardWeb.InstructorLive.Index do
     |> assign(:instructor, Accounts.get_instructor!(id))
   end
 
-  defp apply_action(socket, :new, _params) do
-    socket
-    |> assign(:page_title, "New Instructor")
-    |> assign(:instructor, %Instructor{})
-  end
-
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Listing Instructors")
