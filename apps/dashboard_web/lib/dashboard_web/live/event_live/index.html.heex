@@ -16,9 +16,9 @@
 <table>
   <thead>
     <tr>
-      <th>Name</th>
+      <th>Title</th>
       <th>Description</th>
-      <th>External</th>
+      <th>External id</th>
       <th>External provider</th>
 
       <th></th>
@@ -27,7 +27,7 @@
   <tbody id="events">
     <%= for event <- @events do %>
       <tr id={"event-#{event.id}"}>
-        <td><%= event.name %></td>
+        <td><%= event.title %></td>
         <td><%= event.description %></td>
         <td><%= event.external_id %></td>
         <td><%= event.external_provider %></td>

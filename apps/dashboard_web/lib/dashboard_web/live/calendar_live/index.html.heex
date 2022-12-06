@@ -1,10 +1,10 @@
 <h1>Listing Calendars</h1>
 
-<%= if @live_action in [:new, :edit] do %>
+<%= if @live_action == :edit do %>
   <.modal return_to={Routes.calendar_index_path(@socket, :index)}>
     <.live_component
       module={DashboardWeb.CalendarLive.FormComponent}
-      id={@calendar.id || :new}
+      id={@calendar.id}
       title={@page_title}
       action={@live_action}
       calendar={@calendar}
@@ -39,5 +39,3 @@
     <% end %>
   </tbody>
 </table>
-
-<span><%= live_patch "New Calendar", to: Routes.calendar_index_path(@socket, :new) %></span>

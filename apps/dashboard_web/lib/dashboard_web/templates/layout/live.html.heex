@@ -8,7 +8,27 @@
         <li>
           <%= link "Instructors",
               to: Routes.instructor_index_path(@socket, :index)%>
-              </li>
+        </li>
+        <li>
+          <%= link "Cohorts",
+              to: Routes.cohort_index_path(@socket, :index) %>
+        </li>
+        <li>
+          <%= link "Campuses",
+              to: Routes.campus_index_path(@socket, :index) %>
+        </li>
+        <li>
+          <%= link "Calendar",
+              to: Routes.calendar_index_path(@socket, :index) %>
+        </li>
+        <li>
+          <%= link "Events",
+              to: Routes.event_index_path(@socket, :index) %>
+        </li>
+        <li>
+          <%= link "Classes",
+              to: Routes.class_index_path(@socket, :index) %>
+        </li>
         <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
         <li>
           <%= link "LiveDashboard", to:

@@ -40,7 +40,7 @@ defmodule Dashboard.Umbrella.MixProject do
     [
       # run `mix setup` in all child apps
       setup: ["cmd mix setup"],
-      "phx.routes": "phx.routes MyAppWeb.Router"
+      "phx.routes": "phx.routes DashboardWeb.Router"
     ]
   end
 end

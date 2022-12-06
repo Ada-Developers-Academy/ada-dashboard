@@ -18,10 +18,42 @@ defmodule DashboardWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+
     live "/instructors", InstructorLive.Index, :index
     live "/instructors/:id/edit", InstructorLive.Index, :edit
     live "/instructors/:id", InstructorLive.Show, :show
     live "/instructors/:id/show/edit", InstructorLive.Show, :edit
+
+    live "/cohorts", CohortLive.Index, :index
+    live "/cohorts/new", CohortLive.Index, :new
+    live "/cohorts/:id/edit", CohortLive.Index, :edit
+    live "/cohorts/:id", CohortLive.Show, :show
+    live "/cohorts/:id/show/edit", CohortLive.Show, :edit
+
+    live "/campus", CampusLive.Index, :index
+    live "/campus/new", CampusLive.Index, :new
+    live "/campus/:id/edit", CampusLive.Index, :edit
+    live "/campus/:id", CampusLive.Show, :show
+    live "/campus/:id/show/edit", CampusLive.Show, :edit
+
+    live "/calendar", CalendarLive.Index, :index
+    live "/calendar/:id/edit", CalendarLive.Index, :edit
+    live "/calendar/:id", CalendarLive.Show, :show
+    live "/calendar/:id/show/edit", CalendarLive.Show, :edit
+
+    # TODO: This should be per calendar (and linked to from there)
+    live "/event", EventLive.Index, :index
+    live "/event/new", EventLive.Index, :new
+    live "/event/:id/edit", EventLive.Index, :edit
+    live "/event/:id", EventLive.Show, :show
+    live "/event/:id/show/edit", EventLive.Show, :edit
+
+    # TODO: Require relationship with cohort and campus
+    live "/class", ClassLive.Index, :index
+    live "/class/new", ClassLive.Index, :new
+    live "/class/:id/edit", ClassLive.Index, :edit
+    live "/class/:id", ClassLive.Show, :show
+    live "/class/:id/show/edit", ClassLive.Show, :edit
   end
 
   scope "/auth", DashboardWeb do
