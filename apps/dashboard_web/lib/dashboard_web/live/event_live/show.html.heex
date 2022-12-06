@@ -16,8 +16,8 @@
 <ul>
 
   <li>
-    <strong>Name:</strong>
-    <%= @event.name %>
+    <strong>Title:</strong>
+    <%= @event.title %>
   </li>
 
   <li>
@@ -37,5 +37,5 @@
 
 </ul>
 
-<span><%= live_patch "Edit", to: Routes.event_show_path(@socket, :edit, @event), class: "button" %></span> |
-<span><%= live_redirect "Back", to: Routes.event_index_path(@socket, :index) %></span>
+<span><%= live_redirect "Back",
+          to: Routes.calendar_show_path(@socket, :show, @event.calendar_id) %></span>
