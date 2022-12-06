@@ -1,5 +1,6 @@
 defmodule DashboardWeb.ClassLive.Index do
   use DashboardWeb, :live_view
+  on_mount DashboardWeb.InstructorAuth
 
   alias Dashboard.Classes
   alias Dashboard.Classes.Class

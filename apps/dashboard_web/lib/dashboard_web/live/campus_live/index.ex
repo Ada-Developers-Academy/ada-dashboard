@@ -1,5 +1,6 @@
 defmodule DashboardWeb.CampusLive.Index do
   use DashboardWeb, :live_view
+  on_mount DashboardWeb.InstructorAuth
 
   alias Dashboard.Campuses
   alias Dashboard.Campuses.Campus

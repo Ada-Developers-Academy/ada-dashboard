@@ -1,5 +1,6 @@
 defmodule DashboardWeb.CohortLive.Index do
   use DashboardWeb, :live_view
+  on_mount DashboardWeb.InstructorAuth
 
   alias Dashboard.Cohorts
   alias Dashboard.Cohorts.Cohort

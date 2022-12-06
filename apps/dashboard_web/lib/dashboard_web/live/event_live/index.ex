@@ -1,5 +1,6 @@
 defmodule DashboardWeb.EventLive.Index do
   use DashboardWeb, :live_view
+  on_mount DashboardWeb.InstructorAuth
 
   alias Dashboard.Calendars
   alias Dashboard.Calendars.Event
