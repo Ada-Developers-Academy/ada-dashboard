@@ -7,6 +7,7 @@ defmodule Dashboard.Calendars do
   alias Dashboard.Repo
 
   alias Dashboard.Calendars.Calendar
+  alias Dashboard.Calendars.Event
 
   @doc """
   Returns the list of calendars.
@@ -165,6 +166,19 @@ defmodule Dashboard.Calendars do
   """
   def list_events do
     Repo.all(Event)
+  end
+
+  @doc """
+  Returns the list of events for the given calendar.
+
+  ## Examples
+
+      iex> list_events(calendar_id)
+      [%Event{}, ...]
+
+  """
+  def list_calendar_events(calendar_id) do
+    Repo.all(from e in Event, where: e.calendar_id == ^calendar_id)
   end
 
   @doc """

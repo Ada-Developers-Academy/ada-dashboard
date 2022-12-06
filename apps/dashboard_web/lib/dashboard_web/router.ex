@@ -36,24 +36,15 @@ defmodule DashboardWeb.Router do
     live "/campus/:id", CampusLive.Show, :show
     live "/campus/:id/show/edit", CampusLive.Show, :edit
 
-    live "/calendar", CalendarLive.Index, :index
-    live "/calendar/:id/edit", CalendarLive.Index, :edit
-    live "/calendar/:id", CalendarLive.Show, :show
-    live "/calendar/:id/show/edit", CalendarLive.Show, :edit
-
-    # TODO: This should be per calendar (and linked to from there)
-    live "/event", EventLive.Index, :index
-    live "/event/new", EventLive.Index, :new
-    live "/event/:id/edit", EventLive.Index, :edit
-    live "/event/:id", EventLive.Show, :show
-    live "/event/:id/show/edit", EventLive.Show, :edit
+    live "/calendars", CalendarLive.Index, :index
+    live "/calendars/:id", CalendarLive.Show, :show
 
     # TODO: Require relationship with cohort and campus
-    live "/class", ClassLive.Index, :index
-    live "/class/new", ClassLive.Index, :new
-    live "/class/:id/edit", ClassLive.Index, :edit
-    live "/class/:id", ClassLive.Show, :show
-    live "/class/:id/show/edit", ClassLive.Show, :edit
+    live "/classes", ClassLive.Index, :index
+    live "/classes/new", ClassLive.Index, :new
+    live "/classes/:id/edit", ClassLive.Index, :edit
+    live "/classes/:id", ClassLive.Show, :show
+    live "/classes/:id/show/edit", ClassLive.Show, :edit
   end
 
   scope "/auth", DashboardWeb do

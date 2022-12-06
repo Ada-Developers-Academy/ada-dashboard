@@ -3,30 +3,26 @@
     <nav>
       <ul>
         <li>
-          <%= link "Home", to: Routes.page_path(@socket, :index) %>
+          <%= live_redirect "Home", to: Routes.page_path(@socket, :index) %>
         </li>
         <li>
-          <%= link "Instructors",
+          <%= live_redirect "Instructors",
               to: Routes.instructor_index_path(@socket, :index)%>
         </li>
         <li>
-          <%= link "Cohorts",
+          <%= live_redirect "Cohorts",
               to: Routes.cohort_index_path(@socket, :index) %>
         </li>
         <li>
-          <%= link "Campuses",
+          <%= live_redirect "Campuses",
               to: Routes.campus_index_path(@socket, :index) %>
         </li>
         <li>
-          <%= link "Calendar",
+          <%= live_redirect "Calendars",
               to: Routes.calendar_index_path(@socket, :index) %>
         </li>
         <li>
-          <%= link "Events",
-              to: Routes.event_index_path(@socket, :index) %>
-        </li>
-        <li>
-          <%= link "Classes",
+          <%= live_redirect "Classes",
               to: Routes.class_index_path(@socket, :index) %>
         </li>
         <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>

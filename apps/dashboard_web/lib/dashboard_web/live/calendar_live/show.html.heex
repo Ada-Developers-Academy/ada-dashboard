@@ -1,18 +1,5 @@
 <h1>Show Calendar</h1>
 
-<%= if @live_action in [:edit] do %>
-  <.modal return_to={Routes.calendar_show_path(@socket, :show, @calendar)}>
-    <.live_component
-      module={DashboardWeb.CalendarLive.FormComponent}
-      id={@calendar.id}
-      title={@page_title}
-      action={@live_action}
-      calendar={@calendar}
-      return_to={Routes.calendar_show_path(@socket, :show, @calendar)}
-    />
-  </.modal>
-<% end %>
-
 <ul>
 
   <li>
@@ -32,5 +19,29 @@
 
 </ul>
 
-<span><%= live_patch "Edit", to: Routes.calendar_show_path(@socket, :edit, @calendar), class: "button" %></span> |
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>External id</th>
+      <th>External provider</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  
+  <tbody id="events">
+    <%= for event <- @events do %>
+      <tr id={"event-#{event.id}"}>
+        <td><%= event.title %></td>
+        <td><%= event.description %></td>
+        <td><%= event.external_id %></td>
+        <td><%= event.external_provider %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+
 <span><%= live_redirect "Back", to: Routes.calendar_index_path(@socket, :index) %></span>

@@ -1,18 +1,5 @@
 <h1>Listing Calendars</h1>
 
-<%= if @live_action == :edit do %>
-  <.modal return_to={Routes.calendar_index_path(@socket, :index)}>
-    <.live_component
-      module={DashboardWeb.CalendarLive.FormComponent}
-      id={@calendar.id}
-      title={@page_title}
-      action={@live_action}
-      calendar={@calendar}
-      return_to={Routes.calendar_index_path(@socket, :index)}
-    />
-  </.modal>
-<% end %>
-
 <table>
   <thead>
     <tr>
@@ -32,8 +19,6 @@
 
         <td>
           <span><%= live_redirect "Show", to: Routes.calendar_show_path(@socket, :show, calendar) %></span>
-          <span><%= live_patch "Edit", to: Routes.calendar_index_path(@socket, :edit, calendar) %></span>
-          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: calendar.id, data: [confirm: "Are you sure?"] %></span>
         </td>
       </tr>
     <% end %>
