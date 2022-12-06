@@ -41,6 +41,7 @@ defmodule DashboardWeb.MixProject do
       {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.18"},
+      {:html_sanitize_ex, "~> 1.4"},
       {:jason, "~> 1.2"},
       {:oauth2, "~> 2.0"},
       {:phoenix, "~> 1.6.0"},

@@ -35,7 +35,7 @@
     <%= for event <- @events do %>
       <tr id={"event-#{event.id}"}>
         <td><%= event.title %></td>
-        <td><%= event.description %></td>
+        <td><%= raw HtmlSanitizeEx.basic_html(event.description) %></td>
         <td><%= event.external_id %></td>
         <td><%= event.external_provider %></td>
 
