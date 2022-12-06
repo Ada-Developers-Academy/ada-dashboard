@@ -2,11 +2,20 @@ defmodule DashboardWeb.InstructorLive.Index do
   use DashboardWeb, :live_view
 
   alias Dashboard.Accounts
-  alias Dashboard.Accounts.Instructor
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, :instructors, list_instructors())}
+  def mount(_params, %{"current_user" => current_user} = _session, socket) do
+    socket =
+      if is_nil(current_user) do
+        socket
+        |> put_flash(:error, "You must be logged in as an instructor to access this page!")
+        |> redirect(to: "/")
+      else
+        socket
+        |> assign(:instructors, list_instructors())
+      end
+
+    {:ok, socket}
   end
 
   @impl true
