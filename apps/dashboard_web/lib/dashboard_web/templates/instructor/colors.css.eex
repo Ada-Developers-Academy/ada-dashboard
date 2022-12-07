@@ -1,0 +1,5 @@
+<%= for {name, color} <- @pairs do %>
+.<%= name %>-selected {
+    background-color: <%= color %>
+}
+<% end %>

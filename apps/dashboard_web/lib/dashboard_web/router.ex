@@ -19,6 +19,7 @@ defmodule DashboardWeb.Router do
 
     get "/", PageController, :index
 
+    get "/instructors/colors.css", InstructorController, :colors
     live "/instructors", InstructorLive.Index, :index
     live "/instructors/:id/edit", InstructorLive.Index, :edit
     live "/instructors/:id", InstructorLive.Show, :show

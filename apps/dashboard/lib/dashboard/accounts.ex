@@ -128,4 +128,20 @@ defmodule Dashboard.Accounts do
   def change_instructor(%Instructor{} = instructor, attrs \\ %{}) do
     Instructor.changeset(instructor, attrs)
   end
+
+  @doc """
+  Returns a list of tuples of {name, color} where name is from the email address.
+  """
+  def all_names_and_colors do
+    Repo.all(Instructor)
+    |> Enum.flat_map(fn instructor ->
+      [name | _] = String.split(instructor.email, "@")
+
+      if instructor.background_color do
+        [{name, instructor.background_color}]
+      else
+        []
+      end
+    end)
+  end
 end

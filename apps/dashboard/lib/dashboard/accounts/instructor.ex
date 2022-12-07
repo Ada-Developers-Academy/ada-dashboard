@@ -14,6 +14,7 @@ defmodule Dashboard.Accounts.Instructor do
 
   @doc false
   def changeset(instructor, attrs) do
+    # TODO: Validate colors
     instructor
     |> cast(attrs, [:name, :email, :external_id, :external_provider, :background_color])
     |> unique_constraint([:external_id, :external_provider])
