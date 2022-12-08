@@ -1,4 +1,4 @@
-defmodule Dashboard.Instructors.Claim do
+defmodule Dashboard.Accounts.Claim do
   use Ecto.Schema
   import Ecto.Changeset
 
