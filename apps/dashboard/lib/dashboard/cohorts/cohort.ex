@@ -2,7 +2,7 @@ defmodule Dashboard.Cohorts.Cohort do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "cohort" do
+  schema "cohorts" do
     field :name, :string
 
     timestamps()

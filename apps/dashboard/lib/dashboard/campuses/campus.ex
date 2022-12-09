@@ -2,7 +2,7 @@ defmodule Dashboard.Campuses.Campus do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "campus" do
+  schema "campuses" do
     field :name, :string
 
     timestamps()
