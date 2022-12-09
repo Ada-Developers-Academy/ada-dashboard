@@ -7,7 +7,7 @@ defmodule DashboardWeb.CampusLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :campus_collection, list_campus())}
+    {:ok, assign(socket, :campus_collection, list_campuses())}
   end
 
   @impl true
@@ -38,10 +38,10 @@ defmodule DashboardWeb.CampusLive.Index do
     campus = Campuses.get_campus!(id)
     {:ok, _} = Campuses.delete_campus(campus)
 
-    {:noreply, assign(socket, :campus_collection, list_campus())}
+    {:noreply, assign(socket, :campus_collection, list_campuses())}
   end
 
-  defp list_campus do
-    Campuses.list_campus()
+  defp list_campuses do
+    Campuses.list_campuses()
   end
 end

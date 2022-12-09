@@ -2,14 +2,32 @@ defmodule DashboardWeb.ClassLive.FormComponent do
   use DashboardWeb, :live_component
 
   alias Dashboard.Classes
+  alias Dashboard.Campuses
+  alias Dashboard.Cohorts
 
   @impl true
   def update(%{class: class} = assigns, socket) do
     changeset = Classes.change_class(class)
 
+    campus_names =
+      Enum.into(
+        Campuses.list_campuses(),
+        %{},
+        fn c -> {c.name, c.id} end
+      )
+
+    cohort_names =
+      Enum.into(
+        Cohorts.list_cohorts(),
+        %{},
+        fn c -> {c.name, c.id} end
+      )
+
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:campuses, campus_names)
+     |> assign(:cohorts, cohort_names)
      |> assign(:changeset, changeset)}
   end
 

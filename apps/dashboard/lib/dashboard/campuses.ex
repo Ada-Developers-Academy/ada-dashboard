@@ -9,7 +9,7 @@ defmodule Dashboard.Campuses do
   alias Dashboard.Campuses.Campus
 
   @doc """
-  Returns the list of campus.
+  Returns the list of campuses.
 
   ## Examples
 
@@ -17,7 +17,7 @@ defmodule Dashboard.Campuses do
       [%Campus{}, ...]
 
   """
-  def list_campus do
+  def list_campuses do
     Repo.all(Campus)
   end
 

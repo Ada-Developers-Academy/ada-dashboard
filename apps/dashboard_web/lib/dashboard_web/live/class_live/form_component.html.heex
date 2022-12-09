@@ -12,7 +12,10 @@
     <%= label f, :name %>
     <%= text_input f, :name %>
     <%= error_tag f, :name %>
-  
+
+    <%= select f, :campus_id, @campuses %>
+    <%= select f, :cohort_id, @cohorts %>
+    
     <div>
       <%= submit "Save", phx_disable_with: "Saving..." %>
     </div>

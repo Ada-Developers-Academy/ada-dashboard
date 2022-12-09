@@ -9,15 +9,15 @@ defmodule Dashboard.Cohorts do
   alias Dashboard.Cohorts.Cohort
 
   @doc """
-  Returns the list of cohort.
+  Returns the list of cohorts.
 
   ## Examples
 
-      iex> list_cohort()
+      iex> list_cohorts()
       [%Cohort{}, ...]
 
   """
-  def list_cohort do
+  def list_cohorts do
     Repo.all(Cohort)
   end
 

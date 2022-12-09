@@ -15,7 +15,7 @@ defmodule Dashboard.Classes.Class do
   @doc false
   def changeset(class, attrs) do
     class
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, [:name, :campus_id, :cohort_id])
+    |> validate_required([:name, :campus_id, :cohort_id])
   end
 end

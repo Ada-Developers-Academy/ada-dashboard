@@ -7,7 +7,7 @@ defmodule DashboardWeb.CohortLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :cohort_collection, list_cohort())}
+    {:ok, assign(socket, :cohort_collection, list_cohorts())}
   end
 
   @impl true
@@ -38,10 +38,10 @@ defmodule DashboardWeb.CohortLive.Index do
     cohort = Cohorts.get_cohort!(id)
     {:ok, _} = Cohorts.delete_cohort(cohort)
 
-    {:noreply, assign(socket, :cohort_collection, list_cohort())}
+    {:noreply, assign(socket, :cohort_collection, list_cohorts())}
   end
 
-  defp list_cohort do
-    Cohorts.list_cohort()
+  defp list_cohorts do
+    Cohorts.list_cohorts()
   end
 end
