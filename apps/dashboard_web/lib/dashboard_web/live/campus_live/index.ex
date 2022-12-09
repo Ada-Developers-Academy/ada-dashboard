@@ -36,9 +36,19 @@ defmodule DashboardWeb.CampusLive.Index do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     campus = Campuses.get_campus!(id)
-    {:ok, _} = Campuses.delete_campus(campus)
 
-    {:noreply, assign(socket, :campus_collection, list_campuses())}
+    case Campuses.delete_campus(campus) do
+      {:ok, _} ->
+        {:noreply, assign(socket, :campus_collection, list_campuses())}
+
+      {:error, changeset} ->
+        errors =
+          Enum.map(changeset.errors, fn {field, {error, _}} ->
+            "#{field}: #{error}"
+          end)
+
+        {:noreply, put_flash(socket, :error, errors)}
+    end
   end
 
   defp list_campuses do

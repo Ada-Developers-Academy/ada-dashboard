@@ -86,7 +86,10 @@ defmodule Dashboard.Campuses do
 
   """
   def delete_campus(%Campus{} = campus) do
-    Repo.delete(campus)
+    campus
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.no_assoc_constraint(:classes)
+    |> Repo.delete()
   end
 
   @doc """
