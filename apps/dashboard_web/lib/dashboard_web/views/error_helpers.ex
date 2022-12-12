@@ -44,4 +44,13 @@ defmodule DashboardWeb.ErrorHelpers do
       Gettext.dgettext(DashboardWeb.Gettext, "errors", msg, opts)
     end
   end
+
+  @doc """
+  Extracts and formats errors from changesets.
+  """
+  def get_errors(changeset) do
+    Enum.map(changeset.errors, fn {field, {error, _}} ->
+      "Changeset error: #{field} #{error}."
+    end)
+  end
 end

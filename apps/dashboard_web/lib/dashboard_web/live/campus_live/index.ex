@@ -42,12 +42,7 @@ defmodule DashboardWeb.CampusLive.Index do
         {:noreply, assign(socket, :campus_collection, list_campuses())}
 
       {:error, changeset} ->
-        errors =
-          Enum.map(changeset.errors, fn {field, {error, _}} ->
-            "#{field}: #{error}"
-          end)
-
-        {:noreply, put_flash(socket, :error, errors)}
+        {:noreply, put_flash(socket, :error, get_errors(changeset))}
     end
   end
 
