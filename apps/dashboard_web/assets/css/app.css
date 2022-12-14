@@ -86,3 +86,7 @@
   text-decoration: none;
   cursor: pointer;
 }
+
+label {
+  display: block;
+}

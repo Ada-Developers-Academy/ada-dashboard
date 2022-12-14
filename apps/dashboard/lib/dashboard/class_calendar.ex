@@ -2,9 +2,10 @@ defmodule Dashboard.ClassCalendar do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "class_calendar" do
-    field :class_id, :id
-    field :calendar_id, :id
+  @primary_key false
+  schema "class_calendars" do
+    field :class_id, :id, primary_key: true
+    field :calendar_id, :id, primary_key: true
   end
 
   @doc false

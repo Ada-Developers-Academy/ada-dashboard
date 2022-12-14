@@ -6,8 +6,8 @@ defmodule Dashboard.Calendars do
   import Ecto.Query, warn: false
   alias Dashboard.Repo
 
-  alias Dashboard.Calendars.Calendar
-  alias Dashboard.Calendars.Event
+  alias Dashboard.Calendars.{Calendar, Event}
+  alias Dashboard.ClassCalendar
 
   @doc """
   Returns the list of calendars.
@@ -289,5 +289,35 @@ defmodule Dashboard.Calendars do
   """
   def change_event(%Event{} = event, attrs \\ %{}) do
     Event.changeset(event, attrs)
+  end
+
+  @doc """
+  Returns true if the class and calendar are connected.
+
+  Returns false if they are not.
+  """
+  def has_class_calendar(class, calendar) do
+    !is_nil(Repo.get_by(ClassCalendar, class_id: class.id, calendar_id: calendar.id))
+  end
+
+  @doc """
+  Ensure the connection exists if connected is true, and that it doesn't otherwise.
+  """
+  def create_or_delete_class_calendar(class, calendar, connected) do
+    Repo.transaction(fn ->
+      class_calendar = Repo.get_by(ClassCalendar, class_id: class.id, calendar_id: calendar.id)
+
+      case {class_calendar, connected} do
+        {nil, true} ->
+          class_calendar = %ClassCalendar{class_id: class.id, calendar_id: calendar.id}
+          Repo.insert!(class_calendar)
+
+        {nil, false} ->
+          nil
+
+        {class_calendar, false} ->
+          Repo.delete!(class_calendar)
+      end
+    end)
   end
 end

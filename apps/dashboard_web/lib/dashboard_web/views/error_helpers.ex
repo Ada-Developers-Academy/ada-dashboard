@@ -50,7 +50,7 @@ defmodule DashboardWeb.ErrorHelpers do
   """
   def get_errors(changeset) do
     Enum.map(changeset.errors, fn {field, {error, _}} ->
-      "Changeset error: #{field} #{error}."
+      "Changeset error: #{humanize(field)} #{error}."
     end)
   end
 end

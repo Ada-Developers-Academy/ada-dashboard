@@ -13,14 +13,25 @@
   </.modal>
 <% end %>
 
-<ul>
+<h2>Name:</h2>
+<%= @class.name %>
 
-  <li>
-    <strong>Name:</strong>
-    <%= @class.name %>
-  </li>
+<h3>Calendars</h3>
+<.form
+    let={f}
+    for={:calendars}
+    id="class-calendar-form"
+    phx-submit="save-calendars">
 
-</ul>
+  <%= for calendar <- @calendars do %>
+    <label>
+      <%= checkbox f, "calendar-#{calendar.id}", value: calendar.connected, checked_valie: calendar.id %>
+      <%= link calendar.name, to: Routes.calendar_show_path(@socket, :show, calendar.id) %>
+    </label>
+  <% end %>
+
+  <%= submit "Save", phx_disable_with: "Saving..." %>
+</.form>
 
 <span><%= live_patch "Edit", to: Routes.class_show_path(@socket, :edit, @class), class: "button" %></span> |
 <span><%= live_redirect "Back", to: Routes.class_index_path(@socket, :index) %></span>
