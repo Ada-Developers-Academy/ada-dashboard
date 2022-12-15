@@ -1,5 +1,6 @@
 alias Dashboard.Campuses.Campus
 alias Dashboard.Cohorts.Cohort
+alias Dashboard.Classes.Source
 
 defmodule Dashboard.Classes.Class do
   use Ecto.Schema
@@ -10,7 +11,7 @@ defmodule Dashboard.Classes.Class do
     belongs_to :campus, Campus
     belongs_to :cohort, Cohort
 
-    many_to_many :calendars, Dashboard.ClassCalendar, join_through: "class_calendars"
+    many_to_many :calendars, Source, join_through: "sources"
 
     timestamps()
   end
