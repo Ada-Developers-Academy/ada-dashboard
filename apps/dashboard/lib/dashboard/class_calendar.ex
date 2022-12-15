@@ -1,3 +1,4 @@
+# TODO: Fold this into classes.ex or calendars.ex or make a separate context
 defmodule Dashboard.ClassCalendar do
   use Ecto.Schema
   import Ecto.Changeset
