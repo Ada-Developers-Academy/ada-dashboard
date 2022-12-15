@@ -13,11 +13,11 @@ defmodule Dashboard.Classes do
 
   ## Examples
 
-      iex> list_class()
+      iex> list_classes()
       [%Class{}, ...]
 
   """
-  def list_class do
+  def list_classes do
     Repo.all(Class)
   end
 

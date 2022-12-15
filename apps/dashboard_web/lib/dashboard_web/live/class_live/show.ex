@@ -34,22 +34,19 @@ defmodule DashboardWeb.ClassLive.Show do
         %{"calendars" => calendars},
         %{assigns: %{class: class}} = socket
       ) do
-    calendars =
-      Enum.map(calendars, fn {name, checked} ->
-        [_, raw_id] = String.split(name, "-")
-        {id, ""} = Integer.parse(raw_id)
-        calendar = Calendars.get_calendar!(id)
+    Enum.map(calendars, fn {name, checked} ->
+      [_, raw_id] = String.split(name, "-")
+      {id, ""} = Integer.parse(raw_id)
+      calendar = Calendars.get_calendar!(id)
 
-        connected =
-          case checked do
-            "true" -> true
-            "false" -> false
-          end
+      connected =
+        case checked do
+          "true" -> true
+          "false" -> false
+        end
 
-        Classes.create_or_delete_source(class, calendar, connected)
-
-        %{calendar: calendar, connected: connected}
-      end)
+      Classes.create_or_delete_source(class, calendar, connected)
+    end)
 
     {:noreply, socket}
   end

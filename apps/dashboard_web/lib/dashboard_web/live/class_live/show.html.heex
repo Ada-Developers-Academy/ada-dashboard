@@ -20,12 +20,12 @@
 <.form
     let={f}
     for={:calendars}
-    id="class-calendar-form"
+    id="source-form"
     phx-submit="save-calendars">
 
   <%= for calendar <- @calendars do %>
     <label>
-      <%= checkbox f, "calendar-#{calendar.id}", value: calendar.connected, checked_valie: calendar.id %>
+      <%= checkbox f, "calendar-#{calendar.id}", value: calendar.connected %>
       <%= link calendar.name, to: Routes.calendar_show_path(@socket, :show, calendar.id) %>
     </label>
   <% end %>

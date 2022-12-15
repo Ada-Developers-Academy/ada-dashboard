@@ -1,4 +1,4 @@
-<h1>Show Instructor</h1>
+<h2>Show Instructor</h2>
 
 <%= if @live_action in [:edit] do %>
   <.modal return_to={Routes.instructor_show_path(@socket, :show, @instructor)}>
@@ -39,8 +39,24 @@
     <strong>Background color:</strong>
     <%= @instructor.background_color %>
   </li>
-
 </ul>
+
+<h3>Classes</h3>
+<.form
+    let={f}
+    for={:classes}
+    id="affinity-form"
+    phx-submit="save-classes">
+
+  <%= for class <- @classes do %>
+    <label>
+      <%= checkbox f, "class-#{class.id}", value: class.connected %>
+      <%= link class.name, to: Routes.class_show_path(@socket, :show, class.id) %>
+    </label>
+  <% end %>
+
+  <%= submit "Save", phx_disable_with: "Saving..." %>
+</.form>
 
 <span><%= live_patch "Edit", to: Routes.instructor_show_path(@socket, :edit, @instructor), class: "button" %></span> |
 <span><%= live_redirect "Back", to: Routes.instructor_index_path(@socket, :index) %></span>

@@ -7,7 +7,7 @@ defmodule DashboardWeb.ClassLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :class_collection, list_class())}
+    {:ok, assign(socket, :class_collection, list_classes())}
   end
 
   @impl true
@@ -38,10 +38,10 @@ defmodule DashboardWeb.ClassLive.Index do
     class = Classes.get_class!(id)
     {:ok, _} = Classes.delete_class(class)
 
-    {:noreply, assign(socket, :class_collection, list_class())}
+    {:noreply, assign(socket, :class_collection, list_classes())}
   end
 
-  defp list_class do
-    Classes.list_class()
+  defp list_classes do
+    Classes.list_classes()
   end
 end

@@ -6,8 +6,7 @@ defmodule Dashboard.Accounts do
   import Ecto.Query, warn: false
   alias Dashboard.Repo
 
-  alias Dashboard.Accounts.Instructor
-  alias Dashboard.Accounts.Claim
+  alias Dashboard.Accounts.{Affinity, Claim, Instructor}
 
   @doc """
   Returns the list of instructors.
@@ -238,5 +237,35 @@ defmodule Dashboard.Accounts do
   """
   def change_claim(%Claim{} = claim, attrs \\ %{}) do
     Claim.changeset(claim, attrs)
+  end
+
+  @doc """
+  Returns true if the class and calendar are connected.
+
+  Returns false if they are not.
+  """
+  def has_affinity(instructor, class) do
+    !is_nil(Repo.get_by(Affinity, instructor_id: instructor.id, class_id: class.id))
+  end
+
+  @doc """
+  Ensure the connection exists if connected is true, and that it doesn't otherwise.
+  """
+  def create_or_delete_affinity(instructor, class, connected) do
+    Repo.transaction(fn ->
+      affinity = Repo.get_by(Affinity, instructor_id: instructor.id, class_id: class.id)
+
+      case {affinity, connected} do
+        {nil, true} ->
+          affinity = %Affinity{instructor_id: instructor.id, class_id: class.id}
+          Repo.insert!(affinity)
+
+        {nil, false} ->
+          nil
+
+        {source, false} ->
+          Repo.delete!(affinity)
+      end
+    end)
   end
 end
