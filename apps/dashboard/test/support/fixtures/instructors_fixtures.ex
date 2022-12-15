@@ -17,4 +17,18 @@ defmodule Dashboard.InstructorsFixtures do
 
     claim
   end
+
+  @doc """
+  Generate a affinity.
+  """
+  def affinity_fixture(attrs \\ %{}) do
+    {:ok, affinity} =
+      attrs
+      |> Enum.into(%{
+
+      })
+      |> Dashboard.Instructors.create_affinity()
+
+    affinity
+  end
 end
