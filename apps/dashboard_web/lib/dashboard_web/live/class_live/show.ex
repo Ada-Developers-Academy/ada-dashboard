@@ -1,7 +1,7 @@
 defmodule DashboardWeb.ClassLive.Show do
   use DashboardWeb, :live_view
 
-  alias Dashboard.{Calendars, Classes}
+  alias Dashboard.{Classes, Calendars}
 
   @impl true
   def mount(_params, _session, socket) do
@@ -17,7 +17,7 @@ defmodule DashboardWeb.ClassLive.Show do
         %{
           id: calendar.id,
           name: calendar.name,
-          connected: Calendars.has_class_calendar(class, calendar)
+          connected: Classes.has_source(class, calendar)
         }
       end)
 
@@ -46,14 +46,10 @@ defmodule DashboardWeb.ClassLive.Show do
             "false" -> false
           end
 
-        Calendars.create_or_delete_class_calendar(class, calendar, connected)
+        Classes.create_or_delete_source(class, calendar, connected)
 
         %{calendar: calendar, connected: connected}
       end)
-
-    IO.puts("********************************************************************************")
-    IO.inspect(calendars)
-    IO.puts("********************************************************************************")
 
     {:noreply, socket}
   end

@@ -6,7 +6,7 @@ defmodule Dashboard.Classes do
   import Ecto.Query, warn: false
   alias Dashboard.Repo
 
-  alias Dashboard.Classes.Class
+  alias Dashboard.Classes.{Class, Source}
 
   @doc """
   Returns the list of class.
@@ -100,5 +100,35 @@ defmodule Dashboard.Classes do
   """
   def change_class(%Class{} = class, attrs \\ %{}) do
     Class.changeset(class, attrs)
+  end
+
+  @doc """
+  Returns true if the class and calendar are connected.
+
+  Returns false if they are not.
+  """
+  def has_source(class, calendar) do
+    !is_nil(Repo.get_by(Source, class_id: class.id, calendar_id: calendar.id))
+  end
+
+  @doc """
+  Ensure the connection exists if connected is true, and that it doesn't otherwise.
+  """
+  def create_or_delete_source(class, calendar, connected) do
+    Repo.transaction(fn ->
+      source = Repo.get_by(Source, class_id: class.id, calendar_id: calendar.id)
+
+      case {source, connected} do
+        {nil, true} ->
+          source = %Source{class_id: class.id, calendar_id: calendar.id}
+          Repo.insert!(source)
+
+        {nil, false} ->
+          nil
+
+        {source, false} ->
+          Repo.delete!(source)
+      end
+    end)
   end
 end
