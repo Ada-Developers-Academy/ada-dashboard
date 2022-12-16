@@ -7,6 +7,7 @@ defmodule Dashboard.Campuses do
   alias Dashboard.Repo
 
   alias Dashboard.Campuses.Campus
+  alias Dashboard.Classes.Class
 
   @doc """
   Returns the list of campuses.
@@ -19,6 +20,19 @@ defmodule Dashboard.Campuses do
   """
   def list_campuses do
     Repo.all(Campus)
+  end
+
+  @doc """
+  Returns the list of campuses with classes preloaded.
+
+  ## Examples
+
+      iex> list_campus()
+      [%Campus{}, ...]
+
+  """
+  def list_campuses_with_classes do
+    Repo.all(from c in Campus, preload: [:classes])
   end
 
   @doc """

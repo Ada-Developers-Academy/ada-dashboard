@@ -9,7 +9,7 @@ defmodule Dashboard.Classes do
   alias Dashboard.Classes.{Class, Source}
 
   @doc """
-  Returns the list of class.
+  Returns the list of classes.
 
   ## Examples
 

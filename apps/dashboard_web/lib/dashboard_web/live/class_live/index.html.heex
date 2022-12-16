@@ -22,16 +22,19 @@
     </tr>
   </thead>
   <tbody id="class">
-    <%= for class <- @class_collection do %>
-      <tr id={"class-#{class.id}"}>
-        <td><%= class.name %></td>
+    <%= for campus <- @campuses do %>
+      <tr><td><%= campus.name %></td></tr>
+      <%= for class <- campus.classes do %>
+        <tr id={"class-#{class.id}"}>
+          <td><%= class.name %></td>
 
-        <td>
-          <span><%= live_redirect "Show", to: Routes.class_show_path(@socket, :show, class) %></span>
-          <span><%= live_patch "Edit", to: Routes.class_index_path(@socket, :edit, class) %></span>
-          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: class.id, data: [confirm: "Are you sure?"] %></span>
-        </td>
-      </tr>
+          <td>
+            <span><%= live_redirect "Show", to: Routes.class_show_path(@socket, :show, class) %></span>
+            <span><%= live_patch "Edit", to: Routes.class_index_path(@socket, :edit, class) %></span>
+            <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: class.id, data: [confirm: "Are you sure?"] %></span>
+          </td>
+        </tr>
+      <% end %>
     <% end %>
   </tbody>
 </table>
