@@ -48,11 +48,14 @@
     id="affinity-form"
     phx-submit="save-classes">
 
-  <%= for class <- @classes do %>
-    <label>
-      <%= checkbox f, "class-#{class.id}", value: class.connected %>
-      <%= link class.name, to: Routes.class_show_path(@socket, :show, class.id) %>
-    </label>
+  <%= for campus <- @campuses do %>
+  <h4><%= campus.name %> Campus</h4>
+    <%= for class <- campus.classes do %>
+      <label>
+        <%= checkbox f, "class-#{class.id}", value: class.connected %>
+        <%= link class.name, to: Routes.class_show_path(@socket, :show, class.id) %>
+      </label>
+    <% end %>
   <% end %>
 
   <%= submit "Save", phx_disable_with: "Saving..." %>

@@ -2,7 +2,7 @@ defmodule DashboardWeb.InstructorLive.Show do
   use DashboardWeb, :live_view
 
   alias Dashboard.Accounts
-  alias Dashboard.Classes
+  alias Dashboard.{Campuses, Classes}
 
   @impl true
   def mount(_params, _session, socket) do
@@ -13,12 +13,18 @@ defmodule DashboardWeb.InstructorLive.Show do
   def handle_params(%{"id" => id}, _, socket) do
     instructor = Accounts.get_instructor!(id)
 
-    classes =
-      Enum.map(Classes.list_classes(), fn class ->
+    campuses =
+      Enum.map(Campuses.list_campuses_with_classes(), fn campus ->
         %{
-          id: class.id,
-          name: class.name,
-          connected: Accounts.has_affinity(instructor, class)
+          name: campus.name,
+          classes:
+            Enum.map(campus.classes, fn class ->
+              %{
+                id: class.id,
+                name: class.name,
+                connected: Accounts.has_affinity(instructor, class)
+              }
+            end)
         }
       end)
 
@@ -26,7 +32,7 @@ defmodule DashboardWeb.InstructorLive.Show do
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:instructor, instructor)
-     |> assign(:classes, classes)}
+     |> assign(:campuses, campuses)}
   end
 
   @impl true
