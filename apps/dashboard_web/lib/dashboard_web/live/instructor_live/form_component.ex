@@ -39,17 +39,4 @@ defmodule DashboardWeb.InstructorLive.FormComponent do
         {:noreply, assign(socket, :changeset, changeset)}
     end
   end
-
-  defp save_instructor(socket, :new, instructor_params) do
-    case Accounts.create_instructor!(instructor_params) do
-      {:ok, _instructor} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Instructor created successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, changeset: changeset)}
-    end
-  end
 end

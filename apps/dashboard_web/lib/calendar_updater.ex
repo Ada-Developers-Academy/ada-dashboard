@@ -9,7 +9,7 @@ defmodule DashboardWeb.CalendarUpdater do
   end
 
   @impl true
-  def init(state = %{provider: provider, token: token}) do
+  def init(state) do
     seconds =
       Application.get_env(
         :dashboard_web,
