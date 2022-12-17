@@ -37,7 +37,14 @@
 
   <li>
     <strong>Background color:</strong>
-    <%= @instructor.background_color %>
+    <.form
+    let={f}
+    for={:instructor}
+    id="color-form"
+    phx-submit="save-color">
+      <%= color_input(f, :color, value: @instructor.background_color) %>
+      <%= submit "Save", phx_disable_with: "Saving..." %>
+    </.form>
   </li>
 </ul>
 

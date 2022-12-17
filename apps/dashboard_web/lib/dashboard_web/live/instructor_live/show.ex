@@ -58,6 +58,16 @@ defmodule DashboardWeb.InstructorLive.Show do
     {:noreply, socket}
   end
 
+  def handle_event(
+        "save-color",
+        %{"instructor" => %{"color" => color}},
+        %{assigns: %{instructor: instructor}} = socket
+      ) do
+    {:ok, _} = Accounts.update_instructor(instructor, %{background_color: color})
+
+    {:noreply, socket}
+  end
+
   defp page_title(:show), do: "Show Instructor"
   defp page_title(:edit), do: "Edit Instructor"
 end
