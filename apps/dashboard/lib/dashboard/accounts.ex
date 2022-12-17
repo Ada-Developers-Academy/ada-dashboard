@@ -73,13 +73,18 @@ defmodule Dashboard.Accounts do
       iex> create_or_update_instructor(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
   """
-  def create_or_update_instructor(attrs \\ %{}) do
-    %Instructor{}
-    |> Instructor.changeset(attrs)
-    |> Repo.insert(
-      on_conflict: :replace_all,
-      conflict_target: [:external_id, :external_provider]
-    )
+  def create_or_update_instructor(%{external_provider: provider, external_id: id} = attrs) do
+    Repo.transaction(fn ->
+      instructor = get_instructor_by_external_id(provider, id)
+
+      if is_nil(instructor) do
+        %Instructor{}
+        |> Instructor.changeset(attrs)
+        |> Repo.insert()
+      else
+        instructor
+      end
+    end)
   end
 
   @doc """

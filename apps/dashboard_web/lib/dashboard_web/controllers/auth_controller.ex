@@ -18,20 +18,21 @@ defmodule DashboardWeb.AuthController do
          String.ends_with?(email, "@adadevelopersacademy.org") do
       external_id = user["sub"]
 
-      {:ok, _instructor} =
+      {:ok, instructor} =
         Accounts.create_or_update_instructor(%{
           name: user["name"],
           email: email,
           external_provider: provider,
           external_id: external_id
         })
-    end
 
-    conn
-    |> put_session(:current_user, user)
-    |> put_session(:token, token)
-    |> put_session(:calendar_updater_pid, updater_pid)
-    |> redirect(to: "/")
+      conn
+      |> put_session(:current_user, user)
+      |> put_session(:current_user_id, instructor.id)
+      |> put_session(:token, token)
+      |> put_session(:calendar_updater_pid, updater_pid)
+      |> redirect(to: "/")
+    end
   end
 
   def logout(conn, _params) do
@@ -44,6 +45,7 @@ defmodule DashboardWeb.AuthController do
     conn
     |> put_flash(:info, "You have been logged out!")
     |> delete_session(:current_user)
+    |> delete_session(:current_instructor)
     |> delete_session(:token)
     |> delete_session(:calendar_updater_pid)
     |> redirect(to: "/")
