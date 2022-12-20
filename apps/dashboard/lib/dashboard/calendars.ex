@@ -7,6 +7,7 @@ defmodule Dashboard.Calendars do
   alias Dashboard.Repo
 
   alias Dashboard.Calendars.{Calendar, Event}
+  alias Dashboard.Classes.Class
 
   @doc """
   Returns the list of calendars.
@@ -288,5 +289,36 @@ defmodule Dashboard.Calendars do
   """
   def change_event(%Event{} = event, attrs \\ %{}) do
     Event.changeset(event, attrs)
+  end
+
+  @doc """
+  Returns all events for a given class.
+  """
+  def events_for_class(%Class{} = class) do
+    calendars = Repo.preload(class, calendars: [:events]).calendars
+
+    all_events = Enum.concat(Enum.map(calendars, & &1.events))
+
+    start_times =
+      all_events
+      |> Enum.group_by(& &1.start_time)
+      |> Enum.sort()
+
+    events =
+      Enum.map(start_times, fn {start_time, [first | rest] = events} ->
+        cond do
+          Enum.any?(rest, fn e -> e.end_time != first.end_time end) ->
+            {:warn_end_time, events}
+
+          Enum.any?(rest, fn e -> e.title != first.title end) ->
+            {:warn_title, events}
+
+          Enum.any?(rest, fn e -> e.description != first.description end) ->
+            {:warn_description, events}
+
+          true ->
+            {:ok, first}
+        end
+      end)
   end
 end

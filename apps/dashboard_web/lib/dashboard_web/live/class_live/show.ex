@@ -21,6 +21,8 @@ defmodule DashboardWeb.ClassLive.Show do
         }
       end)
 
+    Calendars.events_for_class(class)
+
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))

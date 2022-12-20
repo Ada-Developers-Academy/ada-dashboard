@@ -2,11 +2,15 @@ defmodule Dashboard.Calendars.Calendar do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Dashboard.Calendars.Event
+
   schema "calendars" do
     field :external_id, :string
     field :external_provider, :string
     field :name, :string
     field :timezone, :string
+
+    has_many :events, Event
 
     timestamps(type: :utc_datetime)
   end
