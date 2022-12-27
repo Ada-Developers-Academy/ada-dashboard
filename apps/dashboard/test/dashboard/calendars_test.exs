@@ -21,7 +21,11 @@ defmodule Dashboard.CalendarsTest do
     end
 
     test "create_calendar/1 with valid data creates a calendar" do
-      valid_attrs = %{external_id: "some external_id", external_provider: "some external_provider", name: "some name"}
+      valid_attrs = %{
+        external_id: "some external_id",
+        external_provider: "some external_provider",
+        name: "some name"
+      }
 
       assert {:ok, %Calendar{} = calendar} = Calendars.create_calendar(valid_attrs)
       assert calendar.external_id == "some external_id"
@@ -35,7 +39,12 @@ defmodule Dashboard.CalendarsTest do
 
     test "update_calendar/2 with valid data updates the calendar" do
       calendar = calendar_fixture()
-      update_attrs = %{external_id: "some updated external_id", external_provider: "some updated external_provider", name: "some updated name"}
+
+      update_attrs = %{
+        external_id: "some updated external_id",
+        external_provider: "some updated external_provider",
+        name: "some updated name"
+      }
 
       assert {:ok, %Calendar{} = calendar} = Calendars.update_calendar(calendar, update_attrs)
       assert calendar.external_id == "some updated external_id"
@@ -79,7 +88,12 @@ defmodule Dashboard.CalendarsTest do
     end
 
     test "create_event/1 with valid data creates a event" do
-      valid_attrs = %{description: "some description", external_id: "some external_id", external_provider: "some external_provider", name: "some name"}
+      valid_attrs = %{
+        description: "some description",
+        external_id: "some external_id",
+        external_provider: "some external_provider",
+        name: "some name"
+      }
 
       assert {:ok, %Event{} = event} = Calendars.create_event(valid_attrs)
       assert event.description == "some description"
@@ -94,7 +108,13 @@ defmodule Dashboard.CalendarsTest do
 
     test "update_event/2 with valid data updates the event" do
       event = event_fixture()
-      update_attrs = %{description: "some updated description", external_id: "some updated external_id", external_provider: "some updated external_provider", name: "some updated name"}
+
+      update_attrs = %{
+        description: "some updated description",
+        external_id: "some updated external_id",
+        external_provider: "some updated external_provider",
+        name: "some updated name"
+      }
 
       assert {:ok, %Event{} = event} = Calendars.update_event(event, update_attrs)
       assert event.description == "some updated description"

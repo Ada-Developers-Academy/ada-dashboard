@@ -14,8 +14,8 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> list_calendars()
-      [%Calendar{}, ...]
+  iex> list_calendars()
+  [%Calendar{}, ...]
 
   """
   def list_calendars do
@@ -29,11 +29,11 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> get_calendar!(123)
-      %Calendar{}
+  iex> get_calendar!(123)
+  %Calendar{}
 
-      iex> get_calendar!(456)
-      ** (Ecto.NoResultsError)
+  iex> get_calendar!(456)
+  ** (Ecto.NoResultsError)
 
   """
   def get_calendar!(id), do: Repo.get!(Calendar, id)
@@ -43,11 +43,11 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> create_calendar(%{field: value})
-      {:ok, %Calendar{}}
+  iex> create_calendar(%{field: value})
+  {:ok, %Calendar{}}
 
-      iex> create_calendar(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  iex> create_calendar(%{field: bad_value})
+  {:error, %Ecto.Changeset{}}
 
   """
   def create_calendar(attrs \\ %{}) do
@@ -61,11 +61,11 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> create_or_update_calendar(%{field: value})
-      {:ok, %Calendar{}}
+  iex> create_or_update_calendar(%{field: value})
+  {:ok, %Calendar{}}
 
-      iex> create_or_update_calendar(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  iex> create_or_update_calendar(%{field: bad_value})
+  {:error, %Ecto.Changeset{}}
 
   """
   def create_or_update_calendar(attrs \\ %{}) do
@@ -82,11 +82,11 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> get_or_create_calendar(%{field: value})
-      %Calendar{}
+  iex> get_or_create_calendar(%{field: value})
+  %Calendar{}
 
-      iex> get_or_create_calendar(%{field: bad_value})
-      raises Ecto.ChangesetError
+  iex> get_or_create_calendar(%{field: bad_value})
+  raises Ecto.ChangesetError
 
   """
   def get_or_create_calendar(attrs \\ %{}) do
@@ -111,11 +111,11 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> update_calendar(calendar, %{field: new_value})
-      {:ok, %Calendar{}}
+  iex> update_calendar(calendar, %{field: new_value})
+  {:ok, %Calendar{}}
 
-      iex> update_calendar(calendar, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  iex> update_calendar(calendar, %{field: bad_value})
+  {:error, %Ecto.Changeset{}}
 
   """
   def update_calendar(%Calendar{} = calendar, attrs) do
@@ -129,11 +129,11 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> delete_calendar(calendar)
-      {:ok, %Calendar{}}
+  iex> delete_calendar(calendar)
+  {:ok, %Calendar{}}
 
-      iex> delete_calendar(calendar)
-      {:error, %Ecto.Changeset{}}
+  iex> delete_calendar(calendar)
+  {:error, %Ecto.Changeset{}}
 
   """
   def delete_calendar(%Calendar{} = calendar) do
@@ -145,8 +145,8 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> change_calendar(calendar)
-      %Ecto.Changeset{data: %Calendar{}}
+  iex> change_calendar(calendar)
+  %Ecto.Changeset{data: %Calendar{}}
 
   """
   def change_calendar(%Calendar{} = calendar, attrs \\ %{}) do
@@ -160,8 +160,8 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> list_events()
-      [%Event{}, ...]
+  iex> list_events()
+  [%Event{}, ...]
 
   """
   def list_events do
@@ -173,8 +173,8 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> list_events(calendar_id)
-      [%Event{}, ...]
+  iex> list_events(calendar_id)
+  [%Event{}, ...]
 
   """
   def list_calendar_events(calendar_id) do
@@ -188,11 +188,11 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> get_event!(123)
-      %Event{}
+  iex> get_event!(123)
+  %Event{}
 
-      iex> get_event!(456)
-      ** (Ecto.NoResultsError)
+  iex> get_event!(456)
+  ** (Ecto.NoResultsError)
 
   """
   def get_event!(id), do: Repo.get!(Event, id)
@@ -202,11 +202,11 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> create_event(%{field: value})
-      {:ok, %Event{}}
+  iex> create_event(%{field: value})
+  {:ok, %Event{}}
 
-      iex> create_event(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  iex> create_event(%{field: bad_value})
+  {:error, %Ecto.Changeset{}}
 
   """
   def create_event(attrs \\ %{}) do
@@ -220,11 +220,11 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> get_or_create_event(%{field: value})
-      %Event{}
+  iex> get_or_create_event(%{field: value})
+  %Event{}
 
-      iex> get_or_create_event!(%{field: bad_value})
-      raises Ecto.ChangesetError
+  iex> get_or_create_event!(%{field: bad_value})
+  raises Ecto.ChangesetError
 
   """
   def get_or_create_event!(attrs \\ %{}) do
@@ -249,11 +249,11 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> update_event(event, %{field: new_value})
-      {:ok, %Event{}}
+  iex> update_event(event, %{field: new_value})
+  {:ok, %Event{}}
 
-      iex> update_event(event, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  iex> update_event(event, %{field: bad_value})
+  {:error, %Ecto.Changeset{}}
 
   """
   def update_event(%Event{} = event, attrs) do
@@ -267,11 +267,11 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> delete_event(event)
-      {:ok, %Event{}}
+  iex> delete_event(event)
+  {:ok, %Event{}}
 
-      iex> delete_event(event)
-      {:error, %Ecto.Changeset{}}
+  iex> delete_event(event)
+  {:error, %Ecto.Changeset{}}
 
   """
   def delete_event(%Event{} = event) do
@@ -283,8 +283,8 @@ defmodule Dashboard.Calendars do
 
   ## Examples
 
-      iex> change_event(event)
-      %Ecto.Changeset{data: %Event{}}
+  iex> change_event(event)
+  %Ecto.Changeset{data: %Event{}}
 
   """
   def change_event(%Event{} = event, attrs \\ %{}) do
@@ -305,7 +305,7 @@ defmodule Dashboard.Calendars do
       |> Enum.sort()
 
     events =
-      Enum.map(start_times, fn {start_time, [first | rest] = events} ->
+      Enum.map(start_times, fn {_start_time, [first | rest] = events} ->
         cond do
           Enum.any?(rest, fn e -> e.end_time != first.end_time end) ->
             {:warn_end_time, events}

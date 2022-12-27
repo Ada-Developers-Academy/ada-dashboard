@@ -8,7 +8,13 @@ defmodule Dashboard.AccountsTest do
 
     import Dashboard.AccountsFixtures
 
-    @invalid_attrs %{background_color: nil, email: nil, external_id: nil, external_provider: nil, name: nil}
+    @invalid_attrs %{
+      background_color: nil,
+      email: nil,
+      external_id: nil,
+      external_provider: nil,
+      name: nil
+    }
 
     test "list_instructors/0 returns all instructors" do
       instructor = instructor_fixture()
@@ -21,7 +27,13 @@ defmodule Dashboard.AccountsTest do
     end
 
     test "create_instructor/1 with valid data creates a instructor" do
-      valid_attrs = %{background_color: "some background_color", email: "some email", external_id: "some external_id", external_provider: "some external_provider", name: "some name"}
+      valid_attrs = %{
+        background_color: "some background_color",
+        email: "some email",
+        external_id: "some external_id",
+        external_provider: "some external_provider",
+        name: "some name"
+      }
 
       assert {:ok, %Instructor{} = instructor} = Accounts.create_instructor(valid_attrs)
       assert instructor.background_color == "some background_color"
@@ -37,9 +49,18 @@ defmodule Dashboard.AccountsTest do
 
     test "update_instructor/2 with valid data updates the instructor" do
       instructor = instructor_fixture()
-      update_attrs = %{background_color: "some updated background_color", email: "some updated email", external_id: "some updated external_id", external_provider: "some updated external_provider", name: "some updated name"}
 
-      assert {:ok, %Instructor{} = instructor} = Accounts.update_instructor(instructor, update_attrs)
+      update_attrs = %{
+        background_color: "some updated background_color",
+        email: "some updated email",
+        external_id: "some updated external_id",
+        external_provider: "some updated external_provider",
+        name: "some updated name"
+      }
+
+      assert {:ok, %Instructor{} = instructor} =
+               Accounts.update_instructor(instructor, update_attrs)
+
       assert instructor.background_color == "some updated background_color"
       assert instructor.email == "some updated email"
       assert instructor.external_id == "some updated external_id"

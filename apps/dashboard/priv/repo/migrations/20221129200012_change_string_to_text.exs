@@ -5,7 +5,7 @@ defmodule Dashboard.Repo.Migrations.ChangeStringToText do
     alter table(:calendars) do
       modify :external_id, :text
       modify :external_provider, :text
-      modify :name, :text,
+      modify :name, :text
       modify :timezone, :text
     end
 

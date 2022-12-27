@@ -1,6 +1,5 @@
 alias Dashboard.Campuses.Campus
 alias Dashboard.Cohorts.Cohort
-alias Dashboard.Classes.Source
 
 defmodule Dashboard.Classes.Class do
   use Ecto.Schema

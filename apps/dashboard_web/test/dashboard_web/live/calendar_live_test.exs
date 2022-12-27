@@ -4,8 +4,16 @@ defmodule DashboardWeb.CalendarLiveTest do
   import Phoenix.LiveViewTest
   import Dashboard.CalendarsFixtures
 
-  @create_attrs %{external_id: "some external_id", external_provider: "some external_provider", name: "some name"}
-  @update_attrs %{external_id: "some updated external_id", external_provider: "some updated external_provider", name: "some updated name"}
+  @create_attrs %{
+    external_id: "some external_id",
+    external_provider: "some external_provider",
+    name: "some name"
+  }
+  @update_attrs %{
+    external_id: "some updated external_id",
+    external_provider: "some updated external_provider",
+    name: "some updated name"
+  }
   @invalid_attrs %{external_id: nil, external_provider: nil, name: nil}
 
   defp create_calendar(_) do

@@ -10,9 +10,7 @@ defmodule Dashboard.InstructorsFixtures do
   def claim_fixture(attrs \\ %{}) do
     {:ok, claim} =
       attrs
-      |> Enum.into(%{
-
-      })
+      |> Enum.into(%{})
       |> Dashboard.Instructors.create_claim()
 
     claim
@@ -24,9 +22,7 @@ defmodule Dashboard.InstructorsFixtures do
   def affinity_fixture(attrs \\ %{}) do
     {:ok, affinity} =
       attrs
-      |> Enum.into(%{
-
-      })
+      |> Enum.into(%{})
       |> Dashboard.Instructors.create_affinity()
 
     affinity

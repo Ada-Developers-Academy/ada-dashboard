@@ -4,9 +4,27 @@ defmodule DashboardWeb.InstructorLiveTest do
   import Phoenix.LiveViewTest
   import Dashboard.AccountsFixtures
 
-  @create_attrs %{background_color: "some background_color", email: "some email", external_id: "some external_id", external_provider: "some external_provider", name: "some name"}
-  @update_attrs %{background_color: "some updated background_color", email: "some updated email", external_id: "some updated external_id", external_provider: "some updated external_provider", name: "some updated name"}
-  @invalid_attrs %{background_color: nil, email: nil, external_id: nil, external_provider: nil, name: nil}
+  @create_attrs %{
+    background_color: "some background_color",
+    email: "some email",
+    external_id: "some external_id",
+    external_provider: "some external_provider",
+    name: "some name"
+  }
+  @update_attrs %{
+    background_color: "some updated background_color",
+    email: "some updated email",
+    external_id: "some updated external_id",
+    external_provider: "some updated external_provider",
+    name: "some updated name"
+  }
+  @invalid_attrs %{
+    background_color: nil,
+    email: nil,
+    external_id: nil,
+    external_provider: nil,
+    name: nil
+  }
 
   defp create_instructor(_) do
     instructor = instructor_fixture()
