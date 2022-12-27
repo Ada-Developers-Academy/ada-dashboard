@@ -1,5 +1,8 @@
 <main>
   <header>
+    <%= live_redirect to: Routes.page_path(@socket, :index) do %>
+      <h1>Ada Dashboard App</h1>
+    <% end %>
     <nav>
       <ul>
         <li>

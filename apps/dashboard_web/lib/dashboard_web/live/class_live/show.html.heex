@@ -1,4 +1,4 @@
-<h1>Show Class</h1>
+<h2><%= @class.name %> Class</h2>
 
 <%= if @live_action in [:edit] do %>
   <.modal return_to={Routes.class_show_path(@socket, :show, @class)}>
@@ -13,10 +13,11 @@
   </.modal>
 <% end %>
 
-<h2>Name:</h2>
-<%= @class.name %>
-
 <h3>Calendars</h3>
+<details>
+<summary>
+Connected calendars:
+</summary>
 <.form
     let={f}
     for={:calendars}
@@ -32,6 +33,7 @@
 
   <%= submit "Save", phx_disable_with: "Saving..." %>
 </.form>
+</details>
 
 <span><%= live_patch "Edit", to: Routes.class_show_path(@socket, :edit, @class), class: "button" %></span> |
 <span><%= live_redirect "Back", to: Routes.class_index_path(@socket, :index) %></span>
