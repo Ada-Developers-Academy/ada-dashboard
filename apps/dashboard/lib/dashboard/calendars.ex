@@ -7,7 +7,7 @@ defmodule Dashboard.Calendars do
   alias Dashboard.Repo
 
   alias Dashboard.Calendars.{Calendar, Event}
-  alias Dashboard.Classes.Class
+  alias Dashboard.Classes.{Class, Source}
 
   @doc """
   Returns the list of calendars.
@@ -22,6 +22,26 @@ defmodule Dashboard.Calendars do
     Repo.all(Calendar)
   end
 
+  @doc """
+  Returns id, name, and "connected" for the list of calendars
+  relating to the provided class.
+
+  ## Examples
+
+  iex> list_calendars_for_class(class)
+  [%{id: ..., name: ..., connected: ...}, ...]
+
+  """
+  def list_calendars_for_class(class) do
+    Repo.all(from c in Calendar,
+      left_join: s in Source,
+      on: c.id == s.calendar_id and s.class_id == ^class.id,
+      select: [id: c.id, name: c.name, connected: not is_nil(s.calendar_id)],
+      distinct: true,
+      order_by: c.name)
+    |> Enum.map(&(Enum.into(&1, %{})))
+  end
+  
   @doc """
   Gets a single calendar.
 

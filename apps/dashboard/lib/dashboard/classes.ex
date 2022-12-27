@@ -103,15 +103,6 @@ defmodule Dashboard.Classes do
   end
 
   @doc """
-  Returns true if the class and calendar are connected.
-
-  Returns false if they are not.
-  """
-  def has_source(class, calendar) do
-    !is_nil(Repo.get_by(Source, class_id: class.id, calendar_id: calendar.id))
-  end
-
-  @doc """
   Ensure the connection exists if connected is true, and that it doesn't otherwise.
   """
   def create_or_delete_source(class, calendar, connected) do

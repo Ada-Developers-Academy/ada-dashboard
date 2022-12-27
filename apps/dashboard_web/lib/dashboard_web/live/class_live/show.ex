@@ -12,16 +12,9 @@ defmodule DashboardWeb.ClassLive.Show do
   def handle_params(%{"id" => id}, _, socket) do
     class = Classes.get_class!(id)
 
-    calendars =
-      Enum.map(Calendars.list_calendars(), fn calendar ->
-        %{
-          id: calendar.id,
-          name: calendar.name,
-          connected: Classes.has_source(class, calendar)
-        }
-      end)
+    calendars = Calendars.list_calendars_for_class(class)
 
-    Calendars.events_for_class(class)
+    # Calendars.events_for_class(class)
 
     {:noreply,
      socket
