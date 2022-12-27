@@ -11,16 +11,15 @@ defmodule DashboardWeb.ClassLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     class = Classes.get_class!(id)
-
     calendars = Calendars.list_calendars_for_class(class)
-
-    # Calendars.events_for_class(class)
+    events = Classes.events_for_class(class)
 
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:class, class)
-     |> assign(:calendars, calendars)}
+     |> assign(:calendars, calendars)
+     |> assign(:events, events)}
   end
 
   @impl true

@@ -13,6 +13,27 @@
   </.modal>
 <% end %>
 
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for {status, [event|_]} <- @events do %>
+        <tr>
+          <td><%= event.id %></td><!-- TODO: For debugging, remove! -->
+          <td><%= event.start_time %></td>
+          <td><%= event.end_time %></td>
+          <td><%= event.title %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
 <h3>Calendars</h3>
 <details>
 <summary>

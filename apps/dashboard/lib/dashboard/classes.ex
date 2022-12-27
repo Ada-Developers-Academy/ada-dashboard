@@ -13,8 +13,8 @@ defmodule Dashboard.Classes do
 
   ## Examples
 
-      iex> list_classes()
-      [%Class{}, ...]
+  iex> list_classes()
+  [%Class{}, ...]
 
   """
   def list_classes do
@@ -28,11 +28,11 @@ defmodule Dashboard.Classes do
 
   ## Examples
 
-      iex> get_class!(123)
-      %Class{}
+  iex> get_class!(123)
+  %Class{}
 
-      iex> get_class!(456)
-      ** (Ecto.NoResultsError)
+  iex> get_class!(456)
+  ** (Ecto.NoResultsError)
 
   """
   def get_class!(id), do: Repo.get!(Class, id)
@@ -42,11 +42,11 @@ defmodule Dashboard.Classes do
 
   ## Examples
 
-      iex> create_class(%{field: value})
-      {:ok, %Class{}}
+  iex> create_class(%{field: value})
+  {:ok, %Class{}}
 
-      iex> create_class(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  iex> create_class(%{field: bad_value})
+  {:error, %Ecto.Changeset{}}
 
   """
   def create_class(attrs \\ %{}) do
@@ -60,11 +60,11 @@ defmodule Dashboard.Classes do
 
   ## Examples
 
-      iex> update_class(class, %{field: new_value})
-      {:ok, %Class{}}
+  iex> update_class(class, %{field: new_value})
+  {:ok, %Class{}}
 
-      iex> update_class(class, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  iex> update_class(class, %{field: bad_value})
+  {:error, %Ecto.Changeset{}}
 
   """
   def update_class(%Class{} = class, attrs) do
@@ -78,11 +78,11 @@ defmodule Dashboard.Classes do
 
   ## Examples
 
-      iex> delete_class(class)
-      {:ok, %Class{}}
+  iex> delete_class(class)
+  {:ok, %Class{}}
 
-      iex> delete_class(class)
-      {:error, %Ecto.Changeset{}}
+  iex> delete_class(class)
+  {:error, %Ecto.Changeset{}}
 
   """
   def delete_class(%Class{} = class) do
@@ -94,8 +94,8 @@ defmodule Dashboard.Classes do
 
   ## Examples
 
-      iex> change_class(class)
-      %Ecto.Changeset{data: %Class{}}
+  iex> change_class(class)
+  %Ecto.Changeset{data: %Class{}}
 
   """
   def change_class(%Class{} = class, attrs \\ %{}) do
@@ -119,6 +119,36 @@ defmodule Dashboard.Classes do
 
         {source, false} ->
           Repo.delete!(source)
+      end
+    end)
+  end
+
+  @doc """
+  Returns all events for a given class.
+  """
+  def events_for_class(%Class{} = class) do
+    calendars = Repo.preload(class, calendars: [:events]).calendars
+
+    all_events = Enum.concat(Enum.map(calendars, & &1.events))
+
+    start_times =
+      all_events
+      |> Enum.group_by(& &1.start_time)
+      |> Enum.sort()
+
+    Enum.map(start_times, fn {_start_time, [first | rest] = events} ->
+      cond do
+        Enum.any?(rest, fn e -> e.end_time != first.end_time end) ->
+          {:warn_end_time, events}
+
+          Enum.any?(rest, fn e -> e.title != first.title end) ->
+          {:warn_title, events}
+
+          Enum.any?(rest, fn e -> e.description != first.description end) ->
+          {:warn_description, events}
+
+        true ->
+          {:ok, first}
       end
     end)
   end
