@@ -268,7 +268,7 @@ defmodule Dashboard.Accounts do
         {nil, false} ->
           nil
 
-        {source, false} ->
+        {_source, false} ->
           Repo.delete!(affinity)
       end
     end)

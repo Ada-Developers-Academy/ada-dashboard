@@ -7,7 +7,7 @@ defmodule Dashboard.Calendars do
   alias Dashboard.Repo
 
   alias Dashboard.Calendars.{Calendar, Event}
-  alias Dashboard.Classes.{Class, Source}
+  alias Dashboard.Classes.Source
 
   @doc """
   Returns the list of calendars.

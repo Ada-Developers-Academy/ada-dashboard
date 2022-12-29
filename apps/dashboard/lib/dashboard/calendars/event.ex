@@ -29,6 +29,6 @@ defmodule Dashboard.Calendars.Event do
       :end_time
     ])
     |> unique_constraint([:external_id, :external_provider])
-    |> validate_required([:external_id, :external_provider, :calendar_id, :title])
+    |> validate_required([:external_id, :external_provider, :calendar_id, :title, :start_time, :end_time])
   end
 end

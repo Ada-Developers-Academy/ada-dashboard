@@ -7,7 +7,6 @@ defmodule Dashboard.Campuses do
   alias Dashboard.Repo
 
   alias Dashboard.Campuses.Campus
-  alias Dashboard.Classes.Class
 
   @doc """
   Returns the list of campuses.

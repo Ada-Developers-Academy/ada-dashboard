@@ -2,18 +2,20 @@
 
 <section>
   <%= if @current_user do %>
-  <p>Welcome, <%= @current_user["name"] %>!</p>
-  <%= link to: Routes.auth_path(@socket, :logout, "google") do %>
-  Log out
-  <% end %>
+    <p>Welcome, <%= @current_user["name"] %>!</p>
+    <%= link to: Routes.auth_path(@socket, :logout, "google") do %>
+      Log out
+    <% end %>
   <% else %>
-  <%= link to: Routes.auth_path(@socket, :index, "google") do %>
-  Sign in with Google
-  <% end %>
+    <%= link to: Routes.auth_path(@socket, :index, "google") do %>
+      Sign in with Google
+    <% end %>
   <% end %>
 
   <h2>Classes</h2>
-  <%= for class <- @instructor.classes do %>
-    <%= live_redirect class.name, to: Routes.class_show_path(@socket, :show, class) %>
+  <%= if @instructor do %>
+    <%= for class <- @instructor.classes do %>
+      <%= live_redirect(class.name, to: Routes.class_show_path(@socket, :show, class)) %>
+    <% end %>
   <% end %>
 </section>

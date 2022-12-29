@@ -10,10 +10,12 @@ defmodule DashboardWeb.PageLive.Index do
 
     # TODO: Add support for student login.
     instructor =
-      user_id
-      |> Accounts.get_instructor!()
-      |> Repo.preload(:classes)
-
+      if user_id do
+        user_id
+        |> Accounts.get_instructor!()
+        |> Repo.preload(:classes)
+      end
+     
     {:ok,
      socket
      |> assign(:current_user, current_user)

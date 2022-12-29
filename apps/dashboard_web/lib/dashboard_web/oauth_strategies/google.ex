@@ -28,7 +28,9 @@ defmodule Google do
   end
 
   def get_token!(token) do
-    OAuth2.Client.get_token!(client(), code: token)
+    {:ok, token} = OAuth2.Client.get_token(client(), code: token)
+
+    token
   end
 
   # Strategy Callbacks
