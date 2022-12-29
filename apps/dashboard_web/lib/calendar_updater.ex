@@ -57,7 +57,7 @@ defmodule DashboardWeb.CalendarUpdater do
 
     # TODO: Validate calendar provider matches.
 
-    Enum.flat_map(calendars, fn cal ->
+    Enum.each(calendars, fn cal ->
       unless cal.external_provider == provider do
         raise ArgumentError,
               "Attempting to access calendar with provider (#{cal.external_provider}) using provider (#{provider})"
@@ -95,17 +95,23 @@ defmodule DashboardWeb.CalendarUpdater do
       case OAuth2.Client.get(token, url) do
         {:ok, response} ->
           [
-            Enum.map(response.body["items"], fn event ->
-              Calendars.get_or_create_event!(%{
-                external_id: event["id"],
-                external_provider: provider,
-                calendar_id: cal.id,
-                location: event["location"],
-                start_time: event["start"]["dateTime"],
-                end_time: event["end"]["dateTime"],
-                title: event["summary"],
-                description: event["description"]
-              })
+            Enum.each(response.body["items"], fn event ->
+              start_time = event["start"]["dateTime"]
+              end_time = event["end"]["dateTime"]
+
+              # Ignore all day events (they don't need instructors)
+              if start_time || end_time do
+                Calendars.get_or_create_event!(%{
+                  external_id: event["id"],
+                  external_provider: provider,
+                  calendar_id: cal.id,
+                  location: event["location"],
+                  start_time: start_time,
+                  end_time: end_time,
+                  title: event["summary"],
+                  description: event["description"]
+                })
+              end
             end)
           ]
 
@@ -113,8 +119,6 @@ defmodule DashboardWeb.CalendarUpdater do
           error_code = error.body["error"]["code"]
           Logger.debug(error)
           Logger.info("Failed to update #{cal.name}: #{error_code}")
-
-          []
       end
     end)
   end
