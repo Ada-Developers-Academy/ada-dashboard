@@ -47,7 +47,7 @@ defmodule DashboardWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {DashboardWeb.LayoutView, "live.html"}
+        layout: {DashboardWeb.LayoutView, :live}
 
       unquote(view_helpers())
     end
@@ -83,6 +83,7 @@ defmodule DashboardWeb do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
+      import Phoenix.Component
       # Import LiveView and .heex helpers (live_render, live_patch, <.form>, etc)
       import Phoenix.LiveView.Helpers
       import DashboardWeb.LiveHelpers

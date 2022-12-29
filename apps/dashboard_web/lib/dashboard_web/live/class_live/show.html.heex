@@ -13,48 +13,46 @@
   </.modal>
 <% end %>
 
-  <table>
-    <thead>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Start</th>
+      <th>End</th>
+      <th>Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for {_status, [event|_]} <- @events do %>
       <tr>
-        <th>ID</th>
-        <th>Start</th>
-        <th>End</th>
-        <th>Title</th>
+        <td><%= event.id %></td>
+        <!-- TODO: For debugging, remove! -->
+        <td><%= event.start_time %></td>
+        <td><%= event.end_time %></td>
+        <td><%= event.title %></td>
       </tr>
-    </thead>
-    <tbody>
-      <%= for {status, [event|_]} <- @events do %>
-        <tr>
-          <td><%= event.id %></td><!-- TODO: For debugging, remove! -->
-          <td><%= event.start_time %></td>
-          <td><%= event.end_time %></td>
-          <td><%= event.title %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+    <% end %>
+  </tbody>
+</table>
 
 <h3>Calendars</h3>
 <details>
-<summary>
-Connected calendars:
-</summary>
-<.form
-    let={f}
-    for={:calendars}
-    id="source-form"
-    phx-submit="save-calendars">
+  <summary>
+    Connected calendars:
+  </summary>
+  <.form :let={f} for={:calendars} id="source-form" phx-submit="save-calendars">
+    <%= for calendar <- @calendars do %>
+      <label>
+        <%= checkbox(f, "calendar-#{calendar.id}", value: calendar.connected) %>
+        <%= link(calendar.name, to: Routes.calendar_show_path(@socket, :show, calendar.id)) %>
+      </label>
+    <% end %>
 
-  <%= for calendar <- @calendars do %>
-    <label>
-      <%= checkbox f, "calendar-#{calendar.id}", value: calendar.connected %>
-      <%= link calendar.name, to: Routes.calendar_show_path(@socket, :show, calendar.id) %>
-    </label>
-  <% end %>
-
-  <%= submit "Save", phx_disable_with: "Saving..." %>
-</.form>
+    <%= submit("Save", phx_disable_with: "Saving...") %>
+  </.form>
 </details>
 
-<span><%= live_patch "Edit", to: Routes.class_show_path(@socket, :edit, @class), class: "button" %></span> |
-<span><%= live_redirect "Back", to: Routes.class_index_path(@socket, :index) %></span>
+<span>
+  <%= live_patch("Edit", to: Routes.class_show_path(@socket, :edit, @class), class: "button") %>
+</span>
+| <span><%= live_redirect "Back", to: Routes.class_index_path(@socket, :index) %></span>

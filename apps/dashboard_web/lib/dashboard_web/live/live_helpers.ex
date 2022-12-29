@@ -1,5 +1,5 @@
 defmodule DashboardWeb.LiveHelpers do
-  import Phoenix.LiveView
+  import Phoenix.Component
   import Phoenix.LiveView.Helpers
 
   alias Phoenix.LiveView.JS
@@ -36,12 +36,12 @@ defmodule DashboardWeb.LiveHelpers do
         phx-key="escape"
       >
         <%= if @return_to do %>
-          <%= live_patch "✖",
+          <%= live_patch("✖",
             to: @return_to,
             id: "close",
             class: "phx-modal-close",
             phx_click: hide_modal()
-          %>
+          ) %>
         <% else %>
           <a id="close" href="#" class="phx-modal-close" phx-click={hide_modal()}>✖</a>
         <% end %>
