@@ -23,7 +23,7 @@ defmodule Dashboard.MixProject do
   def application do
     [
       mod: {Dashboard.Application, []},
-      extra_applications: [:logger, :runtime_tools, :os_mon]
+      extra_applications: [:logger, :runtime_tools, :os_mon, :timex]
     ]
   end
 
@@ -40,7 +40,8 @@ defmodule Dashboard.MixProject do
       {:ecto_sql, "~> 3.6"},
       {:postgrex, ">= 0.0.0"},
       {:jason, "~> 1.2"},
-      {:swoosh, "~> 1.3"}
+      {:swoosh, "~> 1.3"},
+      {:timex, "~> 3.0"}
     ]
   end
 

@@ -16,20 +16,17 @@
 <table>
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Start</th>
-      <th>End</th>
+      <th>Date</th>
+      <th>Time</th>
       <th>Title</th>
     </tr>
   </thead>
   <tbody>
-    <%= for {_status, [event|_]} <- @events do %>
+    <%= for row <- @events do %>
       <tr>
-        <td><%= event.id %></td>
-        <!-- TODO: For debugging, remove! -->
-        <td><%= event.start_time %></td>
-        <td><%= event.end_time %></td>
-        <td><%= event.title %></td>
+        <td><%= row.date %></td>
+        <td><%= "#{row.start_time}-#{row.end_time}" %></td>
+        <td><%= row.event.title %></td>
       </tr>
     <% end %>
   </tbody>
@@ -55,4 +52,4 @@
 <span>
   <%= live_patch("Edit", to: Routes.class_show_path(@socket, :edit, @class), class: "button") %>
 </span>
-| <span><%= live_redirect "Back", to: Routes.class_index_path(@socket, :index) %></span>
+| <span><%= live_redirect("Back", to: Routes.class_index_path(@socket, :index)) %></span>

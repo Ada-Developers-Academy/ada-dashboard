@@ -5,8 +5,7 @@ defmodule Dashboard.Classes do
 
   import Ecto.Query, warn: false
   alias Dashboard.Repo
-
-  alias Dashboard.Classes.{Class, Source}
+  alias Dashboard.Classes.{Class, Source, Row}
 
   @doc """
   Returns the list of classes.
@@ -127,29 +126,55 @@ defmodule Dashboard.Classes do
   Returns all events for a given class.
   """
   def events_for_class(%Class{} = class) do
-    calendars = Repo.preload(class, calendars: [:events]).calendars
+    # TODO: Assert all calendars have the same time zone.
+    calendars = Repo.preload(class, calendars: [events: [:calendar]]).calendars
 
     all_events = Enum.concat(Enum.map(calendars, & &1.events))
 
     start_times =
       all_events
       |> Enum.group_by(& &1.start_time)
-      |> Enum.sort()
+      |> Enum.sort(fn {left, _}, {right, _} ->
+        DateTime.to_unix(left) < DateTime.to_unix(right)
+      end)
 
-    Enum.map(start_times, fn {_start_time, [first | rest] = events} ->
-      cond do
-        Enum.any?(rest, fn e -> e.end_time != first.end_time end) ->
-          {:warn_end_time, events}
+    rows =
+      Enum.map(start_times, fn {start_time_utc, [first | rest] = events} ->
+        start_datetime = DateTime.shift_zone!(start_time_utc, first.calendar.timezone)
+        end_datetime = DateTime.shift_zone!(first.end_time, first.calendar.timezone)
+        {:ok, date} = Timex.format(start_datetime, "{WDfull} {M}/{D}")
+        {:ok, start_time} = Timex.format(start_datetime, "{h12}:{m}")
+        {:ok, end_time} = Timex.format(end_datetime, "{h12}:{m}")
 
-          Enum.any?(rest, fn e -> e.title != first.title end) ->
-          {:warn_title, events}
+        {status, error_message, conflicting_events} =
+          cond do
+            # TODO: Flag if multiple mismatches exist.
+            Enum.any?(rest, fn e -> e.end_time != first.end_time end) ->
+              {:error, "End times don't match.", events}
 
-          Enum.any?(rest, fn e -> e.description != first.description end) ->
-          {:warn_description, events}
+            Enum.any?(rest, fn e -> e.title != first.title end) ->
+              {:error, "Titles don't match.", events}
 
-        true ->
-          {:ok, first}
-      end
+            Enum.any?(rest, fn e -> e.description != first.description end) ->
+              {:error, "Descriptions don't match.", events}
+
+            true ->
+              {:ok, nil, []}
+          end
+
+        %Row{
+          status: status,
+          error_message: error_message,
+          event: first,
+          date: date,
+          start_time: start_time,
+          end_time: end_time,
+          conflicting_events: conflicting_events
+        }
+      end)
+
+    Enum.map(rows, fn row ->
+      row
     end)
   end
 end
