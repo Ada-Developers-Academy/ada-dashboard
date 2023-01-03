@@ -11,11 +11,21 @@ defmodule Dashboard.Application do
       # Start the Ecto repository
       Dashboard.Repo,
       # Start the PubSub system
-      {Phoenix.PubSub, name: Dashboard.PubSub}
+      {Phoenix.PubSub, name: Dashboard.PubSub},
+      # Start the Endpoint (http/https)
+      DashboardWeb.Endpoint
       # Start a worker by calling: Dashboard.Worker.start_link(arg)
       # {Dashboard.Worker, arg}
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one, name: Dashboard.Supervisor)
+  end
+
+  # Tell Phoenix to update the endpoint configuration
+  # whenever the application is updated.
+  @impl true
+  def config_change(changed, _new, removed) do
+    DashboardWeb.Endpoint.config_change(changed, removed)
+    :ok
   end
 end

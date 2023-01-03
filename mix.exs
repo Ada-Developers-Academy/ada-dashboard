@@ -1,23 +1,32 @@
-defmodule Dashboard.Umbrella.MixProject do
+defmodule Dashboard.MixProject do
   use Mix.Project
 
   def project do
     [
-      apps_path: "apps",
+      app: :dashboard,
       version: "0.1.0",
+      elixir: "~> 1.12",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
-      deps: deps(),
       aliases: aliases(),
-      releases: [
-        dashboard_all: [
-          applications: [
-            dashboard: :permanent,
-            dashboard_web: :permanent
-          ]
-        ]
-      ]
+      deps: deps()
     ]
   end
+
+  # Configuration for the OTP application.
+  #
+  # Type `mix help compile.app` for more information.
+  def application do
+    [
+      mod: {Dashboard.Application, []},
+      extra_applications: [:logger, :runtime_tools, :timex]
+    ]
+  end
+
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Dependencies can be Hex packages:
   #
@@ -28,11 +37,30 @@ defmodule Dashboard.Umbrella.MixProject do
   #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
   #
   # Type "mix help deps" for more examples and options.
-  #
-  # Dependencies listed here are available only for this project
-  # and cannot be accessed from applications inside the apps/ folder.
   defp deps do
-    []
+    [
+      {:ecto_sql, "~> 3.6"},
+      {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
+      {:floki, ">= 0.30.0", only: :test},
+      {:gettext, "~> 0.18"},
+      {:html_sanitize_ex, "~> 1.4"},
+      {:jason, "~> 1.2"},
+      {:oauth2, "~> 2.0"},
+      {:phoenix, "~> 1.6.0"},
+      {:phoenix_ecto, "~> 4.4"},
+      {:phoenix_html, "~> 3.0"},
+      {:phoenix_live_dashboard, "~> 0.5"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix_live_view, "~> 0.18.0"},
+      {:phoenix_pubsub, "~> 2.0"},
+      {:plug_cowboy, "~> 2.5"},
+      {:postgrex, ">= 0.0.0"},
+      {:swoosh, "~> 1.3"},
+      {:telemetry_metrics, "~> 0.6"},
+      {:telemetry_poller, "~> 1.0"},
+      {:timex, "~> 3.0"},
+      {:tzdata, "~> 1.1"}
+    ]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
@@ -41,14 +69,14 @@ defmodule Dashboard.Umbrella.MixProject do
   #     $ mix setup
   #
   # See the documentation for `Mix` for more info on aliases.
-  #
-  # Aliases listed here are available only for this project
-  # and cannot be accessed from applications inside the apps/ folder.
   defp aliases do
     [
-      # run `mix setup` in all child apps
-      setup: ["cmd mix setup"],
-      "phx.routes": "phx.routes DashboardWeb.Router"
+      setup: ["deps.get", "ecto.setup"],
+      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      "assets.deploy": ["esbuild default --minify", "phx.digest"]
+      # "phx.routes": "phx.routes DashboardWeb.Router"
     ]
   end
 end
