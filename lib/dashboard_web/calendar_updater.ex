@@ -12,7 +12,7 @@ defmodule DashboardWeb.CalendarUpdater do
   def init(state) do
     seconds =
       Application.get_env(
-        :dashboard_web,
+        :dashboard,
         DashboardWeb.CalendarUpdater
       )[:interval_seconds]
 

@@ -1,12 +1,12 @@
 defmodule DashboardWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :dashboard_web
+  use Phoenix.Endpoint, otp_app: :dashboard
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
-    key: "_dashboard_web_key",
+    key: "_dashboard_key",
     signing_salt: "vmaW2VTO"
   ]
 
@@ -18,7 +18,7 @@ defmodule DashboardWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :dashboard_web,
+    from: :dashboard,
     gzip: false,
     only: ~w(assets fonts images favicon.ico robots.txt)
 
@@ -28,7 +28,7 @@ defmodule DashboardWeb.Endpoint do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader
     plug Phoenix.CodeReloader
-    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :dashboard_web
+    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :dashboard
   end
 
   plug Phoenix.LiveDashboard.RequestLogger,

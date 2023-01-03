@@ -26,12 +26,11 @@ config :dashboard, Dashboard.Mailer, adapter: Swoosh.Adapters.Local
 # Swoosh API client is needed for adapters other than SMTP.
 config :swoosh, :api_client, false
 
-config :dashboard_web,
-  ecto_repos: [Dashboard.Repo],
-  generators: [context_app: :dashboard]
+config :dashboard,
+  ecto_repos: [Dashboard.Repo]
 
 # Configures the endpoint
-config :dashboard_web, DashboardWeb.Endpoint,
+config :dashboard, DashboardWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [view: DashboardWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: Dashboard.PubSub,
@@ -42,7 +41,7 @@ config :esbuild,
   version: "0.12.18",
   default: [
     args: ~w(js/app.js --bundle --target=es2016 --outdir=../priv/static/assets),
-    cd: Path.expand("../apps/dashboard_web/assets", __DIR__),
+    cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
@@ -59,4 +58,4 @@ config :phoenix, :json_library, Jason
 import_config "#{config_env()}.exs"
 
 # Calendar Config
-config :dashboard_web, DashboardWeb.CalendarUpdater, interval_seconds: 300
+config :dashboard, DashboardWeb.CalendarUpdater, interval_seconds: 300

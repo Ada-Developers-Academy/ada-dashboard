@@ -15,7 +15,7 @@ config :dashboard, Dashboard.Repo,
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :dashboard_web, DashboardWeb.Endpoint,
+config :dashboard, DashboardWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "0zBQE8lRVSb3XDPsrkrlik22XoyHz9IveYJSZVbKgzxdUfXiZN+WqdGCoQ5ouAYe",
   server: false
