@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # exit on error
-set -o errexit
+set -ex
 
 # Initial setup
 mix deps.get --only prod
