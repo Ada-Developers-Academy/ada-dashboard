@@ -2,7 +2,7 @@ defmodule Dashboard.Repo.Migrations.ClassCalendarsToSources do
   use Ecto.Migration
 
   def change do
-    drop table(:class_calendars)
+    drop_if_exists table(:class_calendars)
 
     create table(:sources, primary_key: false) do
       add :class_id, references(:classes), primary_key: true
