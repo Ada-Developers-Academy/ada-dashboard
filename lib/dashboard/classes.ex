@@ -140,12 +140,7 @@ defmodule Dashboard.Classes do
           preload: :calendar
       )
 
-    start_times =
-      all_events
-      |> Enum.group_by(& &1.start_time)
-      |> Enum.sort(fn {left, _}, {right, _} ->
-        DateTime.to_unix(left) < DateTime.to_unix(right)
-      end)
+    start_times = group_sorted_by(all_events, fn e -> e.start_time end)
 
     rows =
       Enum.map(start_times, fn {start_time_utc, [first | rest] = events} ->
@@ -182,8 +177,27 @@ defmodule Dashboard.Classes do
         }
       end)
 
-    Enum.map(rows, fn row ->
-      row
+    rows
+  end
+
+  @doc """
+  Takes in a sorted list of elements and a key function, returns a list of tuples in the form of:
+  [{key, [element, element...]}, ...]
+
+  NOTE: A precondition of this is that the items must _already_ be sorted according to keyfn.
+  """
+  # TODO: Stick this into a util module?
+  def group_sorted_by(sorted, keyfn) do
+    sorted
+    |> Enum.reverse()
+    |> Enum.reduce([], fn item, acc ->
+      key = keyfn.(item)
+
+      case acc do
+        [] -> [{key, [item]}]
+        [{^key, items} | rest] -> [{key, [item | items]} | rest]
+        _ -> [{key, [item]} | acc]
+      end
     end)
   end
 end
