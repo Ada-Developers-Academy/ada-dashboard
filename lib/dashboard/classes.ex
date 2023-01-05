@@ -5,6 +5,7 @@ defmodule Dashboard.Classes do
 
   import Ecto.Query, warn: false
   alias Dashboard.Repo
+  alias Dashboard.Calendars.{Calendar, Event}
   alias Dashboard.Classes.{Class, Source, Row}
 
   @doc """
@@ -127,9 +128,17 @@ defmodule Dashboard.Classes do
   """
   def events_for_class(%Class{} = class) do
     # TODO: Assert all calendars have the same time zone.
-    calendars = Repo.preload(class, calendars: [events: [:calendar]]).calendars
-
-    all_events = Enum.concat(Enum.map(calendars, & &1.events))
+    all_events =
+      Repo.all(
+        from e in Event,
+          join: c in Calendar,
+          on: e.calendar_id == c.id,
+          join: s in Source,
+          on: s.calendar_id == c.id,
+          where: s.class_id == ^class.id,
+          order_by: e.start_time,
+          preload: :calendar
+      )
 
     start_times =
       all_events
