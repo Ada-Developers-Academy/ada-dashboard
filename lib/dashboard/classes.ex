@@ -128,56 +128,52 @@ defmodule Dashboard.Classes do
   """
   def events_for_class(%Class{} = class) do
     # TODO: Assert all calendars have the same time zone.
-    all_events =
-      Repo.all(
-        from e in Event,
-          join: c in Calendar,
-          on: e.calendar_id == c.id,
-          join: s in Source,
-          on: s.calendar_id == c.id,
-          where: s.class_id == ^class.id,
-          order_by: e.start_time,
-          preload: :calendar
-      )
+    Repo.all(
+      from e in Event,
+        join: c in Calendar,
+        on: e.calendar_id == c.id,
+        join: s in Source,
+        on: s.calendar_id == c.id,
+        where: s.class_id == ^class.id,
+        order_by: e.start_time,
+        preload: :calendar
+    )
+    |> group_sorted_by(fn e -> e.start_time end)
+    |> Enum.map(fn {start_time_utc, [first | rest] = events} ->
+      start_datetime = DateTime.shift_zone!(start_time_utc, first.calendar.timezone)
+      end_datetime = DateTime.shift_zone!(first.end_time, first.calendar.timezone)
+      # TODO: Move date formatting into the view layer?
+      {:ok, date} = Timex.format(start_datetime, "{WDfull} {M}/{D}")
+      {:ok, start_time} = Timex.format(start_datetime, "{h12}:{m}")
+      {:ok, end_time} = Timex.format(end_datetime, "{h12}:{m}")
 
-    start_times = group_sorted_by(all_events, fn e -> e.start_time end)
+      {status, error_message, conflicting_events} =
+        cond do
+          # TODO: Flag if multiple mismatches exist.
+          Enum.any?(rest, fn e -> e.end_time != first.end_time end) ->
+            {:error, "End times don't match.", events}
 
-    rows =
-      Enum.map(start_times, fn {start_time_utc, [first | rest] = events} ->
-        start_datetime = DateTime.shift_zone!(start_time_utc, first.calendar.timezone)
-        end_datetime = DateTime.shift_zone!(first.end_time, first.calendar.timezone)
-        {:ok, date} = Timex.format(start_datetime, "{WDfull} {M}/{D}")
-        {:ok, start_time} = Timex.format(start_datetime, "{h12}:{m}")
-        {:ok, end_time} = Timex.format(end_datetime, "{h12}:{m}")
+          Enum.any?(rest, fn e -> e.title != first.title end) ->
+            {:error, "Titles don't match.", events}
 
-        {status, error_message, conflicting_events} =
-          cond do
-            # TODO: Flag if multiple mismatches exist.
-            Enum.any?(rest, fn e -> e.end_time != first.end_time end) ->
-              {:error, "End times don't match.", events}
+          Enum.any?(rest, fn e -> e.description != first.description end) ->
+            {:error, "Descriptions don't match.", events}
 
-            Enum.any?(rest, fn e -> e.title != first.title end) ->
-              {:error, "Titles don't match.", events}
+          true ->
+            {:ok, nil, []}
+        end
 
-            Enum.any?(rest, fn e -> e.description != first.description end) ->
-              {:error, "Descriptions don't match.", events}
-
-            true ->
-              {:ok, nil, []}
-          end
-
-        %Row{
-          status: status,
-          error_message: error_message,
-          event: first,
-          date: date,
-          start_time: start_time,
-          end_time: end_time,
-          conflicting_events: conflicting_events
-        }
-      end)
-
-    rows
+      %Row{
+        status: status,
+        error_message: error_message,
+        event: first,
+        date: date,
+        start_time: start_time,
+        end_time: end_time,
+        conflicting_events: conflicting_events
+      }
+    end)
+    |> group_sorted_by(fn row -> row.date end)
   end
 
   @doc """
