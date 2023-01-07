@@ -125,7 +125,20 @@ defmodule DashboardWeb.CalendarUpdater do
 
   defp get_calendars!("google" = provider, token) do
     cal_url = "https://www.googleapis.com/calendar/v3/users/me/calendarList"
-    cals = OAuth2.Client.get!(token, cal_url).body["items"]
+
+    cals =
+      case OAuth2.Client.get(token, cal_url) do
+        {:ok, resp} ->
+          resp.body["items"]
+
+        # TODO: Handle reauthorization!
+        {:error, %OAuth2.Response{status_code: code, body: body}} ->
+          Logger.debug(body)
+          exit("Failed to get token!  Status: #{code}")
+
+        {:error, %OAuth2.Error{reason: reason}} ->
+          exit("Failed to get token!  #{reason}")
+      end
 
     Enum.map(cals, fn cal ->
       {:ok, cal} =
