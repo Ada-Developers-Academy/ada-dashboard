@@ -9,14 +9,22 @@ defmodule DashboardWeb.CalendarUpdater do
   end
 
   @impl true
-  def init(state) do
+  def init(state = %{provider: provider, code: code}) do
+    token = oauth_get_token!(provider, code)
+    user = oauth_get_user!(provider, token).body
+
     seconds =
       Application.get_env(
         :dashboard,
         DashboardWeb.CalendarUpdater
       )[:interval_seconds]
 
-    state = Map.put(state, :interval_seconds, seconds)
+    state =
+      state
+      |> Map.put(:interval_seconds, seconds)
+      |> Map.put(:token, token)
+      |> Map.put(:user, user)
+
     schedule_update(%{interval_seconds: 1})
 
     {:ok, state}
@@ -35,8 +43,17 @@ defmodule DashboardWeb.CalendarUpdater do
     {:reply, state, Map.put(state, :interval_seconds, seconds)}
   end
 
+  @impl true
+  def handle_call(:get_user, _from, state = %{user: user}) do
+    {:reply, user, state}
+  end
+
   def set_interval(seconds) do
     GenServer.call(__MODULE__, {:set_interval, seconds})
+  end
+
+  def get_user!(pid) do
+    GenServer.call(pid, :get_user)
   end
 
   defp update_calendars(provider, token) do
@@ -134,10 +151,10 @@ defmodule DashboardWeb.CalendarUpdater do
         # TODO: Handle reauthorization!
         {:error, %OAuth2.Response{status_code: code, body: body}} ->
           Logger.debug(body)
-          exit("Failed to get token!  Status: #{code}")
+          exit("Failed to get calendars!  Status: #{code}")
 
         {:error, %OAuth2.Error{reason: reason}} ->
-          exit("Failed to get token!  #{reason}")
+          exit("Failed to get calendars!  #{reason}")
       end
 
     Enum.map(cals, fn cal ->
@@ -151,5 +168,20 @@ defmodule DashboardWeb.CalendarUpdater do
 
       cal
     end)
+  end
+
+  defp oauth_get_token!("google", code) do
+    Google.get_token!(code)
+  end
+
+  defp oauth_get_token!(provider, _code) do
+    raise "Provider \"#{provider}\" not supported!"
+  end
+
+  defp oauth_get_user!("google", token) do
+    openid_url = "https://accounts.google.com/.well-known/openid-configuration"
+    user_url = OAuth2.Client.get!(token, openid_url).body["userinfo_endpoint"]
+
+    OAuth2.Client.get!(token, user_url)
   end
 end

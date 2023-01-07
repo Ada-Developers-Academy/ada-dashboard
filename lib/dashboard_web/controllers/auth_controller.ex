@@ -1,6 +1,8 @@
 defmodule DashboardWeb.AuthController do
   use DashboardWeb, :controller
 
+  alias DashboardWeb.CalendarUpdater
+
   alias Dashboard.Accounts
 
   def index(conn, %{"provider" => provider}) do
@@ -8,9 +10,8 @@ defmodule DashboardWeb.AuthController do
   end
 
   def callback(conn, %{"provider" => provider, "code" => code}) do
-    token = get_token!(provider, code)
-    user = get_user!(provider, token).body
-    {:ok, updater_pid} = DashboardWeb.CalendarUpdater.start(%{token: token, provider: provider})
+    {:ok, updater_pid} = CalendarUpdater.start(%{code: code, provider: provider})
+    user = CalendarUpdater.get_user!(updater_pid)
 
     email = user["email"]
 
@@ -29,7 +30,6 @@ defmodule DashboardWeb.AuthController do
       conn
       |> put_session(:current_user, user)
       |> put_session(:current_user_id, instructor.id)
-      |> put_session(:token, token)
       |> put_session(:calendar_updater_pid, updater_pid)
       |> redirect(to: "/")
     end
@@ -46,7 +46,6 @@ defmodule DashboardWeb.AuthController do
     |> put_flash(:info, "You have been logged out!")
     |> delete_session(:current_user)
     |> delete_session(:current_instructor)
-    |> delete_session(:token)
     |> delete_session(:calendar_updater_pid)
     |> redirect(to: "/")
   end
@@ -57,20 +56,5 @@ defmodule DashboardWeb.AuthController do
 
   defp authorize_url!(provider) do
     raise "Provider \"#{provider}\" not supported!"
-  end
-
-  defp get_token!("google", code) do
-    Google.get_token!(code)
-  end
-
-  defp get_token!(provider, _code) do
-    raise "Provider \"#{provider}\" not supported!"
-  end
-
-  defp get_user!("google", token) do
-    openid_url = "https://accounts.google.com/.well-known/openid-configuration"
-    user_url = OAuth2.Client.get!(token, openid_url).body["userinfo_endpoint"]
-
-    OAuth2.Client.get!(token, user_url)
   end
 end
