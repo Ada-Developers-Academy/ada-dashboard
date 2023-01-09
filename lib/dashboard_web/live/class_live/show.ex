@@ -88,7 +88,6 @@ defmodule DashboardWeb.ClassLive.Show do
       {:error, error} ->
         socket
         |> put_flash(:error, error)
-        |> push_redirect(to: "/classes/#{id}")
     end
   end
 
