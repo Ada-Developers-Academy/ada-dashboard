@@ -126,7 +126,7 @@ defmodule Dashboard.Classes do
   @doc """
   Returns all events for a given class.
   """
-  def events_for_class(%Class{} = class) do
+  def events_for_class(%Class{} = class, start_date) do
     # TODO: Assert all calendars have the same time zone.
     Repo.all(
       from e in Event,
