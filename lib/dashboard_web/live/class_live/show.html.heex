@@ -14,6 +14,9 @@
 <% end %>
 
 <h3>Schedule</h3>
+<!-- TODO: Only show if there is actually something next week? -->
+<.link patch={"/classes/#{@id}?start_date=#{@prev_start_query}"}>Prev</.link>
+<.link patch={"/classes/#{@id}?start_date=#{@next_start_query}"}>Next</.link>
 <%= for {date, rows} <- @events do %>
   <h4><%= date %></h4>
 

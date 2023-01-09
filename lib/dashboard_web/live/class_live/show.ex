@@ -3,6 +3,8 @@ defmodule DashboardWeb.ClassLive.Show do
 
   alias Dashboard.{Classes, Calendars}
 
+  alias Timex.Duration
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok, socket}
@@ -25,6 +27,7 @@ defmodule DashboardWeb.ClassLive.Show do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
+     |> assign(:id, id)
      |> assign(:class, class)
      |> assign(:calendars, calendars)
      |> assign(:events, events)
@@ -57,7 +60,7 @@ defmodule DashboardWeb.ClassLive.Show do
   defp parse_start_date(start_param) do
     {start_date, error} =
       if start_param do
-        case Timex.parse(start_param, "{YYYY}-{0M}-{D}") do
+        case Timex.parse(start_param, "{YYYY}-{0M}-{0D}") do
           {:ok, parsed} -> {parsed, nil}
           {:error, _} -> {nil, "Invalid start_date \"#{start_param}\"!"}
         end
@@ -81,16 +84,31 @@ defmodule DashboardWeb.ClassLive.Show do
 
   defp put_start_date(socket, id, start_param) do
     case parse_start_date(start_param) do
-      {:ok, parsed} ->
-        start_date = Timex.format!(parsed, "{YYYY}-{0M}-{D}")
+      {:ok, start_date} ->
+        start_query = Timex.format!(start_date, "{YYYY}-{0M}-{0D}")
 
         # Only redirect if the user provided a valid date and it differs from the beginning of week.
-        if start_param && start_date && start_date != start_param do
-          socket
-          |> push_redirect(to: "/classes/#{id}?start_date=#{start_date}")
-        else
-          socket
-        end
+        socket =
+          if start_param && start_query && start_query != start_param do
+            socket
+            |> push_redirect(to: "/classes/#{id}?start_date=#{start_query}")
+          else
+            socket
+          end
+
+        socket
+        |> assign(
+          :prev_start_query,
+          start_date
+          |> Timex.subtract(Duration.from_weeks(1))
+          |> Timex.format!("{YYYY}-{0M}-{0D}")
+        )
+        |> assign(
+          :next_start_query,
+          start_date
+          |> Timex.add(Duration.from_weeks(1))
+          |> Timex.format!("{YYYY}-{0M}-{0D}")
+        )
 
       {:error, error} ->
         socket
