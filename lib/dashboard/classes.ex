@@ -144,7 +144,7 @@ defmodule Dashboard.Classes do
         preload: :calendar
     )
     |> group_sorted_by(fn e -> e.start_time end)
-    |> Enum.map(fn {start_time_utc, [first | rest] = events} ->
+    |> Enum.flat_map(fn {start_time_utc, [first | rest] = events} ->
       start_datetime = DateTime.shift_zone!(start_time_utc, "America/Los_Angeles")
       end_datetime = DateTime.shift_zone!(first.end_time, "America/Los_Angeles")
       # TODO: Move date formatting into the view layer?
@@ -155,31 +155,26 @@ defmodule Dashboard.Classes do
       {:ok, end_time} = Timex.format(end_datetime, "{h12}:{m}")
       # {:ok, end_time} = DateTime.to_time(end_datetime)
 
-      {status, error_message, conflicting_events} =
-        cond do
-          # TODO: Flag if multiple mismatches exist.
-          Enum.any?(rest, fn e -> e.end_time != first.end_time end) ->
-            {:error, "End times don't match.", events}
-
-          Enum.any?(rest, fn e -> e.title != first.title end) ->
-            {:error, "Titles don't match.", events}
-
-          Enum.any?(rest, fn e -> e.description != first.description end) ->
-            {:error, "Descriptions don't match.", events}
-
-          true ->
-            {:ok, nil, []}
+      status =
+        if Enum.any?(rest, fn e ->
+             e.end_time != first.end_time or e.title != first.title or
+               e.description != first.description
+           end) do
+          :conflict
+        else
+          :ok
         end
 
-      %Row{
-        status: status,
-        error_message: error_message,
-        event: first,
-        date: date,
-        start_time: start_time,
-        end_time: end_time,
-        conflicting_events: conflicting_events
-      }
+      Enum.map(events, fn event ->
+        %Row{
+          status: status,
+          event: event,
+          date: date,
+          start_time: start_time,
+          end_time: end_time,
+          conflicting_events: events
+        }
+      end)
     end)
     |> group_sorted_by(fn row -> row.date end)
   end

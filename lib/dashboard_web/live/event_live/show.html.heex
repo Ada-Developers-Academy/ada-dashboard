@@ -14,7 +14,6 @@
 <% end %>
 
 <ul>
-
   <li>
     <strong>Title:</strong>
     <%= @event.title %>
@@ -22,20 +21,12 @@
 
   <li>
     <strong>Description:</strong>
-    <%= raw HtmlSanitizeEx.basic_html(@event.description) %>
+    <%= raw(HtmlSanitizeEx.basic_html(@event.description)) %>
   </li>
-
-  <li>
-    <strong>External:</strong>
-    <%= @event.external_id %>
-  </li>
-
-  <li>
-    <strong>External provider:</strong>
-    <%= @event.external_provider %>
-  </li>
-
 </ul>
 
-<span><%= live_redirect "Back",
-          to: Routes.calendar_show_path(@socket, :show, @event.calendar_id) %></span>
+<span>
+  <%= live_redirect("Back",
+    to: Routes.calendar_show_path(@socket, :show, @event.calendar_id)
+  ) %>
+</span>

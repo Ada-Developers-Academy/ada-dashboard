@@ -36,7 +36,14 @@
           <td style="text-align: right"><%= row.start_time %></td>
           <td>–</td>
           <td><%= row.end_time %></td>
-          <td><%= row.event.title %></td>
+          <td>
+            <.link patch={"/events/#{row.event.id}"}><%= row.event.title %></.link>
+            <%= if row.status == :conflict do %>
+              <span class="conflict" style="color:red;display:block">
+                This event conflicts with one or more other events
+              </span>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>
