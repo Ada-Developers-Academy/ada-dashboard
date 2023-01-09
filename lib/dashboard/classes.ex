@@ -126,26 +126,34 @@ defmodule Dashboard.Classes do
   @doc """
   Returns all events for a given class.
   """
-  def events_for_class(%Class{} = class, start_date) do
-    # TODO: Assert all calendars have the same time zone.
+  def events_for_class(%Class{} = _class, nil, nil), do: nil
+
+  def events_for_class(%Class{} = class, start_date, end_date) do
+    end_time = Timex.end_of_week(start_date)
+
+    # TODO: Configure timezone per class.
     Repo.all(
       from e in Event,
         join: c in Calendar,
         on: e.calendar_id == c.id,
         join: s in Source,
         on: s.calendar_id == c.id,
-        where: s.class_id == ^class.id,
+        where:
+          s.class_id == ^class.id and ^start_date <= e.start_time and e.end_time <= ^end_time,
         order_by: e.start_time,
         preload: :calendar
     )
     |> group_sorted_by(fn e -> e.start_time end)
     |> Enum.map(fn {start_time_utc, [first | rest] = events} ->
-      start_datetime = DateTime.shift_zone!(start_time_utc, first.calendar.timezone)
-      end_datetime = DateTime.shift_zone!(first.end_time, first.calendar.timezone)
+      start_datetime = DateTime.shift_zone!(start_time_utc, "America/Los_Angeles")
+      end_datetime = DateTime.shift_zone!(first.end_time, "America/Los_Angeles")
       # TODO: Move date formatting into the view layer?
       {:ok, date} = Timex.format(start_datetime, "{WDfull} {M}/{D}")
+      # {:ok, date} = DateTime.to_date(start_datetime)
       {:ok, start_time} = Timex.format(start_datetime, "{h12}:{m}")
+      # {:ok, start_time} = DateTime.to_time(start_datetime)
       {:ok, end_time} = Timex.format(end_datetime, "{h12}:{m}")
+      # {:ok, end_time} = DateTime.to_time(end_datetime)
 
       {status, error_message, conflicting_events} =
         cond do

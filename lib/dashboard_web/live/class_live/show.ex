@@ -12,8 +12,15 @@ defmodule DashboardWeb.ClassLive.Show do
   def handle_params(%{"id" => id} = params, _uri, socket) do
     class = Classes.get_class!(id)
     calendars = Calendars.list_calendars_for_class(class)
-    start_date = Map.get(params, "start_date")
-    events = Classes.events_for_class(class, parse_start_date(start_date))
+    start_param = Map.get(params, "start_date")
+
+    {start_date, end_date} =
+      case parse_start_date(start_param) do
+        {:ok, start_date} -> {start_date, Timex.end_of_week(start_date)}
+        {:error, _} -> {nil, nil}
+      end
+
+    events = Classes.events_for_class(class, start_date, end_date)
 
     {:noreply,
      socket
@@ -21,7 +28,7 @@ defmodule DashboardWeb.ClassLive.Show do
      |> assign(:class, class)
      |> assign(:calendars, calendars)
      |> assign(:events, events)
-     |> put_start_date(id, start_date)}
+     |> put_start_date(id, start_param)}
   end
 
   @impl true
@@ -60,7 +67,7 @@ defmodule DashboardWeb.ClassLive.Show do
 
     start_date =
       if start_date do
-        start_date |> Timex.beginning_of_week() |> Timex.to_date()
+        start_date |> Timex.beginning_of_week()
       else
         nil
       end
