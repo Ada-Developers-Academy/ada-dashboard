@@ -1,10 +1,10 @@
 defmodule DashboardWeb.ClassLive.Show do
   use DashboardWeb, :live_view
 
-  alias Dashboard.{Accounts, Classes, Calendars}
+  alias Dashboard.{Classes, Calendars}
   alias DashboardWeb.CalendarLive.ScheduleComponent
 
-  alias Timex.Duration
+  import ScheduleComponent, only: [put_schedule_info: 3]
 
   @impl true
   def mount(_params, _session, socket) do
@@ -13,33 +13,17 @@ defmodule DashboardWeb.ClassLive.Show do
 
   @impl true
   def handle_params(%{"id" => id} = params, uri, socket) do
-    %URI{
-      path: path
-    } = URI.parse(uri)
-
     class = Classes.get_class!(id)
     calendars = Calendars.list_calendars_for_class(class)
     start_param = Map.get(params, "start_date")
-
-    start_date =
-      case parse_start_date(start_param) do
-        {:ok, start_date} -> start_date
-        {:error, _} -> nil
-      end
-
-    events = Classes.events_for_classes([class], start_date)
-    instructors = Accounts.list_instructors_for_classes([class])
 
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:id, id)
      |> assign(:class, class)
-     |> assign(:classes, [class])
      |> assign(:calendars, calendars)
-     |> assign(:events, events)
-     |> assign(:instructors, instructors)
-     |> put_start_date(path, start_param)}
+     |> put_schedule_info(uri, start_param)}
   end
 
   @impl true
@@ -65,34 +49,25 @@ defmodule DashboardWeb.ClassLive.Show do
     {:noreply, socket}
   end
 
-  @impl true
-  def handle_event(
-        "save-claims",
-        %{"instructors" => instructors},
-        %{assigns: %{class: class}} = socket
-      ) do
-    Enum.map(instructors, fn {name, checked} ->
-      [raw_type, raw_instructor, raw_event] = String.split(name, "-")
-      {instructor_id, ""} = Integer.parse(raw_instructor)
-      instructor = Accounts.get_instructor!(instructor_id)
-      {event_id, ""} = Integer.parse(raw_event)
-      event = Calendars.get_event!(event_id)
-
-      type =
-        case checked do
-          "true" -> raw_type
-          "false" -> nil
-        end
-
-      Accounts.create_or_delete_claim(instructor, event, type)
-    end)
-
-    {:noreply,
-     socket
-     |> assign(:instructors, Accounts.list_instructors_for_classes([class]))}
+  @doc """
+  Returns the parsed start date if valid, returns an error otherwise.
+  """
+  def get_start_date(start_param) do
+    case parse_start_date(start_param) do
+      {:ok, start_date} -> start_date
+      {:error, _} -> nil
+    end
   end
 
-  defp parse_start_date(start_param) do
+  @doc """
+  Returns the parsed start date if valid, returns an error otherwise.
+
+  Returns:
+  {:ok, parsed}
+  or
+  {:error, message}
+  """
+  def parse_start_date(start_param) do
     {start_date, error} =
       if start_param do
         case Timex.parse(start_param, "{YYYY}-{0M}-{0D}") do
@@ -114,43 +89,6 @@ defmodule DashboardWeb.ClassLive.Show do
       {:ok, start_date}
     else
       {:error, error}
-    end
-  end
-
-  defp put_start_date(socket, path, start_param) do
-    case parse_start_date(start_param) do
-      {:ok, start_date} ->
-        start_query =
-          start_date
-          |> Timex.beginning_of_week()
-          |> Timex.format!("{YYYY}-{0M}-{0D}")
-
-        # Only redirect if the user provided a valid date and it differs from the beginning of week.
-        socket =
-          if start_param && start_query && start_query != start_param do
-            socket
-            |> push_redirect(to: "#{path}?start_date=#{start_query}")
-          else
-            socket
-          end
-
-        socket
-        |> assign(
-          :prev_start_query,
-          start_date
-          |> Timex.subtract(Duration.from_weeks(1))
-          |> Timex.format!("{YYYY}-{0M}-{0D}")
-        )
-        |> assign(
-          :next_start_query,
-          start_date
-          |> Timex.add(Duration.from_weeks(1))
-          |> Timex.format!("{YYYY}-{0M}-{0D}")
-        )
-
-      {:error, error} ->
-        socket
-        |> put_flash(:error, error)
     end
   end
 

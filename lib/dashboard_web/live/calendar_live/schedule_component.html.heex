@@ -1,0 +1,98 @@
+<section>
+  <h3>Schedule</h3>
+  <!-- TODO: Only show if there is actually something next week? -->
+  <.link patch={@schedule_path_prev}>Prev</.link>
+  <.link patch={@schedule_path_next}>Next</.link>
+  <%= for {date, rows} <- @events do %>
+    <h4><%= date %></h4>
+
+    <table style="width: 100%;border:1px solid black;" border="1">
+      <!-- TODO: Please forgive me CSS, inline styles are for prototyping only! -->
+      <thead>
+        <tr>
+          <th>Start</th>
+          <th>End</th>
+          <th>Title</th>
+          <%= for _class <- @classes do %>
+            <th>Lead</th>
+            <th>Backup</th>
+          <% end %>
+        </tr>
+        <%= if length(@classes) > 1 do %>
+          <tr>
+            <th>
+              <!-- Start -->
+            </th>
+            <th>
+              <!-- End -->
+            </th>
+            <th>
+              <!-- Title -->
+            </th>
+            <th colspan="2">
+              <%= for class <- @classes do %>
+                <%= class.name %>
+              <% end %>
+            </th>
+          </tr>
+        <% end %>
+      </thead>
+      <tbody>
+        <%= for row <- rows do %>
+          <tr>
+            <td style="text-align: right"><%= row.start_time %></td>
+            <td><%= row.end_time %></td>
+            <td>
+              <.link patch={"/events/#{row.event.id}"}><%= row.event.title %></.link>
+              <%= if row.status == :conflict do %>
+                <span class="conflict" style="color:red;display:block">
+                  This event conflicts with one or more other events
+                </span>
+              <% end %>
+            </td>
+            <td>
+              <.form
+                :let={f}
+                for={:instructors}
+                id="lead-instructors"
+                phx-change="save-claims"
+                phx-submit="save-claims"
+                phx-target={@myself}
+              >
+                <%= for %{instructor: instructor, events: events} <- @instructors do %>
+                  <label>
+                    <%= checkbox(f, "lead-#{instructor.id}-#{row.event.id}",
+                      value: events[row.event.id] == "lead"
+                    ) %>
+                    <%= instructor.name %>
+                  </label>
+                <% end %>
+                <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
+              </.form>
+            </td>
+            <td>
+              <.form
+                :let={f}
+                for={:instructors}
+                id="backup-instructors"
+                phx-change="save-claims"
+                phx-submit="save-claims"
+                phx-target={@myself}
+              >
+                <%= for %{instructor: instructor, events: events} <- @instructors do %>
+                  <label>
+                    <%= checkbox(f, "backup-#{instructor.id}-#{row.event.id}",
+                      value: events[row.event.id] == "backup"
+                    ) %>
+                    <%= instructor.name %>
+                  </label>
+                <% end %>
+                <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
+              </.form>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</section>
