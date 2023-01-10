@@ -142,6 +142,7 @@ defmodule Dashboard.Classes do
         where:
           s.class_id in ^class_ids and ^start_date <= e.start_time and e.end_time <= ^end_time,
         order_by: e.start_time,
+        distinct: true,
         preload: :calendar
     )
     |> group_sorted_by(fn e -> e.start_time end)
