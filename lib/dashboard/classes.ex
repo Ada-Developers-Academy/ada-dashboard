@@ -126,9 +126,9 @@ defmodule Dashboard.Classes do
   @doc """
   Returns all events for a given class.
   """
-  def events_for_class(%Class{} = _class, nil, nil), do: nil
+  def events_for_class(%Class{} = _class, nil), do: nil
 
-  def events_for_class(%Class{} = class, start_date, end_date) do
+  def events_for_class(%Class{} = class, start_date) do
     end_time = Timex.end_of_week(start_date)
 
     # TODO: Configure timezone per class.

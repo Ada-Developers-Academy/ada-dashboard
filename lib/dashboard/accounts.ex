@@ -7,6 +7,8 @@ defmodule Dashboard.Accounts do
   alias Dashboard.Repo
 
   alias Dashboard.Accounts.{Affinity, Claim, Instructor}
+  alias Dashboard.Calendars.{Calendar, Event}
+  alias Dashboard.Classes.Source
 
   @doc """
   Returns the list of instructors.
@@ -19,6 +21,35 @@ defmodule Dashboard.Accounts do
   """
   def list_instructors do
     Repo.all(Instructor)
+  end
+
+  def list_instructors_for_class(class) do
+    Repo.all(
+      from i in Instructor,
+        join: claim in Claim,
+        on: i.id == claim.instructor_id,
+        join: event in Event,
+        on: event.id == claim.event_id,
+        join: calendar in Calendar,
+        on: calendar.id == event.calendar_id,
+        join: source in Source,
+        on: calendar.id == source.calendar_id,
+        where: source.class_id == ^class.id,
+        select: [id: i.id, name: i.name, event_id: event.id, type: claim.type]
+    )
+    |> Enum.group_by(fn row ->
+      row[:id]
+    end)
+    |> Enum.map(fn {id, events} ->
+      %{
+        instructor: get_instructor!(id),
+        events:
+          events
+          |> Enum.into(%{}, fn event ->
+            {event[:event_id], event[:type]}
+          end)
+      }
+    end)
   end
 
   @doc """
@@ -245,12 +276,37 @@ defmodule Dashboard.Accounts do
   end
 
   @doc """
-  Returns true if the class and calendar are connected.
+  Returns true if the instructor and class are connected.
 
   Returns false if they are not.
   """
   def has_affinity(instructor, class) do
     !is_nil(Repo.get_by(Affinity, instructor_id: instructor.id, class_id: class.id))
+  end
+
+  @doc """
+  Ensure the claim exists if connected is true, and that it doesn't otherwise.
+  """
+  def create_or_delete_claim(instructor, event, type) do
+    Repo.transaction(fn ->
+      claim = Repo.get_by(Claim, instructor_id: instructor.id, event_id: event.id)
+
+      case {claim, type} do
+        {nil, nil} ->
+          nil
+
+        {claim, nil} ->
+          Repo.delete!(claim)
+
+        {_, type} ->
+          claim = %Claim{instructor_id: instructor.id, event_id: event.id, type: type}
+
+          Repo.insert!(claim,
+            on_conflict: :replace_all,
+            conflict_target: [:instructor_id, :event_id]
+          )
+      end
+    end)
   end
 
   @doc """

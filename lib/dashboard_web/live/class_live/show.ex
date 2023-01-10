@@ -1,7 +1,7 @@
 defmodule DashboardWeb.ClassLive.Show do
   use DashboardWeb, :live_view
 
-  alias Dashboard.{Classes, Calendars}
+  alias Dashboard.{Accounts, Classes, Calendars}
 
   alias Timex.Duration
 
@@ -16,21 +16,24 @@ defmodule DashboardWeb.ClassLive.Show do
     calendars = Calendars.list_calendars_for_class(class)
     start_param = Map.get(params, "start_date")
 
-    {start_date, end_date} =
+    start_date =
       case parse_start_date(start_param) do
-        {:ok, start_date} -> {start_date, Timex.end_of_week(start_date)}
-        {:error, _} -> {nil, nil}
+        {:ok, start_date} -> start_date
+        {:error, _} -> nil
       end
 
-    events = Classes.events_for_class(class, start_date, end_date)
+    events = Classes.events_for_class(class, start_date)
+    instructors = Accounts.list_instructors_for_class(class)
 
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:id, id)
      |> assign(:class, class)
+     |> assign(:classes, [class])
      |> assign(:calendars, calendars)
      |> assign(:events, events)
+     |> assign(:instructors, instructors)
      |> put_start_date(id, start_param)}
   end
 
@@ -55,6 +58,33 @@ defmodule DashboardWeb.ClassLive.Show do
     end)
 
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event(
+        "save-claims",
+        %{"instructors" => instructors},
+        %{assigns: %{class: class}} = socket
+      ) do
+    Enum.map(instructors, fn {name, checked} ->
+      [raw_type, raw_instructor, raw_event] = String.split(name, "-")
+      {instructor_id, ""} = Integer.parse(raw_instructor)
+      instructor = Accounts.get_instructor!(instructor_id)
+      {event_id, ""} = Integer.parse(raw_event)
+      event = Calendars.get_event!(event_id)
+
+      type =
+        case checked do
+          "true" -> raw_type
+          "false" -> nil
+        end
+
+      Accounts.create_or_delete_claim(instructor, event, type)
+    end)
+
+    {:noreply,
+     socket
+     |> assign(:instructors, Accounts.list_instructors_for_class(class))}
   end
 
   defp parse_start_date(start_param) do
