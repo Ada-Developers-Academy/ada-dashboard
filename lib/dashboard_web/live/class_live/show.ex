@@ -2,6 +2,7 @@ defmodule DashboardWeb.ClassLive.Show do
   use DashboardWeb, :live_view
 
   alias Dashboard.{Accounts, Classes, Calendars}
+  alias DashboardWeb.CalendarLive.ScheduleComponent
 
   alias Timex.Duration
 
@@ -11,7 +12,11 @@ defmodule DashboardWeb.ClassLive.Show do
   end
 
   @impl true
-  def handle_params(%{"id" => id} = params, _uri, socket) do
+  def handle_params(%{"id" => id} = params, uri, socket) do
+    %URI{
+      path: path
+    } = URI.parse(uri)
+
     class = Classes.get_class!(id)
     calendars = Calendars.list_calendars_for_class(class)
     start_param = Map.get(params, "start_date")
@@ -34,7 +39,7 @@ defmodule DashboardWeb.ClassLive.Show do
      |> assign(:calendars, calendars)
      |> assign(:events, events)
      |> assign(:instructors, instructors)
-     |> put_start_date(id, start_param)}
+     |> put_start_date(path, start_param)}
   end
 
   @impl true
@@ -84,7 +89,7 @@ defmodule DashboardWeb.ClassLive.Show do
 
     {:noreply,
      socket
-     |> assign(:instructors, Accounts.list_instructors_for_class(class))}
+     |> assign(:instructors, Accounts.list_instructors_for_classes([class]))}
   end
 
   defp parse_start_date(start_param) do
@@ -112,16 +117,19 @@ defmodule DashboardWeb.ClassLive.Show do
     end
   end
 
-  defp put_start_date(socket, id, start_param) do
+  defp put_start_date(socket, path, start_param) do
     case parse_start_date(start_param) do
       {:ok, start_date} ->
-        start_query = Timex.format!(start_date, "{YYYY}-{0M}-{0D}")
+        start_query =
+          start_date
+          |> Timex.beginning_of_week()
+          |> Timex.format!("{YYYY}-{0M}-{0D}")
 
         # Only redirect if the user provided a valid date and it differs from the beginning of week.
         socket =
           if start_param && start_query && start_query != start_param do
             socket
-            |> push_redirect(to: "/classes/#{id}?start_date=#{start_query}")
+            |> push_redirect(to: "#{path}?start_date=#{start_query}")
           else
             socket
           end
