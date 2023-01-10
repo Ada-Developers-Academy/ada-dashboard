@@ -23,7 +23,7 @@ defmodule DashboardWeb.ClassLive.Show do
       end
 
     events = Classes.events_for_classes([class], start_date)
-    instructors = Accounts.list_instructors_for_class(class)
+    instructors = Accounts.list_instructors_for_classes([class])
 
     {:noreply,
      socket

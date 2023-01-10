@@ -23,7 +23,9 @@ defmodule Dashboard.Accounts do
     Repo.all(Instructor)
   end
 
-  def list_instructors_for_class(class) do
+  def list_instructors_for_classes(classes) do
+    class_ids = Enum.map(classes, fn c -> c.id end)
+
     Repo.all(
       from i in Instructor,
         join: claim in Claim,
@@ -34,7 +36,7 @@ defmodule Dashboard.Accounts do
         on: calendar.id == event.calendar_id,
         join: source in Source,
         on: calendar.id == source.calendar_id,
-        where: source.class_id == ^class.id,
+        where: source.class_id in ^class_ids,
         select: [id: i.id, name: i.name, event_id: event.id, type: claim.type]
     )
     |> Enum.group_by(fn row ->
