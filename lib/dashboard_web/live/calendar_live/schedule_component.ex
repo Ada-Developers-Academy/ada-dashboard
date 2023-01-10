@@ -10,21 +10,40 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
   def update(
         %{
           classes: classes,
-          schedule_start_date: start_date,
-          # Required for rendering
-          schedule_path_prev: _,
-          schedule_path_next: _
+          parent: parent,
+          uri: uri
         } = assigns,
         socket
       ) do
-    events = Classes.events_for_classes(classes, start_date)
-    instructors = Accounts.list_instructors_for_classes(classes)
+    %URI{
+      path: path,
+      query: raw_query
+    } = URI.parse(uri)
+
+    query =
+      case raw_query do
+        nil -> %{}
+        str -> Query.decode(str)
+      end
+
+    socket =
+      case parse_start_date(query) do
+        {:error, _} ->
+          socket
+
+        {_, start_date} ->
+          events = Classes.events_for_classes(classes, start_date)
+          instructors = Accounts.list_instructors_for_classes(classes)
+
+          socket
+          |> assign(:events, events)
+          |> assign(:instructors, instructors)
+      end
 
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:events, events)
-     |> assign(:instructors, instructors)}
+     |> put_schedule_info(parent, path, query)}
   end
 
   @impl true
@@ -54,69 +73,26 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
      |> assign(:instructors, Accounts.list_instructors_for_classes(classes))}
   end
 
-  defp parse_start_date(start_param) do
-    {start_date, error} =
-      if start_param do
+  defp parse_start_date(query) do
+    case Map.get(query, "start_date") do
+      nil ->
+        {:default, Timex.now() |> Timex.beginning_of_week()}
+
+      start_param ->
         case Timex.parse(start_param, "{YYYY}-{0M}-{0D}") do
-          {:ok, parsed} -> {parsed, nil}
-          {:error, _} -> {nil, "Invalid start_date \"#{start_param}\"!"}
+          {:ok, parsed} -> {:ok, parsed}
+          {:error, _} -> {:error, "Invalid start_date \"#{start_param}\"!"}
         end
-      else
-        {Timex.now(), nil}
-      end
-
-    start_date =
-      if start_date do
-        start_date |> Timex.beginning_of_week()
-      else
-        nil
-      end
-
-    if start_date do
-      {:ok, start_date}
-    else
-      {:error, error}
     end
   end
 
-  @doc """
-  Store :schedule_start_date, :schedule_path_prev, and :schedule_path_next in the assigns.
+  defp put_schedule_info(socket, parent, path, query) do
+    case parse_start_date(query) do
+      {:error, error} ->
+        socket
+        |> put_flash(:error, error)
 
-  Pushes a redirect to correct start_date if it isn't a Monday.
-  """
-  def put_schedule_info(socket, uri, start_param) do
-    %URI{
-      path: path,
-      query: raw_query
-    } = URI.parse(uri)
-
-    query =
-      case raw_query do
-        nil -> %{}
-        str -> Query.decode(str)
-      end
-
-    case parse_start_date(start_param) do
-      {:ok, start_date} ->
-        start_query =
-          start_date
-          |> Timex.beginning_of_week()
-          |> Timex.format!("{YYYY}-{0M}-{0D}")
-
-        new_query =
-          query
-          |> Map.put("start_date", start_query)
-          |> Query.encode()
-
-        # Only redirect if the user provided a valid date and it differs from the beginning of week.
-        socket =
-          if start_param && start_query && start_query != start_param do
-            socket
-            |> push_redirect(to: "#{path}?#{new_query}")
-          else
-            socket
-          end
-
+      {status, start_date} ->
         prev_query =
           start_date
           |> Timex.subtract(Duration.from_weeks(1))
@@ -126,6 +102,24 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
           start_date
           |> Timex.add(Duration.from_weeks(1))
           |> Timex.format!("{YYYY}-{0M}-{0D}")
+
+        if status != :default do
+          redirect_date =
+            start_date
+            |> Timex.beginning_of_week()
+
+          # Only redirect if the user provided a valid date and it differs from the beginning of week.
+          if start_date != redirect_date do
+            redirect_query =
+              Map.put(
+                query,
+                "start_date",
+                Timex.format!(redirect_date, "{YYYY}-{0M}-{0D}")
+              )
+
+            send(parent, {:redirect, "#{path}?#{Query.encode(redirect_query)}"})
+          end
+        end
 
         socket
         |> assign(
@@ -140,10 +134,6 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
           :schedule_path_next,
           "#{path}?start_date=#{next_query}"
         )
-
-      {:error, error} ->
-        socket
-        |> put_flash(:error, error)
     end
   end
 end

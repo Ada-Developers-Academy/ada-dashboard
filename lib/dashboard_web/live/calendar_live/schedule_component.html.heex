@@ -1,8 +1,12 @@
 <section>
   <h3>Schedule</h3>
   <!-- TODO: Only show if there is actually something next week? -->
-  <.link patch={@schedule_path_prev}>Prev</.link>
-  <.link patch={@schedule_path_next}>Next</.link>
+  <%= if @schedule_path_prev do %>
+    <.link patch={@schedule_path_prev}>Prev</.link>
+  <% end %>
+  <%= if @schedule_path_next do %>
+    <.link patch={@schedule_path_next}>Next</.link>
+  <% end %>
   <%= for {date, rows} <- @events do %>
     <h4><%= date %></h4>
 

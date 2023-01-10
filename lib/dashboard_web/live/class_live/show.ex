@@ -4,18 +4,15 @@ defmodule DashboardWeb.ClassLive.Show do
   alias Dashboard.{Classes, Calendars}
   alias DashboardWeb.CalendarLive.ScheduleComponent
 
-  import ScheduleComponent, only: [put_schedule_info: 3]
-
   @impl true
   def mount(_params, _session, socket) do
     {:ok, socket}
   end
 
   @impl true
-  def handle_params(%{"id" => id} = params, uri, socket) do
+  def handle_params(%{"id" => id}, uri, socket) do
     class = Classes.get_class!(id)
     calendars = Calendars.list_calendars_for_class(class)
-    start_param = Map.get(params, "start_date")
 
     {:noreply,
      socket
@@ -23,7 +20,15 @@ defmodule DashboardWeb.ClassLive.Show do
      |> assign(:id, id)
      |> assign(:class, class)
      |> assign(:calendars, calendars)
-     |> put_schedule_info(uri, start_param)}
+     |> assign(:uri, uri)
+     |> assign(:self, self())}
+  end
+
+  @impl true
+  def handle_info({:redirect, path}, socket) do
+    {:noreply,
+     socket
+     |> push_redirect(to: path)}
   end
 
   @impl true
@@ -47,49 +52,6 @@ defmodule DashboardWeb.ClassLive.Show do
     end)
 
     {:noreply, socket}
-  end
-
-  @doc """
-  Returns the parsed start date if valid, returns an error otherwise.
-  """
-  def get_start_date(start_param) do
-    case parse_start_date(start_param) do
-      {:ok, start_date} -> start_date
-      {:error, _} -> nil
-    end
-  end
-
-  @doc """
-  Returns the parsed start date if valid, returns an error otherwise.
-
-  Returns:
-  {:ok, parsed}
-  or
-  {:error, message}
-  """
-  def parse_start_date(start_param) do
-    {start_date, error} =
-      if start_param do
-        case Timex.parse(start_param, "{YYYY}-{0M}-{0D}") do
-          {:ok, parsed} -> {parsed, nil}
-          {:error, _} -> {nil, "Invalid start_date \"#{start_param}\"!"}
-        end
-      else
-        {Timex.now(), nil}
-      end
-
-    start_date =
-      if start_date do
-        start_date |> Timex.beginning_of_week()
-      else
-        nil
-      end
-
-    if start_date do
-      {:ok, start_date}
-    else
-      {:error, error}
-    end
   end
 
   defp page_title(:show), do: "Show Class"
