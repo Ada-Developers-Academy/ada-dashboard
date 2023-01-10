@@ -28,16 +28,21 @@ defmodule Dashboard.Accounts do
 
     Repo.all(
       from i in Instructor,
-        join: claim in Claim,
+        left_join: claim in Claim,
         on: i.id == claim.instructor_id,
-        join: event in Event,
+        left_join: event in Event,
         on: event.id == claim.event_id,
-        join: calendar in Calendar,
+        left_join: calendar in Calendar,
         on: calendar.id == event.calendar_id,
-        join: source in Source,
-        on: calendar.id == source.calendar_id,
-        where: source.class_id in ^class_ids,
-        select: [id: i.id, name: i.name, event_id: event.id, type: claim.type]
+        left_join: source in Source,
+        on: calendar.id == source.calendar_id and source.class_id in ^class_ids,
+        select: [
+          id: i.id,
+          name: i.name,
+          event_id: event.id,
+          type: claim.type,
+          class_id: claim.class_id
+        ]
     )
     |> Enum.group_by(fn row ->
       row[:id]
@@ -48,7 +53,7 @@ defmodule Dashboard.Accounts do
         events:
           events
           |> Enum.into(%{}, fn event ->
-            {event[:event_id], event[:type]}
+            {event[:event_id], %{type: event[:type], class_id: event[:class_id]}}
           end)
       }
     end)
@@ -110,12 +115,16 @@ defmodule Dashboard.Accounts do
     Repo.transaction(fn ->
       instructor = get_instructor_by_external_id(provider, id)
 
-      if is_nil(instructor) do
-        %Instructor{}
-        |> Instructor.changeset(attrs)
-        |> Repo.insert()
-      else
+      if instructor do
         instructor
+      else
+        {:ok, created} =
+          %Instructor{}
+          |> Instructor.changeset(attrs)
+          |> Repo.insert(returning: true)
+
+        # TODO: Handle errors
+        created
       end
     end)
   end
@@ -289,9 +298,10 @@ defmodule Dashboard.Accounts do
   @doc """
   Ensure the claim exists if connected is true, and that it doesn't otherwise.
   """
-  def create_or_delete_claim(instructor, event, type) do
+  def create_or_delete_claim(instructor, class, event, type) do
     Repo.transaction(fn ->
-      claim = Repo.get_by(Claim, instructor_id: instructor.id, event_id: event.id)
+      claim =
+        Repo.get_by(Claim, instructor_id: instructor.id, class_id: class.id, event_id: event.id)
 
       case {claim, type} do
         {nil, nil} ->
@@ -301,7 +311,12 @@ defmodule Dashboard.Accounts do
           Repo.delete!(claim)
 
         {_, type} ->
-          claim = %Claim{instructor_id: instructor.id, event_id: event.id, type: type}
+          claim = %Claim{
+            instructor_id: instructor.id,
+            class_id: class.id,
+            event_id: event.id,
+            type: type
+          }
 
           Repo.insert!(claim,
             on_conflict: :replace_all,

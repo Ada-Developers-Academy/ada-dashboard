@@ -53,9 +53,11 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
         %{assigns: %{classes: classes}} = socket
       ) do
     Enum.map(instructors, fn {name, checked} ->
-      [raw_type, raw_instructor, raw_event] = String.split(name, "-")
+      [raw_type, raw_instructor, raw_class, raw_event] = String.split(name, "-")
       {instructor_id, ""} = Integer.parse(raw_instructor)
       instructor = Accounts.get_instructor!(instructor_id)
+      {class_id, ""} = Integer.parse(raw_class)
+      class = Classes.get_class!(class_id)
       {event_id, ""} = Integer.parse(raw_event)
       event = Calendars.get_event!(event_id)
 
@@ -65,7 +67,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
           "false" -> nil
         end
 
-      Accounts.create_or_delete_claim(instructor, event, type)
+      Accounts.create_or_delete_claim(instructor, class, event, type)
     end)
 
     {:noreply,

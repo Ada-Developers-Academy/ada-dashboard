@@ -33,11 +33,11 @@
             <th>
               <!-- Title -->
             </th>
-            <th colspan="2">
-              <%= for class <- @classes do %>
+            <%= for class <- @classes do %>
+              <th colspan="2">
                 <%= class.name %>
-              <% end %>
-            </th>
+              </th>
+            <% end %>
           </tr>
         <% end %>
       </thead>
@@ -54,46 +54,54 @@
                 </span>
               <% end %>
             </td>
-            <td>
-              <.form
-                :let={f}
-                for={:instructors}
-                id="lead-instructors"
-                phx-change="save-claims"
-                phx-submit="save-claims"
-                phx-target={@myself}
-              >
-                <%= for %{instructor: instructor, events: events} <- @instructors do %>
-                  <label>
-                    <%= checkbox(f, "lead-#{instructor.id}-#{row.event.id}",
-                      value: events[row.event.id] == "lead"
-                    ) %>
-                    <%= instructor.name %>
-                  </label>
-                <% end %>
-                <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
-              </.form>
-            </td>
-            <td>
-              <.form
-                :let={f}
-                for={:instructors}
-                id="backup-instructors"
-                phx-change="save-claims"
-                phx-submit="save-claims"
-                phx-target={@myself}
-              >
-                <%= for %{instructor: instructor, events: events} <- @instructors do %>
-                  <label>
-                    <%= checkbox(f, "backup-#{instructor.id}-#{row.event.id}",
-                      value: events[row.event.id] == "backup"
-                    ) %>
-                    <%= instructor.name %>
-                  </label>
-                <% end %>
-                <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
-              </.form>
-            </td>
+            <%= for class <- @classes do %>
+              <td>
+                <.form
+                  :let={f}
+                  for={:instructors}
+                  id="lead-instructors"
+                  phx-change="save-claims"
+                  phx-submit="save-claims"
+                  phx-target={@myself}
+                >
+                  <%= for %{instructor: instructor, events: events} <- @instructors do %>
+                    <label>
+                      <%= checkbox(f, "lead-#{instructor.id}-#{class.id}-#{row.event.id}",
+                        value:
+                          events[row.event.id] &&
+                            events[row.event.id].type == "lead" &&
+                            events[row.event.id].class_id == class.id
+                      ) %>
+                      <%= instructor.name %>
+                    </label>
+                  <% end %>
+                  <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
+                </.form>
+              </td>
+              <td>
+                <.form
+                  :let={f}
+                  for={:instructors}
+                  id="backup-instructors"
+                  phx-change="save-claims"
+                  phx-submit="save-claims"
+                  phx-target={@myself}
+                >
+                  <%= for %{instructor: instructor, events: events} <- @instructors do %>
+                    <label>
+                      <%= checkbox(f, "backup-#{instructor.id}-#{class.id}-#{row.event.id}",
+                        value:
+                          events[row.event.id] &&
+                            events[row.event.id].type == "backup" &&
+                            events[row.event.id].class_id == class.id
+                      ) %>
+                      <%= instructor.name %>
+                    </label>
+                  <% end %>
+                  <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
+                </.form>
+              </td>
+            <% end %>
           </tr>
         <% end %>
       </tbody>

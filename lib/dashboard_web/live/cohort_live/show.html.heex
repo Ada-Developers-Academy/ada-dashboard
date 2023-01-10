@@ -14,13 +14,21 @@
 <% end %>
 
 <ul>
-
   <li>
     <strong>Name:</strong>
     <%= @cohort.name %>
   </li>
-
 </ul>
 
-<span><%= live_patch "Edit", to: Routes.cohort_show_path(@socket, :edit, @cohort), class: "button" %></span> |
-<span><%= live_redirect "Back", to: Routes.cohort_index_path(@socket, :index) %></span>
+<.live_component
+  module={ScheduleComponent}
+  id="schedule"
+  classes={@classes}
+  uri={@uri}
+  parent={@self}
+/>
+
+<span>
+  <%= live_patch("Edit", to: Routes.cohort_show_path(@socket, :edit, @cohort), class: "button") %>
+</span>
+| <span><%= live_redirect("Back", to: Routes.cohort_index_path(@socket, :index)) %></span>
