@@ -126,10 +126,11 @@ defmodule Dashboard.Classes do
   @doc """
   Returns all events for a given class.
   """
-  def events_for_class(%Class{} = _class, nil), do: nil
+  def events_for_classes(_classes, nil), do: nil
 
-  def events_for_class(%Class{} = class, start_date) do
+  def events_for_classes(classes, start_date) do
     end_time = Timex.end_of_week(start_date)
+    class_ids = Enum.map(classes, fn c -> c.id end)
 
     # TODO: Configure timezone per class.
     Repo.all(
@@ -139,7 +140,7 @@ defmodule Dashboard.Classes do
         join: s in Source,
         on: s.calendar_id == c.id,
         where:
-          s.class_id == ^class.id and ^start_date <= e.start_time and e.end_time <= ^end_time,
+          s.class_id in ^class_ids and ^start_date <= e.start_time and e.end_time <= ^end_time,
         order_by: e.start_time,
         preload: :calendar
     )

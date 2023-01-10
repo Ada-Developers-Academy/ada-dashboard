@@ -22,7 +22,7 @@ defmodule DashboardWeb.ClassLive.Show do
         {:error, _} -> nil
       end
 
-    events = Classes.events_for_class(class, start_date)
+    events = Classes.events_for_classes([class], start_date)
     instructors = Accounts.list_instructors_for_class(class)
 
     {:noreply,
