@@ -1,9 +1,11 @@
 defmodule DashboardWeb.CalendarLive.ScheduleComponent do
   use DashboardWeb, :live_component
 
+  alias Dashboard.Classes.Class
+  alias Dashboard.Cohorts.Cohort
   alias Dashboard.{Accounts, Calendars, Classes}
+  alias DashboardWeb.CalendarLive.Location
   alias Plug.Conn.Query
-
   alias Timex.Duration
 
   @impl true
@@ -26,24 +28,40 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
         str -> Query.decode(str)
       end
 
-    socket =
-      case parse_start_date(query) do
-        {:error, _} ->
-          socket
+    case parse_start_date(query) do
+      {:error, _} ->
+        # Error reporting is handled by put_schedule_info
+        {:ok,
+         socket
+         |> assign(assigns)
+         |> put_schedule_info(parent, path, query)}
 
-        {_, start_date} ->
-          events = Classes.events_for_classes(classes, start_date)
-          instructors = Accounts.list_instructors_for_classes(classes)
+      {_, start_date} ->
+        events = Classes.events_for_classes(classes, start_date)
+        instructors = Accounts.list_instructors_for_schedule(classes)
 
-          socket
-          |> assign(:events, events)
-          |> assign(:instructors, instructors)
-      end
+        maybe_cohort =
+          case Map.get(assigns, :cohort) do
+            nil -> []
+            cohort -> [cohort]
+          end
 
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> put_schedule_info(parent, path, query)}
+        locations =
+          Enum.map(maybe_cohort ++ classes, fn loc ->
+            case loc do
+              %Cohort{} = cohort -> Location.new(cohort)
+              %Class{} = class -> Location.new(class)
+            end
+          end)
+
+        {:ok,
+         socket
+         |> assign(assigns)
+         |> assign(:locations, locations)
+         |> assign(:events, events)
+         |> assign(:instructors, instructors)
+         |> put_schedule_info(parent, path, query)}
+    end
   end
 
   @impl true
@@ -53,11 +71,10 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
         %{assigns: %{classes: classes}} = socket
       ) do
     Enum.map(instructors, fn {name, checked} ->
-      [raw_type, raw_instructor, raw_class, raw_event] = String.split(name, "-")
+      [raw_type, raw_instructor, raw_location, raw_event] = String.split(name, "-")
       {instructor_id, ""} = Integer.parse(raw_instructor)
       instructor = Accounts.get_instructor!(instructor_id)
-      {class_id, ""} = Integer.parse(raw_class)
-      class = Classes.get_class!(class_id)
+      location = Location.get!(raw_location)
       {event_id, ""} = Integer.parse(raw_event)
       event = Calendars.get_event!(event_id)
 
@@ -67,12 +84,12 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
           "false" -> nil
         end
 
-      Accounts.create_or_delete_claim(instructor, class, event, type)
+      Accounts.create_or_delete_claim(instructor, location, event, type)
     end)
 
     {:noreply,
      socket
-     |> assign(:instructors, Accounts.list_instructors_for_classes(classes))}
+     |> assign(:instructors, Accounts.list_instructors_for_schedule(classes))}
   end
 
   defp parse_start_date(query) do

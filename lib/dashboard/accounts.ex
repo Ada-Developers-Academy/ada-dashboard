@@ -4,11 +4,13 @@ defmodule Dashboard.Accounts do
   """
 
   import Ecto.Query, warn: false
+
   alias Dashboard.Repo
 
   alias Dashboard.Accounts.{Affinity, Claim, Instructor}
   alias Dashboard.Calendars.{Calendar, Event}
   alias Dashboard.Classes.Source
+  alias DashboardWeb.CalendarLive.Location
 
   @doc """
   Returns the list of instructors.
@@ -23,13 +25,14 @@ defmodule Dashboard.Accounts do
     Repo.all(Instructor)
   end
 
-  def list_instructors_for_classes(classes) do
+  def list_instructors_for_schedule(classes) do
     class_ids = Enum.map(classes, fn c -> c.id end)
+    class_ids_to_names = Enum.into(classes, %{}, fn c -> {c.id, c.name} end)
 
     Repo.all(
-      from i in Instructor,
+      from instructor in Instructor,
         left_join: claim in Claim,
-        on: i.id == claim.instructor_id,
+        on: instructor.id == claim.instructor_id,
         left_join: event in Event,
         on: event.id == claim.event_id,
         left_join: calendar in Calendar,
@@ -37,23 +40,27 @@ defmodule Dashboard.Accounts do
         left_join: source in Source,
         on: calendar.id == source.calendar_id and source.class_id in ^class_ids,
         select: [
-          id: i.id,
-          name: i.name,
-          event_id: event.id,
-          type: claim.type,
+          claim: claim,
+          instructor: instructor,
+          event: event,
           class_id: claim.class_id
         ]
     )
     |> Enum.group_by(fn row ->
-      row[:id]
+      row[:instructor].id
     end)
-    |> Enum.map(fn {id, events} ->
+    |> Enum.map(fn {_, [row | _] = rows} ->
       %{
-        instructor: get_instructor!(id),
-        events:
-          events
-          |> Enum.into(%{}, fn event ->
-            {event[:event_id], %{type: event[:type], class_id: event[:class_id]}}
+        instructor: row[:instructor],
+        claims_by_event:
+          rows
+          |> Enum.filter(fn row -> row[:event] end)
+          |> Enum.into(%{}, fn row ->
+            {row[:event].id,
+             %{
+               claim: row[:claim],
+               location: Location.new(row[:claim], class_ids_to_names[row[:class_id]])
+             }}
           end)
       }
     end)
@@ -298,10 +305,24 @@ defmodule Dashboard.Accounts do
   @doc """
   Ensure the claim exists if connected is true, and that it doesn't otherwise.
   """
-  def create_or_delete_claim(instructor, class, event, type) do
+  def create_or_delete_claim(instructor, location, event, type) do
     Repo.transaction(fn ->
       claim =
-        Repo.get_by(Claim, instructor_id: instructor.id, class_id: class.id, event_id: event.id)
+        case location do
+          %Location{id: class_id, model: :class} ->
+            Repo.get_by(Claim,
+              instructor_id: instructor.id,
+              class_id: class_id,
+              event_id: event.id
+            )
+
+          %Location{id: cohort_id, model: :cohort} ->
+            Repo.get_by(Claim,
+              instructor_id: instructor.id,
+              cohort_id: cohort_id,
+              event_id: event.id
+            )
+        end
 
       case {claim, type} do
         {nil, nil} ->
@@ -311,12 +332,24 @@ defmodule Dashboard.Accounts do
           Repo.delete!(claim)
 
         {_, type} ->
-          claim = %Claim{
-            instructor_id: instructor.id,
-            class_id: class.id,
-            event_id: event.id,
-            type: type
-          }
+          claim =
+            case location do
+              %Location{id: class_id, model: :class} ->
+                %Claim{
+                  instructor_id: instructor.id,
+                  class_id: class_id,
+                  event_id: event.id,
+                  type: type
+                }
+
+              %Location{id: cohort_id, model: :cohort} ->
+                %Claim{
+                  instructor_id: instructor.id,
+                  cohort_id: cohort_id,
+                  event_id: event.id,
+                  type: type
+                }
+            end
 
           Repo.insert!(claim,
             on_conflict: :replace_all,

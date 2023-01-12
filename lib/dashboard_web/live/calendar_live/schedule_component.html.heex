@@ -17,12 +17,12 @@
           <th>Start</th>
           <th>End</th>
           <th>Title</th>
-          <%= for _class <- @classes do %>
+          <%= for _location <- @locations do %>
             <th>Lead</th>
             <th>Backup</th>
           <% end %>
         </tr>
-        <%= if length(@classes) > 1 do %>
+        <%= if length(@locations) > 1 do %>
           <tr>
             <th>
               <!-- Start -->
@@ -33,9 +33,9 @@
             <th>
               <!-- Title -->
             </th>
-            <%= for class <- @classes do %>
+            <%= for location <- @locations do %>
               <th colspan="2">
-                <%= class.name %>
+                <%= location.name %>
               </th>
             <% end %>
           </tr>
@@ -54,7 +54,7 @@
                 </span>
               <% end %>
             </td>
-            <%= for class <- @classes do %>
+            <%= for location <- @locations do %>
               <td>
                 <.form
                   :let={f}
@@ -64,13 +64,13 @@
                   phx-submit="save-claims"
                   phx-target={@myself}
                 >
-                  <%= for %{instructor: instructor, events: events} <- @instructors do %>
+                  <%= for %{instructor: instructor, claims_by_event: claims_by_event} <- @instructors do %>
+                    <% event_id = row.event.id %>
+                    <% c = claims_by_event[event_id] %>
+                    <!-- Claim and Location -->
                     <label>
-                      <%= checkbox(f, "lead-#{instructor.id}-#{class.id}-#{row.event.id}",
-                        value:
-                          events[row.event.id] &&
-                            events[row.event.id].type == "lead" &&
-                            events[row.event.id].class_id == class.id
+                      <%= checkbox(f, "lead-#{instructor.id}-#{location}-#{event_id}",
+                        value: c && c.claim.type == "lead" && c.location == location
                       ) %>
                       <%= instructor.name %>
                     </label>
@@ -87,13 +87,15 @@
                   phx-submit="save-claims"
                   phx-target={@myself}
                 >
-                  <%= for %{instructor: instructor, events: events} <- @instructors do %>
+                  <%= for %{instructor: instructor, claims_by_event: claims_by_event} <- @instructors do %>
+                    <% event_id = row.event.id %>
+                    <% c = claims_by_event[event_id] %>
+                    <%= inspect(location) %>
+                    <%= inspect(c && c.location) %>
+                    <%= event_id %>
                     <label>
-                      <%= checkbox(f, "backup-#{instructor.id}-#{class.id}-#{row.event.id}",
-                        value:
-                          events[row.event.id] &&
-                            events[row.event.id].type == "backup" &&
-                            events[row.event.id].class_id == class.id
+                      <%= checkbox(f, "backup-#{instructor.id}-#{location}-#{row.event.id}",
+                        value: c && c.claim.type == "backup" && c.location == location
                       ) %>
                       <%= instructor.name %>
                     </label>
