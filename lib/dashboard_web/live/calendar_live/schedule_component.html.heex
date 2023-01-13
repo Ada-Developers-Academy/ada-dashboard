@@ -67,10 +67,9 @@
                   <%= for %{instructor: instructor, claims_by_event: claims_by_event} <- @instructors do %>
                     <% event_id = row.event.id %>
                     <% c = claims_by_event[event_id] %>
-                    <!-- Claim and Location -->
                     <label>
                       <%= checkbox(f, "lead-#{instructor.id}-#{location}-#{event_id}",
-                        value: c && c.claim.type == "lead" && c.location == location
+                        value: c && c.claim.type == "lead" && "#{c.location}" == "#{location}"
                       ) %>
                       <%= instructor.name %>
                     </label>
@@ -90,12 +89,9 @@
                   <%= for %{instructor: instructor, claims_by_event: claims_by_event} <- @instructors do %>
                     <% event_id = row.event.id %>
                     <% c = claims_by_event[event_id] %>
-                    <%= inspect(location) %>
-                    <%= inspect(c && c.location) %>
-                    <%= event_id %>
                     <label>
                       <%= checkbox(f, "backup-#{instructor.id}-#{location}-#{row.event.id}",
-                        value: c && c.claim.type == "backup" && c.location == location
+                        value: c && c.claim.type == "backup" && "#{c.location}" == "#{location}"
                       ) %>
                       <%= instructor.name %>
                     </label>
