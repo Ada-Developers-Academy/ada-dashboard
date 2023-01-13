@@ -157,8 +157,13 @@ defmodule DashboardWeb.CalendarUpdater do
           exit("Failed to get calendars!  #{reason}")
       end
 
-    Enum.map(cals, fn cal ->
-      {:ok, cal} =
+    cals
+    |> Enum.filter(fn cal ->
+      # Only include calendars we can write to.
+      cal["accessRole"] in ["writer", "owner"]
+    end)
+    |> Enum.map(fn cal ->
+      {:ok, calendar} =
         Calendars.get_or_create_calendar(%{
           name: cal["summary"],
           external_id: cal["id"],
@@ -166,7 +171,7 @@ defmodule DashboardWeb.CalendarUpdater do
           timezone: cal["timeZone"]
         })
 
-      cal
+      calendar
     end)
   end
 
