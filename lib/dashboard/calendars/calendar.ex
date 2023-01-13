@@ -9,6 +9,7 @@ defmodule Dashboard.Calendars.Calendar do
     field :external_provider, :string
     field :name, :string
     field :timezone, :string
+    field :is_personal, :boolean
 
     has_many :events, Event
 
@@ -18,8 +19,8 @@ defmodule Dashboard.Calendars.Calendar do
   @doc false
   def changeset(calendar, attrs) do
     calendar
-    |> cast(attrs, [:name, :external_id, :external_provider, :timezone])
+    |> cast(attrs, [:name, :external_id, :external_provider, :timezone, :is_personal])
     |> unique_constraint([:external_id, :external_provider])
-    |> validate_required([:name, :external_id, :external_provider, :timezone])
+    |> validate_required([:name, :external_id, :external_provider, :timezone, :is_personal])
   end
 end

@@ -31,8 +31,8 @@ defmodule DashboardWeb.CalendarUpdater do
   end
 
   @impl true
-  def handle_info(:update, state = %{provider: provider, token: token}) do
-    update_calendars(provider, token)
+  def handle_info(:update, %{provider: provider, token: token, user: user} = state) do
+    update_calendars(provider, token, user)
     schedule_update(state)
 
     {:noreply, state}
@@ -44,7 +44,7 @@ defmodule DashboardWeb.CalendarUpdater do
   end
 
   @impl true
-  def handle_call(:get_user, _from, state = %{user: user}) do
+  def handle_call(:get_user, _from, %{user: user} = state) do
     {:reply, user, state}
   end
 
@@ -56,8 +56,8 @@ defmodule DashboardWeb.CalendarUpdater do
     GenServer.call(pid, :get_user)
   end
 
-  defp update_calendars(provider, token) do
-    calendars = get_calendars!(provider, token)
+  defp update_calendars(provider, token, user) do
+    calendars = get_calendars!(provider, token, user)
     get_events!(provider, token, calendars)
   end
 
@@ -140,7 +140,7 @@ defmodule DashboardWeb.CalendarUpdater do
     end)
   end
 
-  defp get_calendars!("google" = provider, token) do
+  defp get_calendars!("google" = provider, token, user) do
     cal_url = "https://www.googleapis.com/calendar/v3/users/me/calendarList"
 
     cals =
@@ -168,7 +168,8 @@ defmodule DashboardWeb.CalendarUpdater do
           name: cal["summary"],
           external_id: cal["id"],
           external_provider: provider,
-          timezone: cal["timeZone"]
+          timezone: cal["timeZone"],
+          is_personal: user["email"] == cal["id"]
         })
 
       calendar

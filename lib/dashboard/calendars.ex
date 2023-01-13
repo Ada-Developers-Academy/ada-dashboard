@@ -33,15 +33,18 @@ defmodule Dashboard.Calendars do
 
   """
   def list_calendars_for_class(class) do
-    Repo.all(from c in Calendar,
-      left_join: s in Source,
-      on: c.id == s.calendar_id and s.class_id == ^class.id,
-      select: [id: c.id, name: c.name, connected: not is_nil(s.calendar_id)],
-      distinct: true,
-      order_by: c.name)
-    |> Enum.map(&(Enum.into(&1, %{})))
+    Repo.all(
+      from c in Calendar,
+        left_join: s in Source,
+        on: c.id == s.calendar_id and s.class_id == ^class.id,
+        select: [id: c.id, name: c.name, connected: not is_nil(s.calendar_id)],
+        where: c.is_personal == false,
+        distinct: true,
+        order_by: c.name
+    )
+    |> Enum.map(&Enum.into(&1, %{}))
   end
-  
+
   @doc """
   Gets a single calendar.
 
