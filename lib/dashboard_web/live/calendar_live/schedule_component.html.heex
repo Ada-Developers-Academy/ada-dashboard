@@ -35,7 +35,11 @@
             </th>
             <%= for location <- @locations do %>
               <th colspan="2">
-                <%= location.name %>
+                <%= if location.model == :class do %>
+                  <.link navigate={"/classes/#{location.id}"}><%= location.name %></.link>
+                <% else %>
+                  <%= location.name %>
+                <% end %>
               </th>
             <% end %>
           </tr>
@@ -47,7 +51,7 @@
             <td style="text-align: right"><%= row.start_time %></td>
             <td><%= row.end_time %></td>
             <td>
-              <.link patch={"/events/#{row.event.id}"}><%= row.event.title %></.link>
+              <.link navigate={"/events/#{row.event.id}"}><%= row.event.title %></.link>
               <%= if row.status == :conflict do %>
                 <span class="conflict" style="color:red;display:block">
                   This event conflicts with one or more other events
