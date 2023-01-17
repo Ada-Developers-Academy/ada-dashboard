@@ -12,7 +12,7 @@
     <% end %>
   <% end %>
 
-  <%= if @instructor do %>
+  <%= if @current_user && @instructor do %>
     <.live_component
       module={ScheduleComponent}
       id="schedule"
