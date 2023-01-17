@@ -61,7 +61,8 @@ config :dashboard, DashboardWeb.Endpoint,
       ~r"priv/gettext/.*(po)$",
       ~r"lib/dashboard_web/(live|views)/.*(ex)$",
       ~r"lib/dashboard_web/templates/.*(eex)$"
-    ]
+    ],
+    debounce: 100
   ]
 
 # Do not include metadata nor timestamps in development logs

@@ -67,25 +67,28 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
   @impl true
   def handle_event(
         "save-claims",
-        %{"instructors" => instructors},
+        %{
+          "_target" => ["claims", target],
+          "claims" => claims
+        },
         %{assigns: %{classes: classes}} = socket
       ) do
-    Enum.map(instructors, fn {name, checked} ->
-      [raw_type, raw_instructor, raw_location, raw_event] = String.split(name, "-")
-      {instructor_id, ""} = Integer.parse(raw_instructor)
-      instructor = Accounts.get_instructor!(instructor_id)
-      location = Location.get!(raw_location)
-      {event_id, ""} = Integer.parse(raw_event)
-      event = Calendars.get_event!(event_id)
+    checked = claims[target]
 
-      type =
-        case checked do
-          "true" -> raw_type
-          "false" -> nil
-        end
+    [raw_type, raw_instructor, raw_location, raw_event] = String.split(target, "-")
+    {instructor_id, ""} = Integer.parse(raw_instructor)
+    instructor = Accounts.get_instructor!(instructor_id)
+    location = Location.get!(raw_location)
+    {event_id, ""} = Integer.parse(raw_event)
+    event = Calendars.get_event!(event_id)
 
-      Accounts.create_or_delete_claim(instructor, location, event, type)
-    end)
+    type =
+      case checked do
+        "true" -> raw_type
+        "false" -> nil
+      end
+
+    Accounts.create_or_delete_claim(instructor, location, event, type)
 
     {:noreply,
      socket
