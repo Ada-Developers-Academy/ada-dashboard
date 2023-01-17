@@ -13,9 +13,9 @@ defmodule DashboardWeb.PageLive.Index do
       if user_id do
         user_id
         |> Accounts.get_instructor!()
-        |> Repo.preload(:classes)
+        |> Repo.preload([:classes, :events])
       end
-     
+
     {:ok,
      socket
      |> assign(:current_user, current_user)

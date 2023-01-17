@@ -2,9 +2,6 @@ defmodule Dashboard.Accounts.Claim do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Dashboard.Classes.Class
-  alias Dashboard.Cohorts.Cohort
-
   @primary_key false
   schema "claims" do
     field :instructor_id, :id, primary_key: true

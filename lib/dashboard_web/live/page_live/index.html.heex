@@ -12,10 +12,47 @@
     <% end %>
   <% end %>
 
+  <h2>Events</h2>
+  <!-- This should probably be a version of the schedule component... -->
+  <%= if @instructor do %>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Start</th>
+          <th>End</th>
+          <th>Title</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for event <- @instructor.events do %>
+          <tr>
+            <td><%= event.start_time %></td>
+            <td><%= event.end_time %></td>
+            <td>
+              <.link navigate={"events/#{event.id}"}>
+                <%= event.title %>
+              </.link>
+            </td>
+            <td>
+              <%= raw(HtmlSanitizeEx.basic_html(event.description)) %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+
   <h2>Classes</h2>
   <%= if @instructor do %>
-    <%= for class <- @instructor.classes do %>
-      <%= live_redirect(class.name, to: Routes.class_show_path(@socket, :show, class)) %>
-    <% end %>
+    <ul>
+      <%= for class <- @instructor.classes do %>
+        <li>
+          <.link navigate={"classes/#{class.id}"}>
+            <%= class.name %>
+          </.link>
+        </li>
+      <% end %>
+    </ul>
   <% end %>
 </section>
