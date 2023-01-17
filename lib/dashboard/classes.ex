@@ -5,8 +5,9 @@ defmodule Dashboard.Classes do
 
   import Ecto.Query, warn: false
   alias Dashboard.Repo
+  alias Dashboard.Accounts.{Claim, Instructor}
   alias Dashboard.Calendars.{Calendar, Event}
-  alias Dashboard.Classes.{Class, Source, Row}
+  alias Dashboard.Classes.{Class, Source}
 
   @doc """
   Returns the list of classes.
@@ -124,7 +125,37 @@ defmodule Dashboard.Classes do
   end
 
   @doc """
-  Returns all events for a given class.
+  Returns all events for a given instructor.
+  """
+  def events_for_instructor(_instructor, nil), do: nil
+
+  def events_for_instructor(%Instructor{} = instructor, start_date) do
+    end_time = Timex.end_of_week(start_date)
+
+    claims =
+      Repo.all(
+        from c in Claim,
+          join: i in Instructor,
+          on: c.instructor_id == i.id and i.id == ^instructor.id,
+          join: e in Event,
+          on: c.event_id == e.id,
+          where: ^start_date <= e.start_time and e.end_time <= ^end_time,
+          order_by: e.start_time,
+          distinct: true,
+          preload: [:event, :class, :cohort],
+          select: [c, e.start_time]
+      )
+
+    claims
+    |> Enum.map(fn [claim, _] -> claim end)
+    |> Enum.reverse()
+    |> Enum.reduce({[], %{}}, fn claim, {events, claim_lookup} ->
+      {[claim.event | events], Map.put(claim_lookup, claim.event.id, claim)}
+    end)
+  end
+
+  @doc """
+  Returns all events for given classes.
   """
   def events_for_classes(_classes, nil), do: nil
 
@@ -132,7 +163,6 @@ defmodule Dashboard.Classes do
     end_time = Timex.end_of_week(start_date)
     class_ids = Enum.map(classes, fn c -> c.id end)
 
-    # TODO: Configure timezone per class.
     Repo.all(
       from e in Event,
         join: c in Calendar,
@@ -145,60 +175,5 @@ defmodule Dashboard.Classes do
         distinct: true,
         preload: :calendar
     )
-    |> group_sorted_by(fn e -> e.start_time end)
-    |> Enum.flat_map(fn {start_time_utc, [first | rest] = events} ->
-      start_datetime = DateTime.shift_zone!(start_time_utc, "America/Los_Angeles")
-      end_datetime = DateTime.shift_zone!(first.end_time, "America/Los_Angeles")
-      # TODO: Move date formatting into the view layer?
-      {:ok, date} = Timex.format(start_datetime, "{WDfull} {M}/{D}")
-      # {:ok, date} = DateTime.to_date(start_datetime)
-      {:ok, start_time} = Timex.format(start_datetime, "{h12}:{m}")
-      # {:ok, start_time} = DateTime.to_time(start_datetime)
-      {:ok, end_time} = Timex.format(end_datetime, "{h12}:{m}")
-      # {:ok, end_time} = DateTime.to_time(end_datetime)
-
-      status =
-        if Enum.any?(rest, fn e ->
-             e.end_time != first.end_time or e.title != first.title or
-               e.description != first.description
-           end) do
-          :conflict
-        else
-          :ok
-        end
-
-      Enum.map(events, fn event ->
-        %Row{
-          status: status,
-          event: event,
-          date: date,
-          start_time: start_time,
-          end_time: end_time,
-          conflicting_events: events
-        }
-      end)
-    end)
-    |> group_sorted_by(fn row -> row.date end)
-  end
-
-  @doc """
-  Takes in a sorted list of elements and a key function, returns a list of tuples in the form of:
-  [{key, [element, element...]}, ...]
-
-  NOTE: A precondition of this is that the items must _already_ be sorted according to keyfn.
-  """
-  # TODO: Stick this into a util module?
-  def group_sorted_by(sorted, keyfn) do
-    sorted
-    |> Enum.reverse()
-    |> Enum.reduce([], fn item, acc ->
-      key = keyfn.(item)
-
-      case acc do
-        [] -> [{key, [item]}]
-        [{^key, items} | rest] -> [{key, [item | items]} | rest]
-        _ -> [{key, [item]} | acc]
-      end
-    end)
   end
 end

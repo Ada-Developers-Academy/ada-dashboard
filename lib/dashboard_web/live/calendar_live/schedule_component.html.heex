@@ -1,5 +1,8 @@
 <section>
   <h3>Schedule</h3>
+  <p class="timezone-info">
+    Note: dates/times displayed in <%= String.replace(@timezone, "_", " ") %> time.
+  </p>
   <!-- TODO: Only show if there is actually something next week? -->
   <%= if @schedule_path_prev do %>
     <.link patch={@schedule_path_prev}>Prev</.link>
@@ -7,7 +10,7 @@
   <%= if @schedule_path_next do %>
     <.link patch={@schedule_path_next}>Next</.link>
   <% end %>
-  <%= for {date, rows} <- @events do %>
+  <%= for {date, rows} <- @rows_by_date do %>
     <h4><%= date %></h4>
 
     <table style="width: 100%;border:1px solid black;" border="1">
@@ -17,6 +20,9 @@
           <th>Start</th>
           <th>End</th>
           <th>Title</th>
+          <%= if @instructor do %>
+            <th>Location</th>
+          <% end %>
           <%= for _location <- @locations do %>
             <th>Lead</th>
             <th>Backup</th>
@@ -58,6 +64,11 @@
                 </span>
               <% end %>
             </td>
+            <%= if row.claim do %>
+              <td>
+                <%= row.claim %>
+              </td>
+            <% end %>
             <%= for location <- @locations do %>
               <td>
                 <.form

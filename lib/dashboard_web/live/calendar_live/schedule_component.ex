@@ -1,12 +1,59 @@
 defmodule DashboardWeb.CalendarLive.ScheduleComponent do
   use DashboardWeb, :live_component
 
-  alias Dashboard.Classes.Class
+  alias Dashboard.Classes.{Class, Row}
   alias Dashboard.Cohorts.Cohort
   alias Dashboard.{Accounts, Calendars, Classes}
   alias DashboardWeb.CalendarLive.Location
   alias Plug.Conn.Query
   alias Timex.Duration
+
+  @impl true
+  def update(%{instructor: instructor, parent: parent, uri: uri} = assigns, socket) do
+    %URI{
+      path: path,
+      query: raw_query
+    } = URI.parse(uri)
+
+    query =
+      case raw_query do
+        nil -> %{}
+        str -> Query.decode(str)
+      end
+
+    # TODO: Configure timezone per instructor.
+    timezone = "America/Los_Angeles"
+
+    case parse_start_date(query) do
+      {:error, _} ->
+        # Error reporting is handled by assign_schedule_info
+        {:ok,
+         socket
+         |> assign(assigns)
+         |> assign_schedule_info(parent, path, query)}
+
+      {_, start_date} ->
+        {events, claim_lookup} = Classes.events_for_instructor(instructor, start_date)
+
+        # IO.puts(
+        #   "********************************************************************************"
+        # )
+
+        # IO.inspect(events)
+
+        # IO.puts(
+        #   "********************************************************************************"
+        # )
+
+        {:ok,
+         socket
+         |> assign(assigns)
+         |> assign(:locations, [])
+         |> assign(:rows_by_date, Row.from_events_by_date(events, timezone, claim_lookup))
+         |> assign(:timezone, timezone)
+         |> assign_schedule_info(parent, path, query)}
+    end
+  end
 
   @impl true
   def update(
@@ -28,16 +75,23 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
         str -> Query.decode(str)
       end
 
+    # TODO: Configure timezone per instructor.
+    timezone = "America/Los_Angeles"
+
     case parse_start_date(query) do
       {:error, _} ->
-        # Error reporting is handled by put_schedule_info
+        # Error reporting is handled by assign_schedule_info
         {:ok,
          socket
          |> assign(assigns)
-         |> put_schedule_info(parent, path, query)}
+         |> assign_schedule_info(parent, path, query)}
 
       {_, start_date} ->
-        events = Classes.events_for_classes(classes, start_date)
+        # TODO: Configure timezone per class.
+        rows_by_date =
+          Classes.events_for_classes(classes, start_date)
+          |> Row.from_events_by_date(timezone)
+
         instructors = Accounts.list_instructors_for_schedule(classes)
 
         maybe_cohort =
@@ -58,9 +112,11 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
          socket
          |> assign(assigns)
          |> assign(:locations, locations)
-         |> assign(:events, events)
+         |> assign(:rows_by_date, rows_by_date)
          |> assign(:instructors, instructors)
-         |> put_schedule_info(parent, path, query)}
+         |> assign(:timezone, timezone)
+         |> assign(:instructor, nil)
+         |> assign_schedule_info(parent, path, query)}
     end
   end
 
@@ -108,7 +164,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
     end
   end
 
-  defp put_schedule_info(socket, parent, path, query) do
+  defp assign_schedule_info(socket, parent, path, query) do
     case parse_start_date(query) do
       {:error, error} ->
         socket

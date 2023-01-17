@@ -2,12 +2,18 @@ defmodule Dashboard.Accounts.Claim do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Dashboard.Accounts.Instructor
+  alias Dashboard.Calendars.Event
+  alias Dashboard.Classes.Class
+  alias Dashboard.Cohorts.Cohort
+
   @primary_key false
   schema "claims" do
-    field :instructor_id, :id, primary_key: true
-    field :event_id, :id, primary_key: true
-    field :class_id, :id
-    field :cohort_id, :id
+    belongs_to :instructor, Instructor, primary_key: true
+    belongs_to :event, Event, primary_key: true
+    belongs_to :class, Class
+    belongs_to :cohort, Cohort
+
     field :type, :string
   end
 
