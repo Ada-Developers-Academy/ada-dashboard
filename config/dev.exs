@@ -59,10 +59,9 @@ config :dashboard, DashboardWeb.Endpoint,
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/dashboard_web/(live|views)/.*(ex)$",
-      ~r"lib/dashboard_web/templates/.*(eex)$"
-    ],
-    debounce: 100
+      ~r"lib/dashboard_web/(live|views)/.*(?<!-emacs-elixir-format\.)(ex)$",
+      ~r"lib/dashboard_web/templates/.*-emacs-elixir-format.(eex)$"
+    ]
   ]
 
 # Do not include metadata nor timestamps in development logs
