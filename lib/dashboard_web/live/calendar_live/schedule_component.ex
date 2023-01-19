@@ -171,6 +171,11 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
           |> Timex.add(Duration.from_weeks(1))
           |> Timex.format!("{YYYY}-{0M}-{0D}")
 
+        today_query =
+          Timex.now()
+          |> Timex.beginning_of_week()
+          |> Timex.format!("{YYYY}-{0M}-{0D}")
+
         if status != :default do
           redirect_date =
             start_date
@@ -201,6 +206,10 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
         |> assign(
           :schedule_path_next,
           "#{path}?start_date=#{next_query}"
+        )
+        |> assign(
+          :schedule_path_today,
+          "#{path}?start_date=#{today_query}"
         )
     end
   end

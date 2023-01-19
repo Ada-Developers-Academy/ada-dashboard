@@ -7,6 +7,9 @@
   <%= if @schedule_path_prev do %>
     <.link patch={@schedule_path_prev}>Prev</.link>
   <% end %>
+  <%= if @schedule_path_today do %>
+    <.link patch={@schedule_path_today}>Today</.link>
+  <% end %>
   <%= if @schedule_path_next do %>
     <.link patch={@schedule_path_next}>Next</.link>
   <% end %>
