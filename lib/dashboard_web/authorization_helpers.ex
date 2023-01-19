@@ -1,18 +1,16 @@
 defmodule DashboardWeb.InstructorAuth do
   import Phoenix.LiveView
 
-  def on_mount(:default, _params, %{"current_user" => current_user} = _session, socket) do
-    if is_nil(current_user) do
-      socket =
-        socket
-        |> put_flash(:error, "You must be logged in as an instructor to access this page!")
-        |> redirect(to: "/")
+  def on_mount(:default, _params, %{"current_user" => _current_user} = _session, socket) do
+    {:cont, socket}
+  end
 
-      {:halt, socket}
-    else
-      IO.inspect(current_user)
+  def on_mount(:default, _params, _session, socket) do
+    socket =
+      socket
+      |> put_flash(:error, "You must be logged in as an instructor to access this page!")
+      |> redirect(to: "/")
 
-      {:cont, socket}
-    end
+    {:halt, socket}
   end
 end

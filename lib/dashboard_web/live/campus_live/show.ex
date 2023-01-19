@@ -1,5 +1,6 @@
 defmodule DashboardWeb.CampusLive.Show do
   use DashboardWeb, :live_view
+  on_mount DashboardWeb.InstructorAuth
 
   alias Dashboard.Campuses
 

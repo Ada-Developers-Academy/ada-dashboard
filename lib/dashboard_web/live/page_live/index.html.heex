@@ -23,8 +23,8 @@
     />
   <% end %>
 
-  <h2>Classes</h2>
-  <%= if @instructor do %>
+  <%= if @current_user && @instructor do %>
+    <h2>Classes</h2>
     <ul>
       <%= for class <- @instructor.classes do %>
         <li>
