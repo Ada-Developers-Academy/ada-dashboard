@@ -35,16 +35,6 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
       {_, start_date} ->
         {events, claim_lookup} = Classes.events_for_instructor(instructor, start_date)
 
-        # IO.puts(
-        #   "********************************************************************************"
-        # )
-
-        # IO.inspect(events)
-
-        # IO.puts(
-        #   "********************************************************************************"
-        # )
-
         {:ok,
          socket
          |> assign(assigns)
