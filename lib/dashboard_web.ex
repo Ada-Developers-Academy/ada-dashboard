@@ -94,6 +94,33 @@ defmodule DashboardWeb do
       import DashboardWeb.ErrorHelpers
       import DashboardWeb.Gettext
       alias DashboardWeb.Router.Helpers, as: Routes
+
+      @doc """
+      Format a list of words with commas and a final "and".
+
+      ## Examples
+
+      iex> format_word_list(["snap", "crackle", "pop"])
+      "snap, crackle and pop"
+
+      iex> format_word_list(["Batman", "Robin"])
+      "Batman and Robin"
+
+      iex> format_word_list(["the cheese"])
+      "the cheese"
+      """
+      def format_word_list([word]), do: word
+
+      def format_word_list(words) do
+        [back | rest] = Enum.reverse(words)
+
+        front =
+          rest
+          |> Enum.reverse()
+          |> Enum.join(", ")
+
+        "#{front} and #{back}"
+      end
     end
   end
 

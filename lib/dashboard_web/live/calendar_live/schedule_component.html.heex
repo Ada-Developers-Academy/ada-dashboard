@@ -63,7 +63,11 @@
               <.link navigate={"/events/#{row.event.id}"}><%= row.event.title %></.link>
               <%= if row.status == :conflict do %>
                 <span class="conflict" style="color:red;display:block">
-                  This event conflicts with one or more other events
+                  <%= if length(row.conflicts) > 1 do %>
+                    The <%= format_word_list(row.conflicts) %> of this event conflict with one or more other events.
+                  <% else %>
+                    The <%= format_word_list(row.conflicts) %> of this event conflicts with one or more other events.
+                  <% end %>
                 </span>
               <% end %>
             </td>
