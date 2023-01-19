@@ -21,7 +21,7 @@
 
   <li>
     <strong>Description:</strong>
-    <%= raw(HtmlSanitizeEx.basic_html(@event.description)) %>
+    <%= sanitize_html(@event.description) %>
   </li>
 </ul>
 

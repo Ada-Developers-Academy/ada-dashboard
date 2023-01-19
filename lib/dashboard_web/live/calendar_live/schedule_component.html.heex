@@ -68,6 +68,35 @@
                   <% else %>
                     The <%= format_word_list(row.conflicts) %> of this event conflicts with one or more other events.
                   <% end %>
+                  <details>
+                    <summary>
+                      <h4 style="display:inline-block">Conflicting Events</h4>
+                    </summary>
+                    <%= for event <- row.conflicting_events do %>
+                      <ul>
+                        <li>
+                          <.link navigate={"/events/#{event.id}"}>
+                            <%= event.title %>
+                          </.link>
+                          (<%= event.calendar.name %>)
+                          <%= if "title" in row.conflicts do %>
+                            <h5>Title</h5>
+                            <%= event.title %>
+                          <% end %>
+                          <%= if "time range" in row.conflicts do %>
+                            <h5>Time Range</h5>
+                            <%= "#{event.start_time} #{event.end_time}" %>
+                          <% end %>
+                          <%= if "description" in row.conflicts do %>
+                            <h5>Description</h5>
+                            <blockquote>
+                              <%= sanitize_html(event.description) %>
+                            </blockquote>
+                          <% end %>
+                        </li>
+                      </ul>
+                    <% end %>
+                  </details>
                 </span>
               <% end %>
             </td>

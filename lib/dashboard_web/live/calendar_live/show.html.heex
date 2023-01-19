@@ -1,7 +1,6 @@
 <h1>Show Calendar</h1>
 
 <ul>
-
   <li>
     <strong>Name:</strong>
     <%= @calendar.name %>
@@ -16,7 +15,6 @@
     <strong>External provider:</strong>
     <%= @calendar.external_provider %>
   </li>
-
 </ul>
 
 <table>
@@ -30,23 +28,23 @@
       <th></th>
     </tr>
   </thead>
-  
+
   <tbody id="events">
     <%= for event <- @events do %>
       <tr id={"event-#{event.id}"}>
         <td><%= event.title %></td>
-        <td><%= raw HtmlSanitizeEx.basic_html(event.description) %></td>
+        <td><%= sanitize_html(event.description) %></td>
         <td><%= event.external_id %></td>
         <td><%= event.external_provider %></td>
 
         <td>
-          <span><%= live_redirect "Show", to:
-                    Routes.event_show_path(@socket, :show, event) %></span>
+          <span>
+            <%= live_redirect("Show", to: Routes.event_show_path(@socket, :show, event)) %>
+          </span>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
 
-
-<span><%= live_redirect "Back", to: Routes.calendar_index_path(@socket, :index) %></span>
+<span><%= live_redirect("Back", to: Routes.calendar_index_path(@socket, :index)) %></span>

@@ -121,6 +121,18 @@ defmodule DashboardWeb do
 
         "#{front} and #{back}"
       end
+
+      @doc """
+      Allow basic HTML for display.
+      """
+      def sanitize_html(nil), do: nil
+
+      def sanitize_html(html) do
+        html
+        |> String.replace("\n", "<br>")
+        |> HtmlSanitizeEx.basic_html()
+        |> raw
+      end
     end
   end
 

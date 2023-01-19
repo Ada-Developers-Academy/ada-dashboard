@@ -29,23 +29,25 @@ defmodule Dashboard.Classes.Row do
       {:ok, end_time} = Timex.format(end_datetime, "{h12}:{m}")
       # {:ok, end_time} = DateTime.to_time(end_datetime)
 
-      conflicts =
-        if Enum.any?(rest, fn e -> e.end_time != first.end_time end) do
-          ["end time"]
-        else
-          []
-        end
+      conflicts = []
 
       conflicts =
-        if Enum.any?(rest, fn e -> e.title != first.title end) do
-          ["title" | conflicts]
+        if Enum.any?(rest, fn e -> e.description != first.description end) do
+          ["description" | conflicts]
         else
           conflicts
         end
 
       conflicts =
-        if Enum.any?(rest, fn e -> e.description != first.description end) do
-          ["description" | conflicts]
+        if Enum.any?(rest, fn e -> e.end_time != first.end_time end) do
+          ["time range" | conflicts]
+        else
+          conflicts
+        end
+
+      conflicts =
+        if Enum.any?(rest, fn e -> e.title != first.title end) do
+          ["title" | conflicts]
         else
           conflicts
         end
