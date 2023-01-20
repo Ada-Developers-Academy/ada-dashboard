@@ -188,7 +188,7 @@ defmodule Dashboard.Calendars do
 
   """
   def list_events do
-    Repo.all(Event)
+    Repo.all(from e in Event, where: is_nil(e.deleted_at))
   end
 
   @doc """
@@ -201,7 +201,7 @@ defmodule Dashboard.Calendars do
 
   """
   def list_calendar_events(calendar_id) do
-    Repo.all(from e in Event, where: e.calendar_id == ^calendar_id)
+    Repo.all(from e in Event, where: e.calendar_id == ^calendar_id and is_nil(e.deleted_at))
   end
 
   @doc """
@@ -312,5 +312,25 @@ defmodule Dashboard.Calendars do
   """
   def change_event(%Event{} = event, attrs \\ %{}) do
     Event.changeset(event, attrs)
+  end
+
+  @doc """
+  Marks events for a given calendar deleted if they no longer exist.
+  """
+  def mark_events_deleted(%Calendar{} = calendar, events) do
+    calendar = calendar |> Repo.preload(:events)
+
+    existing_events =
+      Enum.into(events, %{}, fn event ->
+        {event.id, event}
+      end)
+
+    Enum.each(calendar.events, fn event ->
+      if Map.get(existing_events, event.id) do
+        update_event(event, %{deleted_at: nil})
+      else
+        update_event(event, %{deleted_at: DateTime.utc_now()})
+      end
+    end)
   end
 end

@@ -139,7 +139,7 @@ defmodule Dashboard.Classes do
           on: c.instructor_id == i.id and i.id == ^instructor.id,
           join: e in Event,
           on: c.event_id == e.id,
-          where: ^start_date <= e.start_time and e.end_time <= ^end_time,
+          where: ^start_date <= e.start_time and e.end_time <= ^end_time and is_nil(e.deleted_at),
           order_by: e.start_time,
           distinct: true,
           preload: [:event, :class, :cohort],
@@ -170,7 +170,8 @@ defmodule Dashboard.Classes do
         join: s in Source,
         on: s.calendar_id == c.id,
         where:
-          s.class_id in ^class_ids and ^start_date <= e.start_time and e.end_time <= ^end_time,
+          s.class_id in ^class_ids and ^start_date <= e.start_time and e.end_time <= ^end_time and
+            is_nil(e.deleted_at),
         order_by: e.start_time,
         distinct: true,
         preload: :calendar

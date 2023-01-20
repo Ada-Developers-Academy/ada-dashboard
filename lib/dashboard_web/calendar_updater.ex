@@ -74,26 +74,26 @@ defmodule DashboardWeb.CalendarUpdater do
 
     # TODO: Validate calendar provider matches.
 
-    Enum.each(calendars, fn cal ->
-      unless cal.external_provider == provider do
+    Enum.each(calendars, fn calendar ->
+      unless calendar.external_provider == provider do
         raise ArgumentError,
-              "Attempting to access calendar with provider (#{cal.external_provider}) using provider (#{provider})"
+              "Attempting to access calendar with provider (#{calendar.external_provider}) using provider (#{provider})"
       end
 
-      now = DateTime.now!(cal.timezone)
+      now = DateTime.now!(calendar.timezone)
       days_since_monday = Date.day_of_week(now) - 1
 
       monday =
         now
         |> DateTime.to_date()
         |> Date.add(-1 * days_since_monday)
-        |> DateTime.new!(~T[00:00:00], cal.timezone)
+        |> DateTime.new!(~T[00:00:00], calendar.timezone)
 
       monday_after_next =
         monday
         |> DateTime.to_date()
         |> Date.add(21)
-        |> DateTime.new!(~T[00:00:00], cal.timezone)
+        |> DateTime.new!(~T[00:00:00], calendar.timezone)
 
       params =
         URI.encode_query(%{
@@ -104,38 +104,43 @@ defmodule DashboardWeb.CalendarUpdater do
         })
 
       url =
-        "#{event_base_url}/#{cal.external_id}/events"
+        "#{event_base_url}/#{calendar.external_id}/events"
         |> URI.parse()
         |> URI.append_query(params)
         |> URI.to_string()
 
       case OAuth2.Client.get(token, url) do
         {:ok, response} ->
-          [
-            Enum.each(response.body["items"], fn event ->
+          events =
+            Enum.flat_map(response.body["items"], fn event ->
               start_time = event["start"]["dateTime"]
               end_time = event["end"]["dateTime"]
 
               # Ignore all day events (they don't need instructors)
               if start_time || end_time do
-                Calendars.get_or_create_event!(%{
-                  external_id: event["id"],
-                  external_provider: provider,
-                  calendar_id: cal.id,
-                  location: event["location"],
-                  start_time: start_time,
-                  end_time: end_time,
-                  title: event["summary"],
-                  description: event["description"]
-                })
+                [
+                  Calendars.get_or_create_event!(%{
+                    external_id: event["id"],
+                    external_provider: provider,
+                    calendar_id: calendar.id,
+                    location: event["location"],
+                    start_time: start_time,
+                    end_time: end_time,
+                    title: event["summary"],
+                    description: event["description"]
+                  })
+                ]
+              else
+                []
               end
             end)
-          ]
+
+          Calendars.mark_events_deleted(calendar, events)
 
         {:error, %OAuth2.Response{} = error} ->
           error_code = error.body["error"]["code"]
           Logger.debug(error)
-          Logger.info("Failed to update #{cal.name}: #{error_code}")
+          Logger.info("Failed to update #{calendar.name}: #{error_code}")
       end
     end)
   end
@@ -158,18 +163,18 @@ defmodule DashboardWeb.CalendarUpdater do
       end
 
     cals
-    |> Enum.filter(fn cal ->
+    |> Enum.filter(fn calendar ->
       # Only include calendars we can write to.
-      cal["accessRole"] in ["writer", "owner"]
+      calendar["accessRole"] in ["writer", "owner"]
     end)
-    |> Enum.map(fn cal ->
+    |> Enum.map(fn calendar ->
       {:ok, calendar} =
         Calendars.get_or_create_calendar(%{
-          name: cal["summary"],
-          external_id: cal["id"],
+          name: calendar["summary"],
+          external_id: calendar["id"],
           external_provider: provider,
-          timezone: cal["timeZone"],
-          is_personal: user["email"] == cal["id"]
+          timezone: calendar["timeZone"],
+          is_personal: user["email"] == calendar["id"]
         })
 
       calendar
