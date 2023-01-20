@@ -7,7 +7,7 @@ defmodule Dashboard.Accounts do
 
   alias Dashboard.Repo
 
-  alias Dashboard.Accounts.{Affinity, Claim, Instructor}
+  alias Dashboard.Accounts.{Claim, Instructor, Residence}
   alias Dashboard.Calendars.{Calendar, Event}
   alias Dashboard.Classes.Source
   alias DashboardWeb.CalendarLive.Location
@@ -294,12 +294,12 @@ defmodule Dashboard.Accounts do
   end
 
   @doc """
-  Returns true if the instructor and class are connected.
+  Returns true if the instructor and campus are connected.
 
   Returns false if they are not.
   """
-  def has_affinity(instructor, class) do
-    !is_nil(Repo.get_by(Affinity, instructor_id: instructor.id, class_id: class.id))
+  def has_residence(instructor, campus) do
+    !is_nil(Repo.get_by(Residence, instructor_id: instructor.id, campus_id: campus.id))
   end
 
   @doc """
@@ -362,14 +362,14 @@ defmodule Dashboard.Accounts do
   @doc """
   Ensure the connection exists if connected is true, and that it doesn't otherwise.
   """
-  def create_or_delete_affinity(instructor, class, connected) do
+  def create_or_delete_residence(instructor, campus, connected) do
     Repo.transaction(fn ->
-      affinity = Repo.get_by(Affinity, instructor_id: instructor.id, class_id: class.id)
+      affinity = Repo.get_by(Residence, instructor_id: instructor.id, campus_id: campus.id)
 
       case {affinity, connected} do
         {nil, true} ->
-          affinity = %Affinity{instructor_id: instructor.id, class_id: class.id}
-          Repo.insert!(affinity)
+          residence = %Residence{instructor_id: instructor.id, campus_id: campus.id}
+          Repo.insert!(residence)
 
         {nil, false} ->
           nil

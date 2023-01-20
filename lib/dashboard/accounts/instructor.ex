@@ -2,8 +2,8 @@ defmodule Dashboard.Accounts.Instructor do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Dashboard.Classes.Class
   alias Dashboard.Calendars.Event
+  alias Dashboard.Campuses.Campus
 
   schema "instructors" do
     field :background_color, :string
@@ -12,7 +12,7 @@ defmodule Dashboard.Accounts.Instructor do
     field :external_provider, :string
     field :name, :string
 
-    many_to_many :classes, Class, join_through: "affinities"
+    many_to_many :campuses, Campus, join_through: "residences"
     many_to_many :events, Event, join_through: "claims"
 
     timestamps(type: :utc_datetime)

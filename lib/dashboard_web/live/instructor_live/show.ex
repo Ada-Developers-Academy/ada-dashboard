@@ -3,7 +3,7 @@ defmodule DashboardWeb.InstructorLive.Show do
   on_mount DashboardWeb.InstructorAuth
 
   alias Dashboard.Accounts
-  alias Dashboard.{Campuses, Classes}
+  alias Dashboard.Campuses
 
   @impl true
   def mount(_params, _session, socket) do
@@ -17,13 +17,14 @@ defmodule DashboardWeb.InstructorLive.Show do
     campuses =
       Enum.map(Campuses.list_campuses_with_classes(), fn campus ->
         %{
+          id: campus.id,
           name: campus.name,
+          connected: Accounts.has_residence(instructor, campus),
           classes:
             Enum.map(campus.classes, fn class ->
               %{
                 id: class.id,
-                name: class.name,
-                connected: Accounts.has_affinity(instructor, class)
+                name: class.name
               }
             end)
         }
@@ -38,14 +39,14 @@ defmodule DashboardWeb.InstructorLive.Show do
 
   @impl true
   def handle_event(
-        "save-classes",
-        %{"classes" => classes},
+        "save-campuses",
+        %{"campuses" => classes},
         %{assigns: %{instructor: instructor}} = socket
       ) do
     Enum.map(classes, fn {name, checked} ->
       [_, raw_id] = String.split(name, "-")
       {id, ""} = Integer.parse(raw_id)
-      class = Classes.get_class!(id)
+      campus = Campuses.get_campus!(id)
 
       connected =
         case checked do
@@ -53,7 +54,7 @@ defmodule DashboardWeb.InstructorLive.Show do
           "false" -> false
         end
 
-      Accounts.create_or_delete_affinity(instructor, class, connected)
+      Accounts.create_or_delete_residence(instructor, campus, connected)
     end)
 
     {:noreply, socket}
