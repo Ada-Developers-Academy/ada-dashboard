@@ -2,16 +2,13 @@ defmodule Dashboard.Classes.Class do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Dashboard.Campuses.Campus
   alias Dashboard.Cohorts.Cohort
   alias Dashboard.Calendars.Calendar
 
   schema "classes" do
     field :name, :string
 
-    belongs_to :campus, Campus
     belongs_to :cohort, Cohort
-
     many_to_many :calendars, Calendar, join_through: "sources"
 
     timestamps()

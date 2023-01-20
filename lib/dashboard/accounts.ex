@@ -5,11 +5,13 @@ defmodule Dashboard.Accounts do
 
   import Ecto.Query, warn: false
 
-  alias Dashboard.Repo
-
-  alias Dashboard.Accounts.{Claim, Instructor, Residence}
-  alias Dashboard.Calendars.{Calendar, Event}
+  alias Dashboard.Accounts.Claim
+  alias Dashboard.Accounts.Instructor
+  alias Dashboard.Accounts.Residence
+  alias Dashboard.Calendars.Calendar
+  alias Dashboard.Calendars.Event
   alias Dashboard.Classes.Source
+  alias Dashboard.Repo
   alias DashboardWeb.CalendarLive.Location
 
   @doc """
@@ -27,7 +29,6 @@ defmodule Dashboard.Accounts do
 
   def list_instructors_for_schedule(classes) do
     class_ids = Enum.map(classes, fn c -> c.id end)
-    class_ids_to_names = Enum.into(classes, %{}, fn c -> {c.id, c.name} end)
 
     Repo.all(
       from instructor in Instructor,
@@ -59,7 +60,7 @@ defmodule Dashboard.Accounts do
             {row[:event].id,
              %{
                claim: row[:claim],
-               location: Location.new(row[:claim], class_ids_to_names[row[:class_id]])
+               location: Location.new(row[:claim] |> Repo.preload([:class, :cohort]))
              }}
           end)
       }

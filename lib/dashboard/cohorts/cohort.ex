@@ -3,11 +3,13 @@ defmodule Dashboard.Cohorts.Cohort do
   import Ecto.Changeset
 
   alias Dashboard.Classes.Class
+  alias Dashboard.Campuses.Campus
 
   schema "cohorts" do
     field :name, :string
 
     has_many :classes, Class
+    belongs_to :campus, Campus
 
     timestamps()
   end

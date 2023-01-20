@@ -1,9 +1,13 @@
 defmodule DashboardWeb.CalendarLive.ScheduleComponent do
   use DashboardWeb, :live_component
 
-  alias Dashboard.Classes.{Class, Row}
+  alias Dashboard.Accounts
+  alias Dashboard.Calendars
+  alias Dashboard.Classes
+  alias Dashboard.Classes.Class
+  alias Dashboard.Classes.ScheduleRow
   alias Dashboard.Cohorts.Cohort
-  alias Dashboard.{Accounts, Calendars, Classes, Repo}
+  alias Dashboard.Repo
   alias DashboardWeb.CalendarLive.Location
   alias Plug.Conn.Query
   alias Timex.Duration
@@ -39,7 +43,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
          socket
          |> assign(assigns)
          |> assign(:locations, [])
-         |> assign(:rows_by_date, Row.from_events_by_date(events, timezone, claim_lookup))
+         |> assign(:rows_by_date, ScheduleRow.from_events_by_date(events, timezone, claim_lookup))
          |> assign(:timezone, timezone)
          |> assign_schedule_info(parent, path, query)}
     end
@@ -68,8 +72,6 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
     # TODO: Configure timezone per instructor.
     timezone = "America/Los_Angeles"
 
-    classes = Repo.preload(classes, :campus)
-
     case parse_start_date(query) do
       {:error, _} ->
         # Error reporting is handled by assign_schedule_info
@@ -82,7 +84,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
         # TODO: Configure timezone per class.
         rows_by_date =
           Classes.events_for_classes(classes, start_date)
-          |> Row.from_events_by_date(timezone)
+          |> ScheduleRow.from_events_by_date(timezone)
 
         instructor_claims = Accounts.list_instructors_for_schedule(classes)
 
