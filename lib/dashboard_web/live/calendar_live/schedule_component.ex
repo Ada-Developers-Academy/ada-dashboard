@@ -3,7 +3,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
 
   alias Dashboard.Classes.{Class, Row}
   alias Dashboard.Cohorts.Cohort
-  alias Dashboard.{Accounts, Calendars, Classes}
+  alias Dashboard.{Accounts, Calendars, Classes, Repo}
   alias DashboardWeb.CalendarLive.Location
   alias Plug.Conn.Query
   alias Timex.Duration
@@ -68,6 +68,8 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
     # TODO: Configure timezone per instructor.
     timezone = "America/Los_Angeles"
 
+    classes = Repo.preload(classes, :campus)
+
     case parse_start_date(query) do
       {:error, _} ->
         # Error reporting is handled by assign_schedule_info
@@ -82,7 +84,33 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
           Classes.events_for_classes(classes, start_date)
           |> Row.from_events_by_date(timezone)
 
-        instructors = Accounts.list_instructors_for_schedule(classes)
+        instructor_claims = Accounts.list_instructors_for_schedule(classes)
+
+        # TODO: Add guests instructors.
+        # claims_by_type =
+        #   Enum.reduce(
+        #     instructor_claims,
+        #     %{local: [], remote: [], guest: []},
+        #     fn %{
+        #          instructor: instructor,
+        #          claims_by_event: claims_by_event
+        #        } = claim_info,
+        #        types ->
+        #       if nil in instructor.campuses do
+        #         types
+        #         |> Map.get_and_update(:local, fn local ->
+        #           {local, [claims_info | local]}
+        #         end)
+        #         |> elem(1)
+        #       else
+        #         types
+        #         |> Map.get_and_update(:remote, fn remote ->
+        #           {remote, [claims_info | remote]}
+        #         end)
+        #         |> elem(1)
+        #       end
+        #     end
+        #   )
 
         maybe_cohort =
           case Map.get(assigns, :cohort) do
@@ -103,7 +131,10 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
          |> assign(assigns)
          |> assign(:locations, locations)
          |> assign(:rows_by_date, rows_by_date)
-         |> assign(:instructors, instructors)
+         |> assign(:campus, nil)
+         # |> assign(:claims_by_type, claims_by_type)
+         # TODO: remove
+         |> assign(:instructors, instructor_claims)
          |> assign(:timezone, timezone)
          |> assign(:instructor, nil)
          |> assign_schedule_info(parent, path, query)}
@@ -212,5 +243,55 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
           "#{path}?start_date=#{today_query}"
         )
     end
+  end
+
+  defp claims_form(%{campus: nil} = assigns) do
+    ~H"""
+    <.form
+      :let={f}
+      for={:claims}
+      id={"#{@claim_type}-instructors"}
+      phx-change="save-claims"
+      phx-submit="save-claims"
+      phx-target={@myself}
+    >
+      <%= for %{instructor: instructor, claims_by_event: claims_by_event} <- @claims do %>
+        <% event_id = @row.event.id %>
+        <% c = claims_by_event[event_id] %>
+        <label>
+          <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{event_id}",
+            value: c && c.claim.type == @claim_type && "#{c.location}" == "#{@location}"
+          ) %>
+          <%= instructor.name %>
+        </label>
+      <% end %>
+      <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
+    </.form>
+    """
+  end
+
+  defp claims_form(%{} = assigns) do
+    ~H"""
+    <.form
+      :let={f}
+      for={:claims}
+      id={"#{@claim_type}-instructors"}
+      phx-change="save-claims"
+      phx-submit="save-claims"
+      phx-target={@myself}
+    >
+      <%= for %{instructor: instructor, claims_by_event: claims_by_event} <- @claims do %>
+        <% event_id = @row.event.id %>
+        <% c = claims_by_event[event_id] %>
+        <label>
+          <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{event_id}",
+            value: c && c.claim.type == @claim_type && "#{c.location}" == "#{@location}"
+          ) %>
+          <%= instructor.name %>
+        </label>
+      <% end %>
+      <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
+    </.form>
+    """
   end
 end

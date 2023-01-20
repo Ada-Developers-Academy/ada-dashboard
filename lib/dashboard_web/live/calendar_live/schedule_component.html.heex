@@ -107,48 +107,24 @@
             <% end %>
             <%= for location <- @locations do %>
               <td>
-                <.form
-                  :let={f}
-                  for={:claims}
-                  id="lead-instructors"
-                  phx-change="save-claims"
-                  phx-submit="save-claims"
-                  phx-target={@myself}
-                >
-                  <%= for %{instructor: instructor, claims_by_event: claims_by_event} <- @instructors do %>
-                    <% event_id = row.event.id %>
-                    <% c = claims_by_event[event_id] %>
-                    <label>
-                      <%= checkbox(f, "lead-#{instructor.id}-#{location}-#{event_id}",
-                        value: c && c.claim.type == "lead" && "#{c.location}" == "#{location}"
-                      ) %>
-                      <%= instructor.name %>
-                    </label>
-                  <% end %>
-                  <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
-                </.form>
+                <%= claims_form(%{
+                  myself: @myself,
+                  campus: @campus,
+                  claims: @instructors,
+                  row: row,
+                  location: location,
+                  claim_type: "lead"
+                }) %>
               </td>
               <td>
-                <.form
-                  :let={f}
-                  for={:claims}
-                  id="backup-instructors"
-                  phx-change="save-claims"
-                  phx-submit="save-claims"
-                  phx-target={@myself}
-                >
-                  <%= for %{instructor: instructor, claims_by_event: claims_by_event} <- @instructors do %>
-                    <% event_id = row.event.id %>
-                    <% c = claims_by_event[event_id] %>
-                    <label>
-                      <%= checkbox(f, "backup-#{instructor.id}-#{location}-#{row.event.id}",
-                        value: c && c.claim.type == "backup" && "#{c.location}" == "#{location}"
-                      ) %>
-                      <%= instructor.name %>
-                    </label>
-                  <% end %>
-                  <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
-                </.form>
+                <%= claims_form(%{
+                  myself: @myself,
+                  campus: @campus,
+                  claims: @instructors,
+                  row: row,
+                  location: location,
+                  claim_type: "backup"
+                }) %>
               </td>
             <% end %>
           </tr>

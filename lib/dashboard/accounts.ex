@@ -51,7 +51,7 @@ defmodule Dashboard.Accounts do
     end)
     |> Enum.map(fn {_, [row | _] = rows} ->
       %{
-        instructor: row[:instructor],
+        instructor: row[:instructor] |> Repo.preload(:campuses),
         claims_by_event:
           rows
           |> Enum.filter(fn row -> row[:event] end)
