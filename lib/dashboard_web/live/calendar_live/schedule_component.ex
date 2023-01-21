@@ -268,6 +268,17 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
           <%= instructor.name %>
         <% end %>
       <% end %>
+      <%= if @claim_rows[:remote] do %>
+        <h3>Remote</h3>
+        <%= for {instructor, rows_by_event} <- @claim_rows[:remote] do %>
+          <% claim_row = Map.get(rows_by_event, @row.event.id) %>
+          <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{@row.event.id}",
+            value:
+              claim_row && claim_row.type == @claim_type && "#{claim_row.location}" == "#{@location}"
+          ) %>
+          <%= instructor.name %>
+        <% end %>
+      <% end %>
       <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
     </.form>
     """
