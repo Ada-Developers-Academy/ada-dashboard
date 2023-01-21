@@ -31,11 +31,11 @@ defmodule DashboardWeb.Router do
     live "/cohorts/:id", CohortLive.Show, :show
     live "/cohorts/:id/show/edit", CohortLive.Show, :edit
 
-    live "/campus", CampusLive.Index, :index
-    live "/campus/new", CampusLive.Index, :new
-    live "/campus/:id/edit", CampusLive.Index, :edit
-    live "/campus/:id", CampusLive.Show, :show
-    live "/campus/:id/show/edit", CampusLive.Show, :edit
+    live "/campuses", CampusLive.Index, :index
+    live "/campuses/new", CampusLive.Index, :new
+    live "/campuses/:id/edit", CampusLive.Index, :edit
+    live "/campuses/:id", CampusLive.Show, :show
+    live "/campuses/:id/show/edit", CampusLive.Show, :edit
 
     live "/calendars", CalendarLive.Index, :index
     live "/calendars/:id", CalendarLive.Show, :show

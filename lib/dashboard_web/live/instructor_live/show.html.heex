@@ -48,7 +48,7 @@
   <%= for campus <- @campuses do %>
     <label>
       <%= checkbox(f, "campus-#{campus.id}", value: campus.connected) %>
-      <.link navigate={"/campus/#{campus.id}"}>
+      <.link navigate={"/campuses/#{campus.id}"}>
         <%= campus.name %>
       </.link>
     </label>
