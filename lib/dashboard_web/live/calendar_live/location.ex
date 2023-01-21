@@ -1,5 +1,6 @@
 defmodule DashboardWeb.CalendarLive.Location do
   alias Dashboard.Accounts.Claim
+  alias Dashboard.Campuses.Campus
   alias Dashboard.Classes
   alias Dashboard.Classes.Class
   alias Dashboard.Cohorts
@@ -29,7 +30,7 @@ defmodule DashboardWeb.CalendarLive.Location do
       id: class.id,
       model: :class,
       name: class.name,
-      campus_id: get_campus(class).id
+      campus_id: get_campus_id(class)
     }
   end
 
@@ -38,7 +39,7 @@ defmodule DashboardWeb.CalendarLive.Location do
       id: cohort.id,
       model: :cohort,
       name: "Auditorium",
-      campus_id: get_campus(cohort).id
+      campus_id: get_campus_id(cohort)
     }
   end
 
@@ -47,7 +48,7 @@ defmodule DashboardWeb.CalendarLive.Location do
       id: class.id,
       model: :class,
       name: class.name,
-      campus_id: get_campus(class).id
+      campus_id: get_campus_id(class)
     }
   end
 
@@ -56,14 +57,14 @@ defmodule DashboardWeb.CalendarLive.Location do
       id: cohort.id,
       model: :cohort,
       name: "Auditorum",
-      campus_id: get_campus(cohort).id
+      campus_id: get_campus_id(cohort)
     }
   end
 
-  defp get_campus(entity) do
+  defp get_campus_id(entity) do
     case entity do
-      %Cohort{campus: campus} -> campus
-      %Class{cohort: %Cohort{campus: campus}} -> campus
+      %Cohort{campus: %Campus{} = campus} -> campus.id
+      %Class{cohort: %Cohort{campus: %Campus{} = campus}} -> campus.id
       _ -> nil
     end
   end

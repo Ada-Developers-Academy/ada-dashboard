@@ -125,7 +125,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
           "_target" => ["claims", target],
           "claims" => claims
         },
-        %{assigns: %{classes: classes}} = socket
+        %{assigns: %{locations: locations}} = socket
       ) do
     checked = claims[target]
 
@@ -146,7 +146,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
 
     {:noreply,
      socket
-     |> assign(:instructors, Accounts.list_instructors_for_schedule(classes))}
+     |> assign(:claim_rows, ClaimRow.mapped_rows_from_locations(locations))}
   end
 
   defp parse_start_date(query) do
