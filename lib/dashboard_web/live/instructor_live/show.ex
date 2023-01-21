@@ -14,27 +14,11 @@ defmodule DashboardWeb.InstructorLive.Show do
   def handle_params(%{"id" => id}, _, socket) do
     instructor = Accounts.get_instructor!(id)
 
-    campuses =
-      Enum.map(Campuses.list_campuses_with_classes(), fn campus ->
-        %{
-          id: campus.id,
-          name: campus.name,
-          connected: Accounts.has_residence(instructor, campus),
-          classes:
-            Enum.map(campus.classes, fn class ->
-              %{
-                id: class.id,
-                name: class.name
-              }
-            end)
-        }
-      end)
-
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:instructor, instructor)
-     |> assign(:campuses, campuses)}
+     |> assign(:campuses, Campuses.list_campuses_with_connected(instructor))}
   end
 
   @impl true

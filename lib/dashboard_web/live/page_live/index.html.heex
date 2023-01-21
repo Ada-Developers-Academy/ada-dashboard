@@ -24,12 +24,12 @@
   <% end %>
 
   <%= if @current_user && @instructor do %>
-    <h2>Classes</h2>
+    <h2>Campuses</h2>
     <ul>
-      <%= for class <- @instructor.classes do %>
+      <%= for campus <- @instructor.campuses do %>
         <li>
-          <.link navigate={"classes/#{class.id}"}>
-            <%= class.name %>
+          <.link navigate={"campus/#{campus.id}"}>
+            <%= campus.name %>
           </.link>
         </li>
       <% end %>

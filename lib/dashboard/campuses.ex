@@ -7,6 +7,7 @@ defmodule Dashboard.Campuses do
   alias Dashboard.Repo
 
   alias Dashboard.Campuses.Campus
+  alias Dashboard.Accounts.Residence
 
   @doc """
   Returns the list of campuses.
@@ -30,8 +31,23 @@ defmodule Dashboard.Campuses do
       [%Campus{}, ...]
 
   """
-  def list_campuses_with_classes do
-    Repo.all(from c in Campus, preload: [:classes])
+  def list_campuses_with_connected(instructor) do
+    Repo.all(
+      from c in Campus,
+        left_join: r in Residence,
+        on: r.campus_id == c.id,
+        select: [
+          campus: c,
+          connected: r.instructor_id == ^instructor.id
+        ]
+    )
+    |> Enum.map(fn row ->
+      %{
+        id: row[:campus].id,
+        name: row[:campus].name,
+        connected: row[:connected]
+      }
+    end)
   end
 
   @doc """

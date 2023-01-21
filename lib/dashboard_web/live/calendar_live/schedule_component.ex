@@ -254,7 +254,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
       phx-submit="save-claims"
       phx-target={@myself}
     >
-      <%= inspect(Map.get(@claim_rows, {@row.event.id, :local})) %>
+      <%= inspect(@claim_rows[:remote]) %>
       <%!--
               <%= for claim_row <- Map.get(@claim_rows, {@row.event.id, :local}) do %>
 
