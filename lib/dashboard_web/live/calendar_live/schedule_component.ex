@@ -2,12 +2,12 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
   use DashboardWeb, :live_component
 
   alias Dashboard.Accounts
+  alias Dashboard.Accounts.ClaimRow
   alias Dashboard.Calendars
   alias Dashboard.Classes
   alias Dashboard.Classes.Class
   alias Dashboard.Classes.ScheduleRow
   alias Dashboard.Cohorts.Cohort
-  alias Dashboard.Repo
   alias DashboardWeb.CalendarLive.Location
   alias Plug.Conn.Query
   alias Timex.Duration
@@ -86,34 +86,6 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
           Classes.events_for_classes(classes, start_date)
           |> ScheduleRow.from_events_by_date(timezone)
 
-        instructor_claims = Accounts.list_instructors_for_schedule(classes)
-
-        # TODO: Add guests instructors.
-        # claims_by_type =
-        #   Enum.reduce(
-        #     instructor_claims,
-        #     %{local: [], remote: [], guest: []},
-        #     fn %{
-        #          instructor: instructor,
-        #          claims_by_event: claims_by_event
-        #        } = claim_info,
-        #        types ->
-        #       if nil in instructor.campuses do
-        #         types
-        #         |> Map.get_and_update(:local, fn local ->
-        #           {local, [claims_info | local]}
-        #         end)
-        #         |> elem(1)
-        #       else
-        #         types
-        #         |> Map.get_and_update(:remote, fn remote ->
-        #           {remote, [claims_info | remote]}
-        #         end)
-        #         |> elem(1)
-        #       end
-        #     end
-        #   )
-
         maybe_cohort =
           case Map.get(assigns, :cohort) do
             nil -> []
@@ -128,15 +100,15 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
             end
           end)
 
+        claim_rows = ClaimRow.mapped_rows_from_locations(locations)
+
         {:ok,
          socket
          |> assign(assigns)
          |> assign(:locations, locations)
          |> assign(:rows_by_date, rows_by_date)
          |> assign(:campus, nil)
-         # |> assign(:claims_by_type, claims_by_type)
-         # TODO: remove
-         |> assign(:instructors, instructor_claims)
+         |> assign(:claim_rows, claim_rows)
          |> assign(:timezone, timezone)
          |> assign(:instructor, nil)
          |> assign_schedule_info(parent, path, query)}
@@ -247,30 +219,30 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
     end
   end
 
-  defp claims_form(%{campus: nil} = assigns) do
-    ~H"""
-    <.form
-      :let={f}
-      for={:claims}
-      id={"#{@claim_type}-instructors"}
-      phx-change="save-claims"
-      phx-submit="save-claims"
-      phx-target={@myself}
-    >
-      <%= for %{instructor: instructor, claims_by_event: claims_by_event} <- @claims do %>
-        <% event_id = @row.event.id %>
-        <% c = claims_by_event[event_id] %>
-        <label>
-          <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{event_id}",
-            value: c && c.claim.type == @claim_type && "#{c.location}" == "#{@location}"
-          ) %>
-          <%= instructor.name %>
-        </label>
-      <% end %>
-      <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
-    </.form>
-    """
-  end
+  # defp claims_form(%{campus: nil} = assigns) do
+  #   ~H"""
+  #   <.form
+  #     :let={f}
+  #     for={:claims}
+  #     id={"#{@claim_type}-instructors"}
+  #     phx-change="save-claims"
+  #     phx-submit="save-claims"
+  #     phx-target={@myself}
+  #   >
+  #     <%= for %{instructor: instructor, claims_by_event: claims_by_event} <- @claims do %>
+  #       <% event_id = @row.event.id %>
+  #       <% c = claims_by_event[event_id] %>
+  #       <label>
+  #         <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{event_id}",
+  #           value: c && c.claim.type == @claim_type && "#{c.location}" == "#{@location}"
+  #         ) %>
+  #         <%= instructor.name %>
+  #       </label>
+  #     <% end %>
+  #     <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
+  #   </.form>
+  #   """
+  # end
 
   defp claims_form(%{} = assigns) do
     ~H"""
@@ -282,16 +254,20 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
       phx-submit="save-claims"
       phx-target={@myself}
     >
-      <%= for %{instructor: instructor, claims_by_event: claims_by_event} <- @claims do %>
-        <% event_id = @row.event.id %>
-        <% c = claims_by_event[event_id] %>
+      <%= inspect(Map.get(@claim_rows, {@row.event.id, :local})) %>
+      <%!--
+              <%= for claim_row <- Map.get(@claim_rows, {@row.event.id, :local}) do %>
+
         <label>
-          <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{event_id}",
-            value: c && c.claim.type == @claim_type && "#{c.location}" == "#{@location}"
+          <%= checkbox(f, "#{@claim_type}-#{claim_row.instructor.id}-#{@location}-#{@row.event.id}",
+            value:
+              claim_row && claim_row.type == @claim_type && "#{claim_row.location}" == "#{@location}"
           ) %>
-          <%= instructor.name %>
+          <%= claim_row.instructor.name %>
         </label>
       <% end %>
+                    --%>
+
       <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
     </.form>
     """

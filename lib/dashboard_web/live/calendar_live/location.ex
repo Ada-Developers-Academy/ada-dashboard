@@ -35,7 +35,13 @@ defmodule DashboardWeb.CalendarLive.Location do
   end
 
   def new(%Claim{cohort: nil, class: class}) do
-    %Location{id: class.id, model: :class, name: class.name, entity: class}
+    campus =
+      case class.cohort do
+        %Cohort{campus: %Campus{} = campus} -> campus
+        _ -> nil
+      end
+
+    %Location{id: class.id, model: :class, name: class.name, entity: class, campus: campus}
   end
 
   def new(%Claim{cohort: cohort, class: nil}) do

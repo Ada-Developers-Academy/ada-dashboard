@@ -2,6 +2,7 @@ defmodule Dashboard.Accounts.Instructor do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Dashboard.Accounts.Claim
   alias Dashboard.Calendars.Event
   alias Dashboard.Campuses.Campus
 
@@ -12,6 +13,7 @@ defmodule Dashboard.Accounts.Instructor do
     field :external_provider, :string
     field :name, :string
 
+    has_many :claims, Claim
     many_to_many :campuses, Campus, join_through: "residences"
     many_to_many :events, Event, join_through: "claims"
 
