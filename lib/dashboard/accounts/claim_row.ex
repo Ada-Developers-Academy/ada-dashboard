@@ -1,13 +1,18 @@
-# This is basically a Claim but with some extra fields.
 defmodule Dashboard.Accounts.ClaimRow do
-  @enforce_keys [:claim, :event, :instructor, :location, :type]
-  defstruct [:claim, :event, :instructor, :location, :type]
+  @enforce_keys [:event_id, :instructor_id, :location, :type]
+  defstruct [
+    :event_id,
+    :instructor_id,
+    :location,
+    :type
+  ]
 
   import Ecto.Query, warn: false
 
   alias Dashboard.Accounts.Claim
   alias Dashboard.Accounts.ClaimRow
   alias Dashboard.Accounts.Instructor
+  alias Dashboard.Campuses
   alias Dashboard.Classes.Class
   alias Dashboard.Cohorts.Cohort
   alias Dashboard.Repo
@@ -24,7 +29,14 @@ defmodule Dashboard.Accounts.ClaimRow do
       |> Enum.filter(fn l -> l.model == :cohort end)
       |> Enum.map(fn c -> c.id end)
 
-    campus = List.first(locations).campus
+    campus_ids = Enum.map(locations, fn l -> l.campus_id end)
+    campus_id = List.first(campus_ids)
+
+    unless Enum.all?(campus_ids, fn id -> campus_id == id end) do
+      raise "Not all campus ids match for these locations!"
+    end
+
+    campus = Campuses.get_campus!(campus_id)
 
     Repo.all(
       from instructor in Instructor,
@@ -49,20 +61,25 @@ defmodule Dashboard.Accounts.ClaimRow do
         instructor.claims
         |> Enum.map(fn claim ->
           %ClaimRow{
-            claim: claim,
-            event: claim.event,
+            event_id: claim.event.id,
+            instructor_id: instructor.id,
             type: claim.type,
-            instructor: instructor,
             location: Location.new(claim)
           }
         end)
         |> Enum.group_by(fn row ->
-          row.event.id
+          row.event_id
         end)
 
       {instructor, rows}
     end)
-    |> Enum.group_by(fn {instructor, _rows} ->
+    |> Enum.map(fn {instructor, rows_by_event} ->
+      {instructor,
+       Enum.into(rows_by_event, %{}, fn {event, [row]} ->
+         {event, row}
+       end)}
+    end)
+    |> Enum.group_by(fn {instructor, _rows_by_event} ->
       # TODO: Support guest instructors.
       if campus in instructor.campuses do
         :local

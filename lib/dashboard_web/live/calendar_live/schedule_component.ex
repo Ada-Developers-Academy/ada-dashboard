@@ -8,6 +8,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
   alias Dashboard.Classes.Class
   alias Dashboard.Classes.ScheduleRow
   alias Dashboard.Cohorts.Cohort
+  alias Dashboard.Repo
   alias DashboardWeb.CalendarLive.Location
   alias Plug.Conn.Query
   alias Timex.Duration
@@ -91,6 +92,8 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
             nil -> []
             cohort -> [cohort]
           end
+
+        classes = Repo.preload(classes, cohort: [:campus])
 
         locations =
           Enum.map(maybe_cohort ++ classes, fn loc ->
@@ -254,20 +257,17 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
       phx-submit="save-claims"
       phx-target={@myself}
     >
-      <%= inspect(@claim_rows[:remote]) %>
-      <%!--
-              <%= for claim_row <- Map.get(@claim_rows, {@row.event.id, :local}) do %>
-
-        <label>
-          <%= checkbox(f, "#{@claim_type}-#{claim_row.instructor.id}-#{@location}-#{@row.event.id}",
+      <%= if @claim_rows[:local] do %>
+        <h3>Local</h3>
+        <%= for {instructor, rows_by_event} <- @claim_rows[:local] do %>
+          <% claim_row = Map.get(rows_by_event, @row.event.id) %>
+          <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{@row.event.id}",
             value:
               claim_row && claim_row.type == @claim_type && "#{claim_row.location}" == "#{@location}"
           ) %>
-          <%= claim_row.instructor.name %>
-        </label>
+          <%= instructor.name %>
+        <% end %>
       <% end %>
-                    --%>
-
       <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
     </.form>
     """

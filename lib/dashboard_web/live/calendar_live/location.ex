@@ -1,6 +1,5 @@
 defmodule DashboardWeb.CalendarLive.Location do
   alias Dashboard.Accounts.Claim
-  alias Dashboard.Campuses.Campus
   alias Dashboard.Classes
   alias Dashboard.Classes.Class
   alias Dashboard.Cohorts
@@ -12,8 +11,7 @@ defmodule DashboardWeb.CalendarLive.Location do
     :id,
     :model,
     :name,
-    :entity,
-    :campus
+    :campus_id
   ]
 
   def get!(string) when is_binary(string) do
@@ -27,31 +25,47 @@ defmodule DashboardWeb.CalendarLive.Location do
   end
 
   def new(%Class{} = class) do
-    %Location{id: class.id, model: :class, name: class.name, entity: class}
+    %Location{
+      id: class.id,
+      model: :class,
+      name: class.name,
+      campus_id: get_campus(class).id
+    }
   end
 
   def new(%Cohort{} = cohort) do
-    %Location{id: cohort.id, model: :cohort, name: "Auditorium", entity: cohort}
+    %Location{
+      id: cohort.id,
+      model: :cohort,
+      name: "Auditorium",
+      campus_id: get_campus(cohort).id
+    }
   end
 
   def new(%Claim{cohort: nil, class: class}) do
-    campus =
-      case class.cohort do
-        %Cohort{campus: %Campus{} = campus} -> campus
-        _ -> nil
-      end
-
-    %Location{id: class.id, model: :class, name: class.name, entity: class, campus: campus}
+    %Location{
+      id: class.id,
+      model: :class,
+      name: class.name,
+      campus_id: get_campus(class).id
+    }
   end
 
   def new(%Claim{cohort: cohort, class: nil}) do
-    campus =
-      case cohort.campus do
-        %Campus{} = campus -> campus
-        _ -> nil
-      end
+    %Location{
+      id: cohort.id,
+      model: :cohort,
+      name: "Auditorum",
+      campus_id: get_campus(cohort).id
+    }
+  end
 
-    %Location{id: cohort.id, model: :cohort, name: "Auditorum", entity: cohort, campus: campus}
+  defp get_campus(entity) do
+    case entity do
+      %Cohort{campus: campus} -> campus
+      %Class{cohort: %Cohort{campus: campus}} -> campus
+      _ -> nil
+    end
   end
 
   defimpl String.Chars, for: __MODULE__ do
