@@ -2,12 +2,13 @@ defmodule DashboardWeb.ClassLive.Index do
   use DashboardWeb, :live_view
   on_mount DashboardWeb.InstructorAuth
 
-  alias Dashboard.{Campuses, Classes}
+  alias Dashboard.Campuses
+  alias Dashboard.Classes
   alias Dashboard.Classes.Class
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :campuses, Campuses.list_campuses_with_classes())}
+    {:ok, assign(socket, :campuses, Campuses.list_campuses_with_children())}
   end
 
   @impl true
@@ -38,10 +39,6 @@ defmodule DashboardWeb.ClassLive.Index do
     class = Classes.get_class!(id)
     {:ok, _} = Classes.delete_class(class)
 
-    {:noreply, assign(socket, :campuses, list_campuses())}
-  end
-
-  defp list_campuses do
-    Campuses.list_campuses_with_classes()
+    {:noreply, assign(socket, :campuses, Campuses.list_campuses_with_children())}
   end
 end

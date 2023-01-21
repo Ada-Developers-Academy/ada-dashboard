@@ -6,8 +6,10 @@ defmodule Dashboard.Campuses do
   import Ecto.Query, warn: false
   alias Dashboard.Repo
 
-  alias Dashboard.Campuses.Campus
   alias Dashboard.Accounts.Residence
+  alias Dashboard.Campuses.Campus
+  alias Dashboard.Classes.Class
+  alias Dashboard.Cohorts.Cohort
 
   @doc """
   Returns the list of campuses.
@@ -23,14 +25,35 @@ defmodule Dashboard.Campuses do
   end
 
   @doc """
-  Returns the list of campuses with classes preloaded.
+  Returns the list of campuses with cohorts and their classes preloaded.
 
   ## Examples
 
-      iex> list_campus()
+      iex> list_campus_with_children()
       [%Campus{}, ...]
 
   """
+  def list_campuses_with_children() do
+    Repo.all(
+      from campus in Campus,
+        order_by: campus.name,
+        preload: [
+          cohorts:
+            ^from(
+              cohort in Cohort,
+              order_by: cohort.name,
+              preload: [
+                classes:
+                  ^from(
+                    class in Class,
+                    order_by: class.name
+                  )
+              ]
+            )
+        ]
+    )
+  end
+
   def list_campuses_with_connected(instructor) do
     Repo.all(
       from c in Campus,

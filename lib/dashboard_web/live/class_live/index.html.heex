@@ -1,4 +1,4 @@
-<h1>Listing Class</h1>
+<h2>Listing Classes</h2>
 
 <%= if @live_action in [:new, :edit] do %>
   <.modal return_to={Routes.class_index_path(@socket, :index)}>
@@ -13,30 +13,25 @@
   </.modal>
 <% end %>
 
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-
-      <th></th>
-    </tr>
-  </thead>
-  <tbody id="class">
-    <%= for campus <- @campuses do %>
-      <tr><td><%= campus.name %></td></tr>
-      <%= for class <- campus.classes do %>
-        <tr id={"class-#{class.id}"}>
-          <td><%= class.name %></td>
-
-          <td>
-            <span><%= live_redirect "Show", to: Routes.class_show_path(@socket, :show, class) %></span>
-            <span><%= live_patch "Edit", to: Routes.class_index_path(@socket, :edit, class) %></span>
-            <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: class.id, data: [confirm: "Are you sure?"] %></span>
-          </td>
-        </tr>
+<%= for campus <- @campuses do %>
+  <h3><%= campus.name %></h3>
+  <%= for cohort <- campus.cohorts do %>
+    <h4><%= cohort.name %></h4>
+    <ul>
+      <%= if length(cohort.classes) == 0 do %>
+        (no classes)
       <% end %>
-    <% end %>
-  </tbody>
-</table>
+      <%= for class <- cohort.classes do %>
+        <li>
+          <.link navigate={"/classes/#{class.id}"}>
+            <%= class.name %>
+          </.link>
+          &mdash; <!-- TODO: Replace when actually styling. -->
+          <.link patch={"/classes/#{class.id}/edit"}>Edit</.link>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>
 
-<span><%= live_patch "New Class", to: Routes.class_index_path(@socket, :new) %></span>
+<span><%= live_patch("Create new class", to: Routes.class_index_path(@socket, :new)) %></span>

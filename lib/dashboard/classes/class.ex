@@ -17,9 +17,8 @@ defmodule Dashboard.Classes.Class do
   @doc false
   def changeset(class, attrs) do
     class
-    |> cast(attrs, [:name, :campus_id, :cohort_id])
-    |> foreign_key_constraint(:campus)
+    |> cast(attrs, [:name, :cohort_id])
     |> foreign_key_constraint(:cohort)
-    |> validate_required([:name, :campus_id, :cohort_id])
+    |> validate_required([:name, :cohort_id])
   end
 end

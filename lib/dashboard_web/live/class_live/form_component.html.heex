@@ -2,22 +2,21 @@
   <h2><%= @title %></h2>
 
   <.form
-    let={f}
+    :let={f}
     for={@changeset}
     id="class-form"
     phx-target={@myself}
     phx-change="validate"
-    phx-submit="save">
-  
-    <%= label f, :name %>
-    <%= text_input f, :name %>
-    <%= error_tag f, :name %>
+    phx-submit="save"
+  >
+    <%= label(f, :name) %>
+    <%= text_input(f, :name) %>
+    <%= error_tag(f, :name) %>
 
-    <%= select f, :campus_id, @campuses %>
-    <%= select f, :cohort_id, @cohorts %>
-    
+    <%= select(f, :cohort_id, @cohorts) %>
+
     <div>
-      <%= submit "Save", phx_disable_with: "Saving..." %>
+      <%= submit("Save", phx_disable_with: "Saving...") %>
     </div>
   </.form>
 </div>
