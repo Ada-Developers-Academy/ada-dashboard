@@ -94,6 +94,11 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
           end
 
         classes = Repo.preload(classes, cohort: [:campus])
+        campus = List.first(classes).cohort.campus
+
+        unless Enum.all?(classes, fn c -> c.cohort.campus == campus end) do
+          raise "Not all campus ids match for these classes!"
+        end
 
         locations =
           Enum.map(maybe_cohort ++ classes, fn loc ->
@@ -110,7 +115,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
          |> assign(assigns)
          |> assign(:locations, locations)
          |> assign(:rows_by_date, rows_by_date)
-         |> assign(:campus, nil)
+         |> assign(:campus, campus)
          |> assign(:claim_rows, claim_rows)
          |> assign(:timezone, timezone)
          |> assign(:instructor, nil)
@@ -222,31 +227,6 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
     end
   end
 
-  # defp claims_form(%{campus: nil} = assigns) do
-  #   ~H"""
-  #   <.form
-  #     :let={f}
-  #     for={:claims}
-  #     id={"#{@claim_type}-instructors"}
-  #     phx-change="save-claims"
-  #     phx-submit="save-claims"
-  #     phx-target={@myself}
-  #   >
-  #     <%= for %{instructor: instructor, claims_by_event: claims_by_event} <- @claims do %>
-  #       <% event_id = @row.event.id %>
-  #       <% c = claims_by_event[event_id] %>
-  #       <label>
-  #         <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{event_id}",
-  #           value: c && c.claim.type == @claim_type && "#{c.location}" == "#{@location}"
-  #         ) %>
-  #         <%= instructor.name %>
-  #       </label>
-  #     <% end %>
-  #     <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
-  #   </.form>
-  #   """
-  # end
-
   defp claims_form(%{} = assigns) do
     ~H"""
     <.form
@@ -258,7 +238,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
       phx-target={@myself}
     >
       <%= if @claim_rows[:local] do %>
-        <h3>Local</h3>
+        <h3><%= @campus.name %> Instructors</h3>
         <%= for {instructor, rows_by_event} <- @claim_rows[:local] do %>
           <% claim_row = Map.get(rows_by_event, @row.event.id) %>
           <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{@row.event.id}",
@@ -269,7 +249,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
         <% end %>
       <% end %>
       <%= if @claim_rows[:remote] do %>
-        <h3>Remote</h3>
+        <h3>Other Instructors</h3>
         <%= for {instructor, rows_by_event} <- @claim_rows[:remote] do %>
           <% claim_row = Map.get(rows_by_event, @row.event.id) %>
           <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{@row.event.id}",

@@ -16,12 +16,12 @@ defmodule DashboardWeb.CohortLive.Show do
     cohort =
       id
       |> Cohorts.get_cohort!()
-      |> Repo.preload(:classes)
+      |> Repo.preload([:classes, :campus])
 
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:cohort, Cohorts.get_cohort!(id))
+     |> assign(:cohort, cohort)
      |> assign(:classes, cohort.classes)
      |> assign(:uri, uri)
      |> assign(:self, self())}
