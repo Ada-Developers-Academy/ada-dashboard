@@ -22,5 +22,15 @@ defmodule Dashboard.Accounts.Claim do
     claim
     |> cast(attrs, [:instructor_id, :event_id, :class_id, :cohort_id, :type])
     |> validate_required([:instructor_id, :event_id, :cohort_id, :class_id, :type])
+    |> check_constraint(
+      :class_id,
+      name: :require_cohort_id_xor_class_id,
+      message: "Claims require exactly one of class_id or cohort_id."
+    )
+    |> check_constraint(
+      :cohort_id,
+      name: :require_cohort_id_xor_class_id,
+      message: "Claims require exactly one of class_id or cohort_id."
+    )
   end
 end
