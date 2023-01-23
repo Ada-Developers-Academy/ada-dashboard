@@ -56,6 +56,9 @@ defmodule Dashboard.Accounts.ClaimRow do
           campuses: []
         ]
     )
+    |> Enum.filter(fn instructor ->
+      is_nil(instructor.is_guest) or campus in instructor.campuses
+    end)
     |> Enum.into(%{}, fn instructor ->
       rows =
         instructor.claims
@@ -80,11 +83,15 @@ defmodule Dashboard.Accounts.ClaimRow do
        end)}
     end)
     |> Enum.group_by(fn {instructor, _rows_by_event} ->
-      # TODO: Support guest instructors.
-      if campus in instructor.campuses do
-        :local
-      else
-        :remote
+      cond do
+        is_nil(instructor.email) ->
+          :guest
+
+        campus in instructor.campuses ->
+          :local
+
+        true ->
+          :remote
       end
     end)
   end

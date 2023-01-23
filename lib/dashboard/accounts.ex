@@ -10,9 +10,11 @@ defmodule Dashboard.Accounts do
   alias Dashboard.Accounts.Residence
   alias Dashboard.Calendars.Calendar
   alias Dashboard.Calendars.Event
+  alias Dashboard.Campuses.Campus
   alias Dashboard.Classes.Source
   alias Dashboard.Repo
   alias DashboardWeb.CalendarLive.Location
+  alias Ecto.Multi
 
   @doc """
   Returns the list of instructors.
@@ -106,6 +108,43 @@ defmodule Dashboard.Accounts do
     %Instructor{}
     |> Instructor.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def create_guest_instructor(
+        %{name: name},
+        %Campus{} = campus,
+        claim_type,
+        %Location{} = location,
+        %Event{} = event
+      ) do
+    Multi.new()
+    |> Multi.insert(
+      :instructor,
+      Instructor.changeset(%Instructor{}, %{name: name, is_guest: true})
+    )
+    |> Multi.insert(:residence, fn %{instructor: instructor} ->
+      %Residence{instructor_id: instructor.id, campus_id: campus.id}
+    end)
+    |> Multi.insert(:claim, fn %{instructor: instructor} ->
+      case location do
+        %Location{id: class_id, model: :class} ->
+          %Claim{
+            instructor_id: instructor.id,
+            event_id: event.id,
+            type: claim_type,
+            class_id: class_id
+          }
+
+        %Location{id: cohort_id, model: :cohort} ->
+          %Claim{
+            instructor_id: instructor.id,
+            event_id: event.id,
+            type: claim_type,
+            cohort_id: cohort_id
+          }
+      end
+    end)
+    |> Repo.transaction()
   end
 
   @doc """

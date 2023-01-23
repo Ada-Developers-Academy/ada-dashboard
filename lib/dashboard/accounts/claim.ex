@@ -21,7 +21,7 @@ defmodule Dashboard.Accounts.Claim do
   def changeset(claim, attrs) do
     claim
     |> cast(attrs, [:instructor_id, :event_id, :class_id, :cohort_id, :type])
-    |> validate_required([:instructor_id, :event_id, :cohort_id, :class_id, :type])
+    |> validate_required([:instructor_id, :event_id, :type])
     |> check_constraint(
       :class_id,
       name: :require_cohort_id_xor_class_id,

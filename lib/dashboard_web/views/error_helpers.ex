@@ -48,9 +48,13 @@ defmodule DashboardWeb.ErrorHelpers do
   @doc """
   Extracts and formats errors from changesets.
   """
-  def get_errors(changeset) do
+  def get_errors(changeset, humanize \\ true) do
     Enum.map(changeset.errors, fn {field, {error, _}} ->
-      "Changeset error: #{humanize(field)} #{error}."
+      if humanize do
+        "Changeset error: #{humanize(field)} #{error}."
+      else
+        "Error: #{error}."
+      end
     end)
   end
 end
