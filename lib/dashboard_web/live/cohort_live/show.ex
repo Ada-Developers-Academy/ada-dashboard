@@ -27,13 +27,6 @@ defmodule DashboardWeb.CohortLive.Show do
      |> assign(:self, self())}
   end
 
-  @impl true
-  def handle_info({:redirect, path}, socket) do
-    {:noreply,
-     socket
-     |> push_redirect(to: path)}
-  end
-
   defp page_title(:show), do: "Show Cohort"
   defp page_title(:edit), do: "Edit Cohort"
 end

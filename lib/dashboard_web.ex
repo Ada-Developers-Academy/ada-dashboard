@@ -49,6 +49,20 @@ defmodule DashboardWeb do
       use Phoenix.LiveView,
         layout: {DashboardWeb.LayoutView, :live}
 
+      @impl true
+      def handle_info({:redirect, path}, socket) do
+        {:noreply,
+         socket
+         |> push_redirect(to: path)}
+      end
+
+      @impl true
+      def handle_info({:flash, kind, message}, socket) do
+        {:noreply,
+         socket
+         |> put_flash(kind, message)}
+      end
+
       unquote(view_helpers())
     end
   end
