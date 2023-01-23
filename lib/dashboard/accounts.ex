@@ -229,10 +229,14 @@ defmodule Dashboard.Accounts do
   def all_names_and_colors do
     Repo.all(Instructor)
     |> Enum.flat_map(fn instructor ->
-      [name | _] = String.split(instructor.email, "@")
+      if instructor.email do
+        [name | _] = String.split(instructor.email, "@")
 
-      if instructor.background_color do
-        [{name, instructor.background_color}]
+        if instructor.background_color do
+          [{name, instructor.background_color}]
+        else
+          []
+        end
       else
         []
       end
