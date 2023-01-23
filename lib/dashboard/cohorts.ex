@@ -35,7 +35,34 @@ defmodule Dashboard.Cohorts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_cohort!(id), do: Repo.get!(Cohort, id)
+  def get_cohort!(id) do
+    Repo.get(Cohort, id)
+  end
+
+  @doc """
+  Gets a single cohort.
+
+  Raises `Ecto.NoResultsError` if the Cohort does not exist.
+
+  ## Examples
+
+      iex> get_with_campus_and_classes!(123)
+      %Cohort{campus: %Campus{}, classes: [%Class{}, ...]}
+
+      iex> get_with_campus_and_classes!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_with_campus_and_classes!(id) do
+    Repo.one!(
+      from c in Cohort,
+        join: campus in assoc(c, :campus),
+        join: classes in assoc(c, :classes),
+        where: c.id == ^id,
+        limit: 1,
+        preload: [:campus, :classes]
+    )
+  end
 
   @doc """
   Creates a cohort.

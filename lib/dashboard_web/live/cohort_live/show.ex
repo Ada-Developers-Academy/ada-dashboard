@@ -2,7 +2,7 @@ defmodule DashboardWeb.CohortLive.Show do
   use DashboardWeb, :live_view
   on_mount DashboardWeb.InstructorAuth
 
-  alias Dashboard.{Cohorts, Repo}
+  alias Dashboard.Cohorts
   alias DashboardWeb.CalendarLive.ScheduleComponent
 
   @impl true
@@ -13,10 +13,7 @@ defmodule DashboardWeb.CohortLive.Show do
   @impl true
   def handle_params(%{"id" => id}, uri, socket) do
     # TODO: Return 404 if missing.
-    cohort =
-      id
-      |> Cohorts.get_cohort!()
-      |> Repo.preload([:classes, :campus])
+    cohort = Cohorts.get_with_campus_and_classes!(id)
 
     {:noreply,
      socket
