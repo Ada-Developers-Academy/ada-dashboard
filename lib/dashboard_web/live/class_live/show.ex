@@ -33,6 +33,13 @@ defmodule DashboardWeb.ClassLive.Show do
   end
 
   @impl true
+  def handle_info({:flash, kind, message}, socket) do
+    {:noreply,
+     socket
+     |> put_flash(kind, message)}
+  end
+
+  @impl true
   def handle_event(
         "save-calendars",
         %{"calendars" => calendars},

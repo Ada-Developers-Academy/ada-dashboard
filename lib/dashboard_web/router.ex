@@ -41,7 +41,6 @@ defmodule DashboardWeb.Router do
     live "/calendars/:id", CalendarLive.Show, :show
     live "/events/:id", EventLive.Show, :show
 
-    # TODO: Require relationship with cohort and campus
     live "/classes", ClassLive.Index, :index
     live "/classes/new", ClassLive.Index, :new
     live "/classes/:id/edit", ClassLive.Index, :edit

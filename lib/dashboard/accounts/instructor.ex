@@ -36,7 +36,7 @@ defmodule Dashboard.Accounts.Instructor do
     |> unique_constraint(
       [:name, :is_guest],
       name: :instructors_name_index,
-      message: "A guest instructor with name \"#{attrs[:name]}\" name already exists"
+      message: "A guest instructor with the name \"#{attrs[:name]}\" name already exists"
     )
   end
 end

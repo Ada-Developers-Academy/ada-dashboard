@@ -158,7 +158,13 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
   def handle_event(
         "add-guest-claims",
         %{"add_guest_instructor" => params},
-        %{assigns: %{campus: campus, locations: locations}} = socket
+        %{
+          assigns: %{
+            campus: campus,
+            locations: locations,
+            parent: parent
+          }
+        } = socket
       ) do
     [{target, name}] = Enum.to_list(params)
 
@@ -174,9 +180,9 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
          |> assign(:claim_rows, ClaimRow.mapped_rows_from_locations(locations))}
 
       {:error, _operation, changeset, _changes_so_far} ->
-        IO.inspect(get_errors(changeset))
-        # TODO: Figure out why this doesn't show!
-        {:noreply, put_flash(socket, :error, get_errors(changeset))}
+        send(parent, {:flash, :error, get_errors(changeset, false)})
+
+        {:noreply, socket}
     end
   end
 
