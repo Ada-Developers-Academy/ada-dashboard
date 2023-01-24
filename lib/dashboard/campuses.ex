@@ -8,8 +8,6 @@ defmodule Dashboard.Campuses do
 
   alias Dashboard.Accounts.Residence
   alias Dashboard.Campuses.Campus
-  alias Dashboard.Classes.Class
-  alias Dashboard.Cohorts.Cohort
 
   @doc """
   Returns the list of campuses.
@@ -36,21 +34,10 @@ defmodule Dashboard.Campuses do
   def list_campuses_with_children() do
     Repo.all(
       from campus in Campus,
-        order_by: campus.name,
-        preload: [
-          cohorts:
-            ^from(
-              cohort in Cohort,
-              order_by: cohort.name,
-              preload: [
-                classes:
-                  ^from(
-                    class in Class,
-                    order_by: class.name
-                  )
-              ]
-            )
-        ]
+        left_join: cohorts in assoc(campus, :cohorts),
+        left_join: classes in assoc(cohorts, :classes),
+        order_by: [asc: campus.name, asc: cohorts.name, asc: classes.name],
+        preload: [cohorts: {cohorts, [classes: classes]}]
     )
   end
 
@@ -59,6 +46,7 @@ defmodule Dashboard.Campuses do
       from c in Campus,
         left_join: r in Residence,
         on: r.campus_id == c.id,
+        distinct: c,
         select: [
           campus: c,
           connected: r.instructor_id == ^instructor.id

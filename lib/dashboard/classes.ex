@@ -39,6 +39,31 @@ defmodule Dashboard.Classes do
   def get_class!(id), do: Repo.get!(Class, id)
 
   @doc """
+  Gets a single class with Cohort and Campus preloaded.
+
+  Raises `Ecto.NoResultsError` if the Class does not exist.
+
+  ## Examples
+
+  iex> get_class_with_cohort_and_campus!(123)
+  %Class{cohort: %Cohort{campus: %Campus{}}}
+
+  iex> get_class_with_cohort_and_campus!(456)
+  ** (Ecto.NoResultsError)
+
+  """
+  def get_class_with_cohort_and_campus!(id) do
+    Repo.one!(
+      from c in Class,
+        join: cohort in assoc(c, :cohort),
+        join: campus in assoc(cohort, :campus),
+        where: c.id == ^id,
+        limit: 1,
+        preload: [cohort: {cohort, [campus: campus]}]
+    )
+  end
+
+  @doc """
   Creates a class.
 
   ## Examples
@@ -139,10 +164,12 @@ defmodule Dashboard.Classes do
           on: c.instructor_id == i.id and i.id == ^instructor.id,
           join: e in Event,
           on: c.event_id == e.id,
+          join: cohort in assoc(c, :cohort),
+          join: class in assoc(c, :class),
           where: ^start_date <= e.start_time and e.end_time <= ^end_time and is_nil(e.deleted_at),
           order_by: e.start_time,
           distinct: true,
-          preload: [:event, :class, :cohort],
+          preload: [class: class, cohort: cohort, event: e],
           select: [c, e.start_time]
       )
 
@@ -174,7 +201,7 @@ defmodule Dashboard.Classes do
             is_nil(e.deleted_at),
         order_by: e.start_time,
         distinct: true,
-        preload: :calendar
+        preload: [calendar: c]
     )
   end
 end

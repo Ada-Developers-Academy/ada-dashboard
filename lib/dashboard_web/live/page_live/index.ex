@@ -1,7 +1,7 @@
 defmodule DashboardWeb.PageLive.Index do
   use DashboardWeb, :live_view
 
-  alias Dashboard.{Accounts, Repo}
+  alias Dashboard.Accounts
   alias DashboardWeb.CalendarLive.ScheduleComponent
 
   @impl true
@@ -13,9 +13,7 @@ defmodule DashboardWeb.PageLive.Index do
     # TODO: Add support for student login.
     instructor =
       if user_id do
-        user_id
-        |> Accounts.get_instructor!()
-        |> Repo.preload([:campuses, :events])
+        Accounts.get_with_campuses_and_events!(user_id)
       end
 
     {:ok,

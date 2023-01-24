@@ -13,7 +13,7 @@ defmodule DashboardWeb.CohortLive.Show do
   @impl true
   def handle_params(%{"id" => id}, uri, socket) do
     # TODO: Return 404 if missing.
-    cohort = Cohorts.get_with_campus_and_classes!(id)
+    cohort = Cohorts.get_with_classes_cohorts_and_campuses!(id)
 
     {:noreply,
      socket

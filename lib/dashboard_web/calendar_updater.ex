@@ -1,8 +1,9 @@
-alias Dashboard.Calendars
-
 defmodule DashboardWeb.CalendarUpdater do
   use GenServer
   require Logger
+
+  alias Dashboard.Calendars
+  alias Dashboard.Repo
 
   def start(state) do
     GenServer.start(__MODULE__, state)
@@ -135,7 +136,7 @@ defmodule DashboardWeb.CalendarUpdater do
               end
             end)
 
-          Calendars.mark_events_deleted(calendar, events)
+          Calendars.mark_events_deleted(Repo.preload(calendar, :events), events)
 
         {:error, %OAuth2.Response{} = error} ->
           error_code = error.body["error"]["code"]

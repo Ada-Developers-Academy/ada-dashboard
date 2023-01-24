@@ -8,10 +8,8 @@ defmodule Dashboard.Accounts do
   alias Dashboard.Accounts.Claim
   alias Dashboard.Accounts.Instructor
   alias Dashboard.Accounts.Residence
-  alias Dashboard.Calendars.Calendar
   alias Dashboard.Calendars.Event
   alias Dashboard.Campuses.Campus
-  alias Dashboard.Classes.Source
   alias Dashboard.Repo
   alias DashboardWeb.CalendarLive.Location
   alias Ecto.Multi
@@ -29,46 +27,6 @@ defmodule Dashboard.Accounts do
     Repo.all(Instructor)
   end
 
-  def list_instructors_for_schedule(classes) do
-    class_ids = Enum.map(classes, fn c -> c.id end)
-
-    Repo.all(
-      from instructor in Instructor,
-        left_join: claim in Claim,
-        on: instructor.id == claim.instructor_id,
-        left_join: event in Event,
-        on: event.id == claim.event_id,
-        left_join: calendar in Calendar,
-        on: calendar.id == event.calendar_id,
-        left_join: source in Source,
-        on: calendar.id == source.calendar_id and source.class_id in ^class_ids,
-        select: [
-          claim: claim,
-          instructor: instructor,
-          event: event,
-          class_id: claim.class_id
-        ]
-    )
-    |> Enum.group_by(fn row ->
-      row[:instructor].id
-    end)
-    |> Enum.map(fn {_, [row | _] = rows} ->
-      %{
-        instructor: row[:instructor] |> Repo.preload(:campuses),
-        claims_by_event:
-          rows
-          |> Enum.filter(fn row -> row[:event] end)
-          |> Enum.into(%{}, fn row ->
-            {row[:event].id,
-             %{
-               claim: row[:claim],
-               location: Location.new(row[:claim] |> Repo.preload([:class, :cohort]))
-             }}
-          end)
-      }
-    end)
-  end
-
   @doc """
   Gets a single instructor.
 
@@ -84,6 +42,30 @@ defmodule Dashboard.Accounts do
 
   """
   def get_instructor!(id), do: Repo.get!(Instructor, id)
+
+  @doc """
+  Gets a single instructorwith campuses and events preloaded.
+
+  Raises `Ecto.NoResultsError` if the Instructor does not exist.
+
+  ## Examples
+
+      iex> get_with_campuses_and_events!(123)
+      %Instructor{campuses: [%Campus{}, ...], events: [%Event{}, ...]}
+
+      iex> get_with_campuses_and_events!(456)
+      ** (Ecto.NoResultsError)
+  """
+  def get_with_campuses_and_events!(instructor_id) do
+    Repo.one(
+      from i in Instructor,
+        join: c in assoc(i, :campuses),
+        join: e in assoc(i, :events),
+        preload: [campuses: c, events: e],
+        where: i.id == ^instructor_id,
+        limit: 1
+    )
+  end
 
   def get_instructor_by_external_id(external_provider, external_id) do
     Repo.get_by(

@@ -2,7 +2,8 @@ defmodule DashboardWeb.ClassLive.Show do
   use DashboardWeb, :live_view
   on_mount DashboardWeb.InstructorAuth
 
-  alias Dashboard.{Classes, Calendars}
+  alias Dashboard.Classes
+  alias Dashboard.Calendars
   alias DashboardWeb.CalendarLive.ScheduleComponent
 
   @impl true
@@ -12,7 +13,8 @@ defmodule DashboardWeb.ClassLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, uri, socket) do
-    class = Classes.get_class!(id)
+    # TODO: Return 404 if missing.
+    class = Classes.get_class_with_cohort_and_campus!(id)
     calendars = Calendars.list_calendars_for_class(class)
 
     {:noreply,

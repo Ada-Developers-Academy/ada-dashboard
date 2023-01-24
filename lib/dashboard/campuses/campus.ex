@@ -7,8 +7,8 @@ defmodule Dashboard.Campuses.Campus do
 
   schema "campuses" do
     field :name, :string
-    has_many :cohorts, Cohort
 
+    has_many :cohorts, Cohort
     many_to_many :instructors, Instructor, join_through: "residences"
 
     timestamps()

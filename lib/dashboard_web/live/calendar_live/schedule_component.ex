@@ -4,17 +4,24 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
   alias Dashboard.Accounts
   alias Dashboard.Accounts.ClaimRow
   alias Dashboard.Calendars
+  alias Dashboard.Campuses.Campus
   alias Dashboard.Classes
   alias Dashboard.Classes.Class
   alias Dashboard.Classes.ScheduleRow
   alias Dashboard.Cohorts.Cohort
-  alias Dashboard.Repo
   alias DashboardWeb.CalendarLive.Location
   alias Plug.Conn.Query
   alias Timex.Duration
 
   @impl true
-  def update(%{instructor: instructor, parent: parent, uri: uri} = assigns, socket) do
+  def update(
+        %{
+          instructor: instructor,
+          parent: parent,
+          uri: uri
+        } = assigns,
+        socket
+      ) do
     %URI{
       path: path,
       query: raw_query
@@ -53,7 +60,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
   @impl true
   def update(
         %{
-          classes: classes,
+          classes: [%Class{cohort: %Cohort{campus: %Campus{} = campus}} | _] = classes,
           parent: parent,
           uri: uri
         } = assigns,
@@ -92,9 +99,6 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
             nil -> []
             cohort -> [cohort]
           end
-
-        classes = Repo.preload(classes, cohort: [:campus])
-        campus = List.first(classes).cohort.campus
 
         unless Enum.all?(classes, fn c -> c.cohort.campus == campus end) do
           raise "Not all campus ids match for these classes!"

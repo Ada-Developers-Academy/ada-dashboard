@@ -46,21 +46,30 @@ defmodule Dashboard.Cohorts do
 
   ## Examples
 
-      iex> get_with_campus_and_classes!(123)
+      iex> get_with_classes_cohorts_and_campuses!(123)
       %Cohort{campus: %Campus{}, classes: [%Class{}, ...]}
 
-      iex> get_with_campus_and_classes!(456)
+      iex> get_with_classes_cohorts_and_campuses!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_with_campus_and_classes!(id) do
+  def get_with_classes_cohorts_and_campuses!(id) do
     Repo.one!(
       from c in Cohort,
         join: campus in assoc(c, :campus),
         join: classes in assoc(c, :classes),
+        join: class_cohort in assoc(classes, :cohort),
+        join: class_cohort_campus in assoc(class_cohort, :campus),
         where: c.id == ^id,
         limit: 1,
-        preload: [:campus, :classes]
+        preload: [
+          campus: campus,
+          classes:
+            {classes,
+             [
+               cohort: {class_cohort, [campus: class_cohort_campus]}
+             ]}
+        ]
     )
   end
 
