@@ -4,10 +4,14 @@ defmodule Dashboard.Classes do
   """
 
   import Ecto.Query, warn: false
+
+  alias Dashboard.Accounts.Claim
+  alias Dashboard.Accounts.Instructor
+  alias Dashboard.Calendars.Calendar
+  alias Dashboard.Calendars.Event
+  alias Dashboard.Classes.Class
+  alias Dashboard.Classes.Source
   alias Dashboard.Repo
-  alias Dashboard.Accounts.{Claim, Instructor}
-  alias Dashboard.Calendars.{Calendar, Event}
-  alias Dashboard.Classes.{Class, Source}
 
   @doc """
   Returns the list of classes.

@@ -6,7 +6,8 @@ defmodule Dashboard.Calendars do
   import Ecto.Query, warn: false
   alias Dashboard.Repo
 
-  alias Dashboard.Calendars.{Calendar, Event}
+  alias Dashboard.Calendars.Calendar
+  alias Dashboard.Calendars.Event
   alias Dashboard.Classes.Source
 
   @doc """
