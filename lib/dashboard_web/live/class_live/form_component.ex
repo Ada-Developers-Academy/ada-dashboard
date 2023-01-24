@@ -2,7 +2,6 @@ defmodule DashboardWeb.ClassLive.FormComponent do
   use DashboardWeb, :live_component
 
   alias Dashboard.Classes
-  alias Dashboard.Campuses
   alias Dashboard.Cohorts
 
   @impl true
