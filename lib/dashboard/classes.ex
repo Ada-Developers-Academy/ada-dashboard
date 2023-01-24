@@ -168,12 +168,13 @@ defmodule Dashboard.Classes do
           on: c.instructor_id == i.id and i.id == ^instructor.id,
           join: e in Event,
           on: c.event_id == e.id,
-          join: cohort in assoc(c, :cohort),
-          join: class in assoc(c, :class),
+          left_join: event in assoc(c, :event),
+          left_join: cohort in assoc(c, :cohort),
+          left_join: class in assoc(c, :class),
           where: ^start_date <= e.start_time and e.end_time <= ^end_time and is_nil(e.deleted_at),
           order_by: e.start_time,
           distinct: true,
-          preload: [class: class, cohort: cohort, event: e],
+          preload: [class: class, cohort: cohort, event: event],
           select: [c, e.start_time]
       )
 

@@ -44,7 +44,7 @@ defmodule Dashboard.Accounts do
   def get_instructor!(id), do: Repo.get!(Instructor, id)
 
   @doc """
-  Gets a single instructorwith campuses and events preloaded.
+  Gets a single instructor with campuses and events preloaded.
 
   Raises `Ecto.NoResultsError` if the Instructor does not exist.
 
@@ -56,14 +56,14 @@ defmodule Dashboard.Accounts do
       iex> get_with_campuses_and_events!(456)
       ** (Ecto.NoResultsError)
   """
-  def get_with_campuses_and_events!(instructor_id) do
+  def get_instructor_with_campuses!(instructor_id) do
     Repo.one(
       from i in Instructor,
-        join: c in assoc(i, :campuses),
-        join: e in assoc(i, :events),
+        left_join: c in assoc(i, :campuses),
+        left_join: e in assoc(i, :events),
         preload: [campuses: c, events: e],
         where: i.id == ^instructor_id,
-        limit: 1
+        distinct: i
     )
   end
 

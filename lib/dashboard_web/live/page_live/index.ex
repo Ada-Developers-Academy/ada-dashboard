@@ -13,7 +13,7 @@ defmodule DashboardWeb.PageLive.Index do
     # TODO: Add support for student login.
     instructor =
       if user_id do
-        Accounts.get_with_campuses_and_events!(user_id)
+        Accounts.get_instructor_with_campuses!(user_id)
       end
 
     {:ok,
