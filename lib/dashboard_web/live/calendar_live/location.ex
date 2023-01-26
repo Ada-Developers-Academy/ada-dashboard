@@ -16,7 +16,7 @@ defmodule DashboardWeb.CalendarLive.Location do
   ]
 
   def get!(string) when is_binary(string) do
-    [type, raw_id] = String.split(string, "/")
+    [type, raw_id] = String.split(string, ":")
     {id, ""} = Integer.parse(raw_id)
 
     case type do
@@ -71,11 +71,11 @@ defmodule DashboardWeb.CalendarLive.Location do
 
   defimpl String.Chars, for: __MODULE__ do
     def to_string(%Location{id: id, model: :class}) do
-      "class/#{id}"
+      "class:#{id}"
     end
 
     def to_string(%Location{id: id, model: :cohort}) do
-      "cohort/#{id}"
+      "cohort:#{id}"
     end
   end
 end

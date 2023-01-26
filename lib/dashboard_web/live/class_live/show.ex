@@ -2,8 +2,8 @@ defmodule DashboardWeb.ClassLive.Show do
   use DashboardWeb, :live_view
   on_mount DashboardWeb.InstructorAuth
 
-  alias Dashboard.Classes
   alias Dashboard.Calendars
+  alias Dashboard.Classes
   alias DashboardWeb.CalendarLive.ScheduleComponent
 
   @impl true

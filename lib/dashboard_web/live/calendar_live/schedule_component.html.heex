@@ -106,7 +106,12 @@
             <% end %>
             <%= for location <- @locations do %>
               <td>
-                <%= claims_form(%{
+                <.live_component
+                  module={ClaimsFormComponent}
+                  id={"claim-rows-lead-#{location}-#{row.event.id}"}
+                  uri={@uri}
+                />
+                <% claims_form(%{
                   myself: @myself,
                   campus: @campus,
                   claim_rows: @claim_rows,
@@ -116,6 +121,11 @@
                 }) %>
               </td>
               <td>
+                <.live_component
+                  module={ClaimsFormComponent}
+                  id={"claim-rows-backup-#{location}-#{row.event.id}"}
+                  uri={@uri}
+                />
                 <%= claims_form(%{
                   myself: @myself,
                   campus: @campus,

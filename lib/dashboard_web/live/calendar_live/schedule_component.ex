@@ -9,6 +9,7 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
   alias Dashboard.Classes.Class
   alias Dashboard.Classes.ScheduleRow
   alias Dashboard.Cohorts.Cohort
+  alias DashboardWeb.CalendarLive.ClaimsFormComponent
   alias DashboardWeb.CalendarLive.Location
   alias Plug.Conn.Query
   alias Timex.Duration

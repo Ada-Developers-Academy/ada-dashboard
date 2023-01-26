@@ -98,7 +98,6 @@ label {
 .schedule table tr {
   display: grid;
   grid-template-columns: max-content max-content 1fr 300px 300px;
-  max-height: 2em;
 }
 
 .schedule table tr th {
