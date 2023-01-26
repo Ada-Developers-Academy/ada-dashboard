@@ -1,4 +1,4 @@
-<section>
+<section class="schedule">
   <h3>Schedule</h3>
   <p class="timezone-info">
     Note: dates/times displayed in <%= String.replace(@timezone, "_", " ") %> time.
@@ -16,8 +16,7 @@
   <%= for {date, rows} <- @rows_by_date do %>
     <h4><%= date %></h4>
 
-    <table style="width: 100%;border:1px solid black;" border="1">
-      <!-- TODO: Please forgive me CSS, inline styles are for prototyping only! -->
+    <table>
       <thead>
         <tr>
           <th>Start</th>
@@ -57,12 +56,12 @@
       <tbody>
         <%= for row <- rows do %>
           <tr>
-            <td style="text-align: right"><%= row.start_time %></td>
+            <td><%= row.start_time %></td>
             <td><%= row.end_time %></td>
             <td>
               <.link navigate={"/events/#{row.event.id}"}><%= row.event.title %></.link>
               <%= if row.status == :conflict do %>
-                <span class="conflict" style="color:red;display:block">
+                <span class="conflict">
                   <%= if length(row.conflicts) > 1 do %>
                     The <%= format_word_list(row.conflicts) %> of this event conflict with one or more other events.
                   <% else %>
@@ -70,7 +69,7 @@
                   <% end %>
                   <details>
                     <summary>
-                      <h4 style="display:inline-block">Conflicting Events</h4>
+                      <h4>Conflicting Events</h4>
                     </summary>
                     <%= for event <- row.conflicting_events do %>
                       <ul>
