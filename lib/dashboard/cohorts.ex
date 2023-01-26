@@ -57,11 +57,11 @@ defmodule Dashboard.Cohorts do
     Repo.one!(
       from c in Cohort,
         join: campus in assoc(c, :campus),
-        join: classes in assoc(c, :classes),
+        left_join: classes in assoc(c, :classes),
         join: class_cohort in assoc(classes, :cohort),
         join: class_cohort_campus in assoc(class_cohort, :campus),
         where: c.id == ^id,
-        limit: 1,
+        distinct: c,
         preload: [
           campus: campus,
           classes:

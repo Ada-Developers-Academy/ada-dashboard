@@ -9,7 +9,6 @@ defmodule Dashboard.Accounts.ClaimRow do
 
   import Ecto.Query, warn: false
 
-  alias Dashboard.Accounts.Claim
   alias Dashboard.Accounts.ClaimRow
   alias Dashboard.Accounts.Instructor
   alias Dashboard.Campuses
@@ -40,20 +39,35 @@ defmodule Dashboard.Accounts.ClaimRow do
 
     Repo.all(
       from instructor in Instructor,
-        left_join: claim in Claim,
-        on: claim.instructor_id == instructor.id,
+        left_join: claim in assoc(instructor, :claims),
         left_join: class in Class,
         on: claim.class_id == class.id and class.id in ^class_ids,
         left_join: cohort in Cohort,
         on: claim.cohort_id == cohort.id and cohort.id in ^cohort_ids,
+        left_join: campus in assoc(instructor, :campuses),
+        left_join: claim_class in assoc(claim, :class),
+        left_join: claim_cohort in assoc(claim, :cohort),
+        left_join: claim_class_cohort in assoc(claim_class, :cohort),
+        left_join: claim_class_cohort_campus in assoc(claim_class_cohort, :campus),
+        left_join: claim_cohort_campus in assoc(claim_cohort, :campus),
+        left_join: claim_event in assoc(claim, :event),
         distinct: true,
         preload: [
-          claims: [
-            class: [cohort: [:campus]],
-            cohort: [:campus],
-            event: []
-          ],
-          campuses: []
+          campuses: campus,
+          claims:
+            {claim,
+             [
+               class:
+                 {claim_class,
+                  [
+                    cohort: {
+                      claim_class_cohort,
+                      [campus: claim_class_cohort_campus]
+                    }
+                  ]},
+               cohort: {claim_cohort, [campus: claim_cohort_campus]},
+               event: claim_event
+             ]}
         ]
     )
     |> Enum.filter(fn instructor ->
