@@ -108,5 +108,8 @@ defmodule Dashboard.Accounts.ClaimRow do
           :remote
       end
     end)
+    |> Enum.into(%{}, fn {locality, instructors} ->
+      {locality, Enum.sort_by(instructors, fn {instructor, _claims} -> instructor.name end)}
+    end)
   end
 end
