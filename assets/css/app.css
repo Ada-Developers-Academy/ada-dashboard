@@ -92,29 +92,27 @@ label {
 }
 
 .schedule table {
-  width: 100%;
+  min-width: 100%;
 }
 
-.schedule table tr {
-  display: grid;
-  grid-template-columns: max-content max-content 1fr 300px 300px;
-}
-
-.schedule table tr th {
+.schedule table thead tr th {
   text-align: center;
 }
 
-.schedule * {
-  background: #fff;
+.schedule table tr .title {
+  min-width: 500px;
+}
+
+.schedule table tr .claims {
+  width: 250px;
 }
 
 /* "Start" column */
-.schedule table tr th:nth-child(1) {
+.schedule table tr > *:nth-child(1) {
   min-width: 4em;
 }
 
 .schedule table tr td:nth-child(1) {
-  min-width: 4em;
   text-align: right;
 }
 
@@ -123,9 +121,14 @@ label {
   font-weight: bold;
   position: relative;
   top: -1px;
+  right: -1px;
 }
 
 /* "End" column */
-.schedule table tr td:nth-child(2) {
+.schedule table tr *:nth-child(2) {
   min-width: 2.75em;
+  text-align: left;
 }
+
+
+

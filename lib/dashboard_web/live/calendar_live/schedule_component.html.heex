@@ -21,7 +21,7 @@
         <tr>
           <th>Start</th>
           <th>End</th>
-          <th>Title</th>
+          <th class="title">Title</th>
           <%= if @instructor do %>
             <th>Location</th>
           <% end %>
@@ -38,7 +38,7 @@
             <th>
               <!-- End -->
             </th>
-            <th>
+            <th class="title">
               <!-- Title -->
             </th>
             <%= for location <- @locations do %>
@@ -58,7 +58,7 @@
           <tr>
             <td><%= row.start_time %></td>
             <td><%= row.end_time %></td>
-            <td>
+            <td class="title">
               <.link navigate={"/events/#{row.event.id}"}><%= row.event.title %></.link>
               <%= if row.status == :conflict do %>
                 <span class="conflict">
@@ -105,26 +105,24 @@
               </td>
             <% end %>
             <%= for location <- @locations do %>
-              <td>
-                <%= claims_form(%{
-                  myself: @myself,
-                  campus: @campus,
-                  claim_rows: @claim_rows,
-                  row: row,
-                  location: location,
-                  claim_type: "lead"
-                }) %>
-              </td>
-              <td>
-                <%= claims_form(%{
-                  myself: @myself,
-                  campus: @campus,
-                  claim_rows: @claim_rows,
-                  row: row,
-                  location: location,
-                  claim_type: "backup"
-                }) %>
-              </td>
+              <.live_component
+                module={ClaimsCellComponent}
+                id={"claim-cell-lead-#{location}-#{row.event.id}"}
+                claim_type="lead"
+                campus={@campus}
+                row={row}
+                location={location}
+                claim_rows={@claim_rows}
+              />
+              <.live_component
+                module={ClaimsCellComponent}
+                id={"claim-backup-lead-#{location}-#{row.event.id}"}
+                claim_type="backup"
+                campus={@campus}
+                row={row}
+                location={location}
+                claim_rows={@claim_rows}
+              />
             <% end %>
           </tr>
         <% end %>

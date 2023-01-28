@@ -318,7 +318,7 @@ defmodule Dashboard.Calendars do
   @doc """
   Marks events for a given calendar deleted if they no longer exist.
   """
-  def mark_events_deleted(%Calendar{events: [%Event{}, _]} = calendar, events) do
+  def mark_events_deleted(calendar, events) do
     existing_events =
       Enum.into(events, %{}, fn event ->
         {event.id, event}

@@ -28,7 +28,7 @@
     <ul>
       <%= for campus <- @instructor.campuses do %>
         <li>
-          <.link navigate={"campus/#{campus.id}"}>
+          <.link navigate={"campuses/#{campus.id}"}>
             <%= campus.name %>
           </.link>
         </li>

@@ -1,4 +1,5 @@
-<section class="claim-rows">
+<td class="claims">
+  <.link patch="expand">replace with little form</.link>
   <%= if @expand do %>
     <.form
       :let={f}
@@ -63,7 +64,5 @@
       </label>
       <%= submit("Add", phx_disable_with: "Adding...") %>
     </.form>
-  <% else %>
-    <.link patch={"#{@uri}?expand=#{@id}"}>edit</.link>
   <% end %>
-</section>
+</td>
