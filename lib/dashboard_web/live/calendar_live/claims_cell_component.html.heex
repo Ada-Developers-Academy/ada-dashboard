@@ -1,6 +1,9 @@
 <td class="claims">
-  <.link patch="expand">replace with little form</.link>
   <%= if @expand do %>
+    <.form :let={_} for={:claims} phx-submit="collapse-claims" phx-target={@myself}>
+      <%= submit("Done") %>
+    </.form>
+
     <.form
       :let={f}
       for={:claims}
@@ -63,6 +66,10 @@
         Add guest: <%= text_input(f, "#{@claim_type}-#{@location}-#{@row.event.id}") %>
       </label>
       <%= submit("Add", phx_disable_with: "Adding...") %>
+    </.form>
+  <% else %>
+    <.form :let={_} for={:claims} phx-submit="expand-claims" phx-target={@myself}>
+      <%= submit("Edit") %>
     </.form>
   <% end %>
 </td>
