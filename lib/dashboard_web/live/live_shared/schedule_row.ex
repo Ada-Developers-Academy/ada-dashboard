@@ -53,11 +53,11 @@ defmodule DashboardWeb.LiveShared.ScheduleRow do
           conflicts
         end
 
-      status =
+      {status, conflicting_events} =
         if length(conflicts) > 0 do
-          :conflict
+          {:conflict, grouped}
         else
-          :ok
+          {:ok, []}
         end
 
       formatted_claim =
@@ -79,7 +79,7 @@ defmodule DashboardWeb.LiveShared.ScheduleRow do
         date: date,
         start_time: start_time,
         end_time: end_time,
-        conflicting_events: grouped,
+        conflicting_events: conflicting_events,
         conflicts: conflicts,
         claim: formatted_claim
       }
