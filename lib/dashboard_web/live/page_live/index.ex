@@ -2,7 +2,7 @@ defmodule DashboardWeb.PageLive.Index do
   use DashboardWeb, :live_view
 
   alias Dashboard.Accounts
-  alias DashboardWeb.CalendarLive.ScheduleComponent
+  alias DashboardWeb.LiveShared.ScheduleComponent
 
   @impl true
   def mount(_params, session, socket) do

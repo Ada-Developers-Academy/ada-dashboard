@@ -11,7 +11,7 @@ defmodule Dashboard.Accounts do
   alias Dashboard.Calendars.Event
   alias Dashboard.Campuses.Campus
   alias Dashboard.Repo
-  alias DashboardWeb.CalendarLive.Location
+  alias DashboardWeb.LiveShared.Location
   alias Ecto.Multi
 
   @doc """

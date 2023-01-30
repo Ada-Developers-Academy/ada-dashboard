@@ -4,7 +4,7 @@ defmodule DashboardWeb.ClassLive.Show do
 
   alias Dashboard.Calendars
   alias Dashboard.Classes
-  alias DashboardWeb.CalendarLive.ScheduleComponent
+  alias DashboardWeb.LiveShared.ScheduleComponent
 
   @impl true
   def mount(_params, _session, socket) do

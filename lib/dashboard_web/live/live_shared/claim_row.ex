@@ -1,4 +1,4 @@
-defmodule Dashboard.Accounts.ClaimRow do
+defmodule DashboardWeb.LiveShared.ClaimRow do
   @enforce_keys [:event_id, :instructor_id, :location, :type]
   defstruct [
     :event_id,
@@ -9,13 +9,13 @@ defmodule Dashboard.Accounts.ClaimRow do
 
   import Ecto.Query, warn: false
 
-  alias Dashboard.Accounts.ClaimRow
   alias Dashboard.Accounts.Instructor
   alias Dashboard.Campuses
   alias Dashboard.Classes.Class
   alias Dashboard.Cohorts.Cohort
   alias Dashboard.Repo
-  alias DashboardWeb.CalendarLive.Location
+  alias DashboardWeb.LiveShared.ClaimRow
+  alias DashboardWeb.LiveShared.Location
 
   def mapped_rows_from_locations(locations) do
     class_ids =

@@ -3,7 +3,7 @@ defmodule DashboardWeb.CohortLive.Show do
   on_mount DashboardWeb.InstructorAuth
 
   alias Dashboard.Cohorts
-  alias DashboardWeb.CalendarLive.ScheduleComponent
+  alias DashboardWeb.LiveShared.ScheduleComponent
 
   @impl true
   def mount(_params, _session, socket) do

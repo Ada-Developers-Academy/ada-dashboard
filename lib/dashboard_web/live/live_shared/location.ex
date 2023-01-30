@@ -1,11 +1,11 @@
-defmodule DashboardWeb.CalendarLive.Location do
+defmodule DashboardWeb.LiveShared.Location do
   alias Dashboard.Accounts.Claim
   alias Dashboard.Campuses.Campus
   alias Dashboard.Classes
   alias Dashboard.Classes.Class
   alias Dashboard.Cohorts
   alias Dashboard.Cohorts.Cohort
-  alias DashboardWeb.CalendarLive.Location
+  alias DashboardWeb.LiveShared.Location
 
   @enforce_keys [:id, :model, :name]
   defstruct [

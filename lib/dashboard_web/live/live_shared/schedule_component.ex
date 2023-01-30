@@ -1,16 +1,14 @@
-defmodule DashboardWeb.CalendarLive.ScheduleComponent do
+defmodule DashboardWeb.LiveShared.ScheduleComponent do
   use DashboardWeb, :live_component
 
-  alias Dashboard.Accounts
-  alias Dashboard.Accounts.ClaimRow
-  alias Dashboard.Calendars
   alias Dashboard.Campuses.Campus
   alias Dashboard.Classes
   alias Dashboard.Classes.Class
-  alias Dashboard.Classes.ScheduleRow
   alias Dashboard.Cohorts.Cohort
-  alias DashboardWeb.CalendarLive.ClaimsCellComponent
-  alias DashboardWeb.CalendarLive.Location
+  alias DashboardWeb.LiveShared.ClaimRow
+  alias DashboardWeb.LiveShared.ClaimsCellComponent
+  alias DashboardWeb.LiveShared.Location
+  alias DashboardWeb.LiveShared.ScheduleRow
   alias Plug.Conn.Query
   alias Timex.Duration
 
@@ -128,69 +126,6 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
     end
   end
 
-  @impl true
-  def handle_event(
-        "save-claims",
-        %{
-          "_target" => ["claims", target],
-          "claims" => claims
-        },
-        %{assigns: %{locations: locations}} = socket
-      ) do
-    checked = claims[target]
-
-    [raw_type, raw_instructor, raw_location, raw_event] = String.split(target, "-")
-    {instructor_id, ""} = Integer.parse(raw_instructor)
-    instructor = Accounts.get_instructor!(instructor_id)
-    location = Location.get!(raw_location)
-    {event_id, ""} = Integer.parse(raw_event)
-    event = Calendars.get_event!(event_id)
-
-    type =
-      case checked do
-        "true" -> raw_type
-        "false" -> nil
-      end
-
-    Accounts.create_or_delete_claim(instructor, location, event, type)
-
-    {:noreply,
-     socket
-     |> assign(:claim_rows, ClaimRow.mapped_rows_from_locations(locations))}
-  end
-
-  @impl true
-  def handle_event(
-        "add-guest-claims",
-        %{"add_guest_instructor" => params},
-        %{
-          assigns: %{
-            campus: campus,
-            locations: locations,
-            parent: parent
-          }
-        } = socket
-      ) do
-    [{target, name}] = Enum.to_list(params)
-
-    [claim_type, raw_location, raw_event] = String.split(target, "-")
-    location = Location.get!(raw_location)
-    {event_id, ""} = Integer.parse(raw_event)
-    event = Calendars.get_event!(event_id)
-
-    case Accounts.create_guest_instructor(%{name: name}, campus, claim_type, location, event) do
-      {:ok, _} ->
-        {:noreply,
-         socket
-         |> assign(:claim_rows, ClaimRow.mapped_rows_from_locations(locations))}
-
-      {:error, _operation, changeset, _changes_so_far} ->
-        send(parent, {:flash, :error, get_errors(changeset, false)})
-
-        {:noreply, socket}
-    end
-  end
-
   defp parse_start_date(query) do
     case Map.get(query, "start_date") do
       nil ->
@@ -262,75 +197,5 @@ defmodule DashboardWeb.CalendarLive.ScheduleComponent do
           "#{path}?start_date=#{today_query}"
         )
     end
-  end
-
-  defp claims_form(%{} = assigns) do
-    ~H"""
-    <section class="claim-rows">
-      <.form
-        :let={f}
-        for={:claims}
-        phx-change="save-claims"
-        phx-submit="save-claims"
-        phx-target={@myself}
-      >
-        <%= if @claim_rows[:local] do %>
-          <h3><%= @campus.name %> Instructors</h3>
-          <%= for {instructor, rows_by_event} <- @claim_rows[:local] do %>
-            <% claim_row = Map.get(rows_by_event, @row.event.id) %>
-            <label>
-              <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{@row.event.id}",
-                value:
-                  claim_row && claim_row.type == @claim_type &&
-                    "#{claim_row.location}" == "#{@location}"
-              ) %>
-              <%= instructor.name %>
-            </label>
-          <% end %>
-        <% end %>
-        <%= if @claim_rows[:remote] do %>
-          <h3>Other Instructors</h3>
-          <%= for {instructor, rows_by_event} <- @claim_rows[:remote] do %>
-            <% claim_row = Map.get(rows_by_event, @row.event.id) %>
-            <label>
-              <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{@row.event.id}",
-                value:
-                  claim_row && claim_row.type == @claim_type &&
-                    "#{claim_row.location}" == "#{@location}"
-              ) %>
-              <%= instructor.name %>
-            </label>
-          <% end %>
-        <% end %>
-        <%= if @claim_rows[:guest] do %>
-          <h3>Guest Instructors</h3>
-          <%= for {instructor, rows_by_event} <- @claim_rows[:guest] do %>
-            <% claim_row = Map.get(rows_by_event, @row.event.id) %>
-            <label>
-              <%= checkbox(f, "#{@claim_type}-#{instructor.id}-#{@location}-#{@row.event.id}",
-                value:
-                  claim_row && claim_row.type == @claim_type &&
-                    "#{claim_row.location}" == "#{@location}"
-              ) %>
-              <%= instructor.name %>
-            </label>
-          <% end %>
-        <% end %>
-        <noscript><%= submit("Save", phx_disable_with: "Saving...") %></noscript>
-      </.form>
-      <.form
-        :let={f}
-        for={:add_guest_instructor}
-        id={"add-#{@claim_type}-guest-instructors"}
-        phx-submit="add-guest-claims"
-        phx-target={@myself}
-      >
-        <label>
-          Add guest: <%= text_input(f, "#{@claim_type}-#{@location}-#{@row.event.id}") %>
-        </label>
-        <%= submit("Add", phx_disable_with: "Adding...") %>
-      </.form>
-    </section>
-    """
   end
 end
