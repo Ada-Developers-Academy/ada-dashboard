@@ -7,7 +7,7 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
   alias DashboardWeb.LiveShared.Location
 
   @impl true
-  def update(assigns, socket) do
+  def update(%{locations: _locations, parent: _parent} = assigns, socket) do
     {:ok,
      socket
      |> assign(assigns)
