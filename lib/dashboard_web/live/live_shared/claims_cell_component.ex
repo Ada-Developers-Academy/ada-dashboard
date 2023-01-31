@@ -7,10 +7,18 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
   alias DashboardWeb.LiveShared.Location
 
   @impl true
-  def update(%{locations: _locations, parent: _parent} = assigns, socket) do
+  def update(
+        %{
+          claim_rows: claim_rows,
+          row: %{event: %{id: event_id}},
+          claim_type: claim_type
+        } = assigns,
+        socket
+      ) do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:instructor_names, get_instructor_names(claim_rows, event_id, claim_type))
      |> assign(:expand, false)}
   end
 
@@ -57,10 +65,12 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
       end
 
     Accounts.create_or_delete_claim(instructor, location, event, type)
+    claim_rows = ClaimRow.mapped_rows_from_locations(locations)
 
     {:noreply,
      socket
-     |> assign(:claim_rows, ClaimRow.mapped_rows_from_locations(locations))}
+     |> assign(:claim_rows, claim_rows)
+     |> assign(:instructor_names, get_instructor_names(claim_rows, event_id, type))}
   end
 
   @impl true
@@ -93,5 +103,20 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
 
         {:noreply, socket}
     end
+  end
+
+  defp get_instructor_names(claim_rows, event_id, claim_type) do
+    Enum.flat_map(claim_rows, fn {_locality, instructors_with_claims} ->
+      Enum.flat_map(instructors_with_claims, fn {instructor, claims_by_event} ->
+        claim_row = Map.get(claims_by_event, event_id)
+
+        if claim_row && claim_row.type == claim_type do
+          [instructor.name]
+        else
+          []
+        end
+      end)
+    end)
+    |> Enum.sort()
   end
 end

@@ -68,6 +68,10 @@
       <%= submit("Add", phx_disable_with: "Adding...") %>
     </.form>
   <% else %>
+    <%= for name <- @instructor_names do %>
+      <span class="instructor-name"><%= name %></span>
+    <% end %>
+
     <.form :let={_} for={:claims} phx-submit="expand-claims" phx-target={@myself}>
       <%= submit("Edit") %>
     </.form>
