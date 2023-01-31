@@ -18,7 +18,10 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:instructor_names, get_instructor_names(claim_rows, event_id, claim_type))
+     |> assign(
+       :instructor_names,
+       get_instructor_names_and_handles(claim_rows, event_id, claim_type)
+     )
      |> assign(:expand, false)}
   end
 
@@ -70,7 +73,7 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
     {:noreply,
      socket
      |> assign(:claim_rows, claim_rows)
-     |> assign(:instructor_names, get_instructor_names(claim_rows, event_id, type))}
+     |> assign(:instructor_names, get_instructor_names_and_handles(claim_rows, event_id, type))}
   end
 
   @impl true
@@ -105,13 +108,20 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
     end
   end
 
-  defp get_instructor_names(claim_rows, event_id, claim_type) do
+  defp get_instructor_names_and_handles(claim_rows, event_id, claim_type) do
     Enum.flat_map(claim_rows, fn {_locality, instructors_with_claims} ->
       Enum.flat_map(instructors_with_claims, fn {instructor, claims_by_event} ->
         claim_row = Map.get(claims_by_event, event_id)
 
         if claim_row && claim_row.type == claim_type do
-          [instructor.name]
+          handle =
+            if instructor.email do
+              List.first(String.split(instructor.email, "@"))
+            else
+              nil
+            end
+
+          [{instructor.name, handle}]
         else
           []
         end
