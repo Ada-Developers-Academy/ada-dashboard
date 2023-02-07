@@ -3,18 +3,40 @@
 /* Variables */
 :root {
   --guest-instructor-bg:  #ddd;
+  --primary-text: #000;
+  --link-text: #2650C8;
+  --instructor-text: #000;
   --primary-bg: #fff;
-  --secondary-bg: #F7B500;
-  --tertiary-bg: #eee;
-  --primary-fg: #0F355E;
-  --secondary-fg: #E7175F;
+  --secondary-bg: #f7b500;
+  --primary-fg: #0f355e;
+  --secondary-fg: #e7175f;
   --border-light: #bbb;
   --border-med: #999;
   --border-dark: #666;
+  --zebra-stripe-bg: linear-gradient(
+    to right,
+    var(--primary-bg),
+    2em,
+    #eee,
+    calc(100% - 2em),
+    var(--primary-bg));
+
 }
 
 @media (prefers-color-scheme: dark) {
-
+  :root {
+    --primary-text: #fff;
+    --link-text: #3670B3;
+    --primary-bg: #10253a;
+    --primary-fg: #0aa3c2;
+    --zebra-stripe-bg: linear-gradient(
+      to right,
+      var(--primary-bg),
+      8em,
+      #eee1,
+      calc(100% - 8em),
+      var(--primary-bg));
+  }
 }
 
 /* Fonts */
@@ -142,7 +164,13 @@ label {
 /* General Styles */
 
 body {
-  font-family: Open Sans, Helvetica, sans-serif
+  font-family: Open Sans, Helvetica, sans-serif;
+  color: var(--primary-text);
+  background: var(--primary-bg);
+}
+
+a {
+  color: var(--link-text)
 }
 
 /* Headings */
@@ -208,13 +236,7 @@ nav {
 }
 
 .schedule table .rows tr:nth-child(even) {
-  background: linear-gradient(
-    to right,
-    var(--primary-bg),
-    2em,
-    var(--tertiary-bg),
-    calc(100% - 2em),
-    var(--primary-bg));
+  background: var(--zebra-stripe-bg);
 }
 
 .schedule table .rows tr td {
@@ -273,6 +295,7 @@ nav {
 .schedule table tr *:nth-child(2) {
   min-width: 2.75em;
   text-align: left;
+  padding-left: 4px;
 }
 
 /* Claims */
@@ -322,6 +345,7 @@ nav {
 /* Instructor Names */
 
 .instructor-name {
+  color: var(--instructor-text);
   padding: 3px 8px 2px;
   border-radius: 3px;
   font-size: 14px;
