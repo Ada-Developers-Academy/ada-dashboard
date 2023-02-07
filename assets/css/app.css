@@ -10,9 +10,9 @@
   --secondary-bg: #f7b500;
   --primary-fg: #0f355e;
   --secondary-fg: #e7175f;
-  --border-light: #bbb;
-  --border-med: #999;
-  --border-dark: #666;
+  --border-odd-stripe: #bbb;
+  --border-med-stripe: #999;
+  --border-even-stripe: #666;
   --zebra-stripe-bg: linear-gradient(
     to right,
     var(--primary-bg),
@@ -29,11 +29,14 @@
     --link-text: #3670B3;
     --primary-bg: #10253a;
     --primary-fg: #0aa3c2;
+    --border-odd-stripe: #888;
+    --border-med-stripe: #999;
+    --border-even-stripe: #888;
     --zebra-stripe-bg: linear-gradient(
       to right,
       var(--primary-bg),
       8em,
-      #eee1,
+      #406080,
       calc(100% - 8em),
       var(--primary-bg));
   }
@@ -223,7 +226,7 @@ nav {
 }
 
 .schedule table .date h4 {
-  margin: 0;
+  margin: 2em 0 0;
 }
 
 .schedule table h5 {
@@ -232,7 +235,7 @@ nav {
 }
 
 .schedule table .rows td {
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border-odd-stripe);
 }
 
 .schedule table .rows tr:nth-child(even) {
@@ -240,11 +243,11 @@ nav {
 }
 
 .schedule table .rows tr td {
-  border-bottom: 1px solid var(--border-med);
+  border-bottom: 1px solid var(--border-med-stripe);
 }
 
 .schedule table .rows tr:nth-child(even) td {
-  border: 1px solid var(--border-dark);
+  border: 1px solid var(--border-even-stripe);
 }
 
 /* Remove line between start and end */
