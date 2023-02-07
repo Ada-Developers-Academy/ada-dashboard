@@ -121,7 +121,7 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
               nil
             end
 
-          [{instructor.name, handle}]
+          [{instructor.name, handle, not is_nil(instructor.background_color)}]
         else
           []
         end

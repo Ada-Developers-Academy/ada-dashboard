@@ -1,34 +1,61 @@
 <section class="schedule">
   <h3>Schedule</h3>
-  <p class="timezone-info">
+  <p id="timezone-info">
     Note: dates/times displayed in <%= String.replace(@timezone, "_", " ") %> time.
   </p>
-  <!-- TODO: Only show if there is actually something next week? -->
-  <%= if @schedule_path_prev do %>
-    <.link patch={@schedule_path_prev}>Prev</.link>
-  <% end %>
-  <%= if @schedule_path_today do %>
-    <.link patch={@schedule_path_today}>Today</.link>
-  <% end %>
-  <%= if @schedule_path_next do %>
-    <.link patch={@schedule_path_next}>Next</.link>
-  <% end %>
-  <%= for {date, rows} <- @rows_by_date do %>
-    <h4><%= date %></h4>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Start</th>
-          <th>End</th>
-          <th class="title">Title</th>
-          <%= if @instructor do %>
-            <th>Location</th>
-          <% end %>
+  <div id="week-controls">
+    <!-- TODO: Only show if there is actually something next week? -->
+    <%= if @schedule_path_prev do %>
+      <.link patch={@schedule_path_prev}>Prev</.link>
+    <% end # if @schedule_path_prev %>
+    <%= if @schedule_path_today do %>
+      <.link patch={@schedule_path_today}>Today</.link>
+    <% end # if @schedule_path_today %>
+    <%= if @schedule_path_next do %>
+      <.link patch={@schedule_path_next}>Next</.link>
+    <% end # if @schedule_path_next %>
+  </div>
+  <table>
+    <%= for {date, rows} <- @rows_by_date do %>
+      <tbody>
+        <tr class="date">
+          <th></th>
+          <th></th>
+          <th>
+            <h4><%= date %></h4>
+          </th>
+          <th></th>
+        </tr>
+        <%= unless @instructor do %>
           <%= for _location <- @locations do %>
-            <th>Lead</th>
-            <th>Backup</th>
-          <% end %>
+            <th></th>
+            <th></th>
+          <% end # for _location <- @locations %>
+        <% end # if @instructor do %>
+
+        <tr>
+          <th>
+            <h5>Start</h5>
+          </th>
+          <th>
+            <h5>End</h5>
+          </th>
+          <th class="title">
+            <h5>Title</h5>
+          </th>
+          <%= if @instructor do %>
+            <th>
+              <h5>Location</h5>
+            </th>
+          <% end # if @instructor %>
+          <%= for _location <- @locations do %>
+            <th>
+              <h5>Lead</h5>
+            </th>
+            <th>
+              <h5>Backup</h5>
+            </th>
+          <% end # for _location <- @locations %>
         </tr>
         <%= if length(@locations) > 1 do %>
           <tr>
@@ -44,16 +71,18 @@
             <%= for location <- @locations do %>
               <th colspan="2">
                 <%= if location.model == :class do %>
-                  <.link navigate={"/classes/#{location.id}"}><%= location.name %></.link>
+                  <h5>
+                    <.link navigate={"/classes/#{location.id}"}><%= location.name %></.link>
+                  </h5>
                 <% else %>
-                  <%= location.name %>
-                <% end %>
+                  <h5><%= location.name %></h5>
+                <% end # if location.model == :class %>
               </th>
-            <% end %>
+            <% end # for location <- @locations %>
           </tr>
-        <% end %>
-      </thead>
-      <tbody>
+        <% end # if length(@locations) > 1 %>
+      </tbody>
+      <tbody class="rows">
         <%= for row <- rows do %>
           <tr>
             <td><%= row.start_time %></td>
@@ -66,7 +95,7 @@
                     The <%= format_word_list(row.conflicts) %> of this event conflict with one or more other events.
                   <% else %>
                     The <%= format_word_list(row.conflicts) %> of this event conflicts with one or more other events.
-                  <% end %>
+                  <% end # if length(row.conflicts) > 1 %>
                   <details>
                     <summary>
                       <h4>Conflicting Events</h4>
@@ -79,31 +108,31 @@
                           </.link>
                           (<%= event.calendar.name %>)
                           <%= if "title" in row.conflicts do %>
-                            <h5>Title</h5>
+                            <h6>Title</h6>
                             <%= event.title %>
-                          <% end %>
+                          <% end # if "title" in row.conflicts %>
                           <%= if "time range" in row.conflicts do %>
-                            <h5>Time Range</h5>
+                            <h6>Time Range</h6>
                             <%= "#{event.start_time} #{event.end_time}" %>
-                          <% end %>
+                          <% end # if "time range" in row.conflicts %>
                           <%= if "description" in row.conflicts do %>
-                            <h5>Description</h5>
+                            <h6>Description</h6>
                             <blockquote>
                               <%= sanitize_html(event.description) %>
                             </blockquote>
-                          <% end %>
+                          <% end # if "description" in row.conflicts %>
                         </li>
                       </ul>
-                    <% end %>
+                    <% end # for event <- row.conflicting_events %>
                   </details>
                 </span>
-              <% end %>
+              <% end # if row.status == :conflict %>
             </td>
             <%= if row.claim do %>
               <td>
                 <%= row.claim %>
               </td>
-            <% end %>
+            <% end # if row.claim %>
             <%= for location <- @locations do %>
               <.live_component
                 module={ClaimsCellComponent}
@@ -127,10 +156,10 @@
                 claim_rows={@claim_rows}
                 parent={@parent}
               />
-            <% end %>
+            <% end # for location <- @locations %>
           </tr>
-        <% end %>
+        <% end # for row <- rows %>
       </tbody>
-    </table>
-  <% end %>
+    <% end # for {date, rows} <- @rows_by_date %>
+  </table>
 </section>

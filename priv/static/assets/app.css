@@ -1,4 +1,43 @@
 /* css/app.css */
+:root {
+  --guest-instructor-bg: #ddd;
+  --primary-bg: #fff;
+  --secondary-bg: #F7B500;
+  --tertiary-bg: #eee;
+  --primary-fg: #0F355E;
+  --secondary-fg: #E7175F;
+  --border-light: #bbb;
+  --border-med: #999;
+  --border-dark: #666;
+}
+@media (prefers-color-scheme: dark) {
+}
+@font-face {
+  font-family: "Barlow";
+  src: url(/fonts/barlow.woff2) format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Montserrat";
+  src: url(/fonts/montserrat.woff) format("woff");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Open Sans";
+  src: url(/fonts/open-sans.woff2) format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+}
+@font-face {
+  font-family: "Open Sans";
+  src: url(/fonts/open-sans-italic.woff) format("woff");
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+}
 .alert {
   padding: 15px;
   margin-bottom: 20px;
@@ -79,17 +118,92 @@
 label {
   display: block;
 }
+body {
+  font-family:
+    Open Sans,
+    Helvetica,
+    sans-serif;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family:
+    Montserrat,
+    Helvetica,
+    sans-serif;
+  text-transform: capitalize;
+}
+h2 {
+  color: var(--primary-fg);
+}
+h3 {
+  color: var(--secondary-fg);
+}
+nav {
+  font-family:
+    Barlow,
+    Helvetica,
+    sans-serif;
+}
+.schedule #week-controls {
+  text-align: center;
+}
+.schedule #timezone-info {
+}
 .schedule table {
   min-width: 100%;
+  border-collapse: collapse;
 }
-.schedule table thead tr th {
+.schedule table tr a {
+  text-decoration: none;
+  color: inherit;
+}
+.schedule table tr a:hover {
+  text-decoration: underline;
+}
+.schedule table .date {
+  border-bottom: 3px solid var(--secondary-fg);
+}
+.schedule table .date h4 {
+  margin: 0;
+}
+.schedule table h5 {
+  margin: 0.5em 0;
+  font-size: 16px;
+}
+.schedule table .rows td {
+  border: 1px solid var(--border-light);
+}
+.schedule table .rows tr:nth-child(even) {
+  background: linear-gradient(to right, var(--primary-bg), 2em, var(--tertiary-bg), calc(100% - 2em), var(--primary-bg));
+}
+.schedule table .rows tr td {
+  border-bottom: 1px solid var(--border-med);
+}
+.schedule table .rows tr:nth-child(even) td {
+  border: 1px solid var(--border-dark);
+}
+.schedule table .rows tr td:nth-child(1) {
+  border-right: none;
+}
+.schedule table .rows tr td:nth-child(2) {
+  border-left: none;
+}
+.schedule table .rows tr td:first-child {
+  border-left: none;
+}
+.schedule table .rows tr td:last-child {
+  border-right: none;
+}
+.schedule table tr th {
   text-align: center;
 }
 .schedule table tr .title {
   min-width: 500px;
-}
-.schedule table tr .claims {
-  width: 250px;
+  padding: 4px 7px 3px;
 }
 .schedule table tr > *:nth-child(1) {
   min-width: 4em;
@@ -107,4 +221,51 @@ label {
 .schedule table tr *:nth-child(2) {
   min-width: 2.75em;
   text-align: left;
+}
+.schedule table .rows tr td.claims {
+  position: relative;
+  min-width: 12em;
+  padding: 4px 0 3px;
+  border-left: none;
+  border-right: none;
+  max-width: min-content;
+}
+.schedule .expand-claims {
+  display: inline-block;
+}
+.schedule .expand-claims button {
+  display: block;
+  font-size: 0px;
+  position: absolute;
+  top: 3px;
+  right: 4px;
+}
+.schedule .expand-claims button::after {
+  content: "+";
+  font-size: 18px;
+  display: inline-block;
+  margin: -3px 0 -1px 1px;
+}
+.schedule .collapse-claims button {
+  display: block;
+  font-size: 0px;
+  position: absolute;
+  top: 3px;
+  right: 4px;
+}
+.schedule .collapse-claims button::after {
+  content: "\d7";
+  font-size: 18px;
+  display: inline-block;
+  margin: -3px 0 -1px 1px;
+}
+.instructor-name {
+  padding: 3px 8px 2px;
+  border-radius: 3px;
+  font-size: 14px;
+  margin-top: -1px;
+  margin-left: 3px;
+}
+.instructor-name.guest-instructor {
+  background-color: var(--guest-instructor-bg);
 }

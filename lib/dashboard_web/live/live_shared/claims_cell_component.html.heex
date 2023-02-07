@@ -1,6 +1,12 @@
 <td class="claims">
   <%= if @expand do %>
-    <.form :let={_} for={:claims} phx-submit="collapse-claims" phx-target={@myself}>
+    <.form
+      :let={_}
+      for={:claims}
+      phx-submit="collapse-claims"
+      phx-target={@myself}
+      class="collapse-claims"
+    >
       <%= submit("Done") %>
     </.form>
 
@@ -68,16 +74,25 @@
       <%= submit("Add", phx_disable_with: "Adding...") %>
     </.form>
   <% else %>
-    <%= for {name, handle} <- @instructor_names do %>
-      <%= if handle do %>
-        <span class={"instructor-name #{handle}-selected"}><%= name %></span>
-      <% else %>
-        <span class="instructor-name guest-instructor"><%= name %></span>
+    <%= for {name, handle, has_color} <- @instructor_names do %>
+      <%= cond do %>
+        <% handle && has_color -> %>
+          <span class={"instructor-name #{handle}-selected"}><%= name %></span>
+        <% handle -> %>
+          <span class="instructor-name"><%= name %></span>
+        <% true -> %>
+          <span class="instructor-name guest-instructor"><%= name %></span>
       <% end %>
     <% end %>
 
-    <.form :let={_} for={:claims} phx-submit="expand-claims" phx-target={@myself}>
-      <%= submit("Edit") %>
+    <.form
+      :let={_}
+      for={:claims}
+      phx-submit="expand-claims"
+      phx-target={@myself}
+      class="expand-claims"
+    >
+      <%= submit("Edit", title: "Edit instructors") %>
     </.form>
   <% end %>
 </td>
