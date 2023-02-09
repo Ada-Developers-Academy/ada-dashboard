@@ -20,7 +20,7 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
      |> assign(assigns)
      |> assign(
        :instructor_names,
-       get_instructor_names_and_handles(claim_rows, event_id, claim_type)
+       get_display_names_and_handles(claim_rows, event_id, claim_type)
      )
      |> assign(:expand, false)}
   end
@@ -73,7 +73,7 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
     {:noreply,
      socket
      |> assign(:claim_rows, claim_rows)
-     |> assign(:instructor_names, get_instructor_names_and_handles(claim_rows, event_id, type))}
+     |> assign(:instructor_names, get_display_names_and_handles(claim_rows, event_id, type))}
   end
 
   @impl true
@@ -108,7 +108,7 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
     end
   end
 
-  defp get_instructor_names_and_handles(claim_rows, event_id, claim_type) do
+  defp get_display_names_and_handles(claim_rows, event_id, claim_type) do
     Enum.flat_map(claim_rows, fn {_locality, instructors_with_claims} ->
       Enum.flat_map(instructors_with_claims, fn {instructor, claims_by_event} ->
         claim_row = Map.get(claims_by_event, event_id)
@@ -121,7 +121,7 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
               nil
             end
 
-          [{instructor.name, handle, not is_nil(instructor.background_color)}]
+          [{instructor.display_name, handle, not is_nil(instructor.background_color)}]
         else
           []
         end

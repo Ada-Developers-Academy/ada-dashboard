@@ -12,6 +12,7 @@ defmodule Dashboard.Accounts.Instructor do
     field :external_id, :string
     field :external_provider, :string
     field :name, :string
+    field :display_name, :string
     field :is_guest, :boolean
 
     has_many :claims, Claim
@@ -23,10 +24,28 @@ defmodule Dashboard.Accounts.Instructor do
 
   @doc false
   def changeset(instructor, attrs) do
+    name = Map.get(attrs, :name)
+    display_name = Map.get(attrs, :display_name)
+
+    attrs =
+      if name && !display_name do
+        Map.put(attrs, :display_name, List.first(String.split(name)))
+      else
+        attrs
+      end
+
     # TODO: Validate colors for accessibility
     instructor
-    |> cast(attrs, [:name, :email, :external_id, :external_provider, :background_color, :is_guest])
-    |> validate_required([:name])
+    |> cast(attrs, [
+      :name,
+      :email,
+      :external_id,
+      :external_provider,
+      :background_color,
+      :is_guest,
+      :display_name
+    ])
+    |> validate_required([:name, :display_name])
     |> unique_constraint([:external_id, :external_provider])
     |> check_constraint(
       :is_guest,

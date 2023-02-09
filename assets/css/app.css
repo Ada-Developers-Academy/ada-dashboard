@@ -295,7 +295,7 @@ nav {
 }
 
 /* "End" column */
-.schedule table tr *:nth-child(2) {
+.schedule table tr > *:nth-child(2) {
   min-width: 2.75em;
   text-align: left;
   padding-left: 4px;
