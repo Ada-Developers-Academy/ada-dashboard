@@ -2,15 +2,22 @@ defmodule DashboardWeb.CohortLive.FormComponent do
   use DashboardWeb, :live_component
 
   alias Dashboard.Cohorts
+  alias Dashboard.Campuses
 
   @impl true
   def update(%{cohort: cohort} = assigns, socket) do
     changeset = Cohorts.change_cohort(cohort)
+    campuses = Enum.into(
+        Campuses.list_campuses(),
+        %{},
+        fn c -> {c.name, c.id} end
+      )
 
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:changeset, changeset)}
+     |> assign(:changeset, changeset)
+     |> assign(:campuses, campuses)}
   end
 
   @impl true

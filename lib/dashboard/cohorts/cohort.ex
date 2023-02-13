@@ -17,7 +17,7 @@ defmodule Dashboard.Cohorts.Cohort do
   @doc false
   def changeset(cohort, attrs) do
     cohort
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, [:name, :campus_id])
+    |> validate_required([:name, :campus_id])
   end
 end

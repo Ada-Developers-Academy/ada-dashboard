@@ -19,15 +19,16 @@
     <%= @cohort.name %>
   </li>
 </ul>
-
-<.live_component
-  module={ScheduleComponent}
-  id="schedule"
-  cohort={@cohort}
-  classes={@classes}
-  uri={@uri}
-  parent={@self}
-/>
+<%= if @classes do %>
+  <.live_component
+    module={ScheduleComponent}
+    id="schedule"
+    cohort={@cohort}
+    classes={@classes}
+    uri={@uri}
+    parent={@self}
+  />
+<% end %>
 
 <span>
   <%= live_patch("Edit", to: Routes.cohort_show_path(@socket, :edit, @cohort), class: "button") %>

@@ -54,7 +54,7 @@ defmodule Dashboard.Cohorts do
 
   """
   def get_with_classes_cohorts_and_campuses!(id) do
-    Repo.one!(
+    Repo.one(
       from c in Cohort,
         join: campus in assoc(c, :campus),
         left_join: classes in assoc(c, :classes),
