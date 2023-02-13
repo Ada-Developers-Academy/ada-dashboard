@@ -13,8 +13,10 @@ defmodule Dashboard.Repo.Migrations.AddCampusIdToCohort do
     flush()
 
     # Backfill that's only safe with a single campus!
-    campus = Repo.one!(Campus)
-    Repo.update_all(Cohort, set: [campus_id: campus.id])
+    campus = Repo.one(Campus)
+    if campus do
+      Repo.update_all(Cohort, set: [campus_id: campus.id])
+    end
 
     alter table(:cohorts) do
       modify :campus_id, references(:campuses), null: false
