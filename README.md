@@ -4,7 +4,8 @@ To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
   * Create and migrate your database with `mix ecto.setup`
-  * Start Phoenix endpoint with `mix phx.server`
+  * Create a `.env` with the environment variables mentioned below
+  * Start Phoenix endpoint with `source .env && mix phx.server`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
@@ -12,11 +13,20 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 * Elixir (`brew install elixir` on macOS)
 * Postgres (`brew install postgres` on macOS)
-* Google API key with "calendar" scope (this requires approval unless the app is marked as "internal").
+* An [Internal Google OAuth Client ID](https://cloud.google.com/docs/authentication/api-keys) with "./auth/calendar" scope (this requires approval unless the app is marked as "internal").
+  * You will need to go to "Enabled APIs & Services" and enable the Calendar API to be able to select the scope.
 * The following environment variables to be set/exported:
   * `GOOGLE_CLIENT_ID` (from the Google Dashboard)
   * `GOOGLE_CLIENT_SECRET` (from the Google Dashboard)
   * `REDIRECT_URI` (Should `#{PROTOCOL}://#{HOST}:#{PORT}/auth/google/callback`, eg. `"http://localhost:4000/auth/google/callback"`)
+
+Your `.env` file should look like this:
+
+```bash
+export GOOGLE_CLIENT_ID='my client id'
+export GOOGLE_CLIENT_SECRET='my client secret'
+export REDIRECT_URI="http://localhost:4000/auth/google/callback"
+```
 
 ## Deploying ##
 
@@ -54,4 +64,5 @@ All other settings can be left as their defaults.
 ### Resources ###
 
 * [Phoenix deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
+* [VS Code Elixir LS](https://github.com/elixir-lsp/vscode-elixir-ls)
+* [Google API Authentication Keys](https://cloud.google.com/docs/authentication/api-keys)
