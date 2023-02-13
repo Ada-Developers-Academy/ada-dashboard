@@ -116,7 +116,8 @@ defmodule DashboardWeb.LiveShared.ClaimsCellComponent do
         if claim_row && claim_row.type == claim_type do
           handle =
             if instructor.email do
-              List.first(String.split(instructor.email, "@"))
+              name = List.first(String.split(instructor.email, "@"))
+              String.replace(name, ".", "-dot-")
             else
               nil
             end

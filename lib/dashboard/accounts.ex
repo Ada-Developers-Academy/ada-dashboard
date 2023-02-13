@@ -213,6 +213,7 @@ defmodule Dashboard.Accounts do
     |> Enum.flat_map(fn instructor ->
       if instructor.email do
         [name | _] = String.split(instructor.email, "@")
+        name = String.replace(name, ".", "-dot-")
 
         if instructor.background_color do
           [{name, instructor.background_color}]
